@@ -1,0 +1,26 @@
+logs/*
+!.gitkeep
+node_modules/
+coverage/
+npm-debug.log
+
+# Cache, intermediate files
+.sass-cache/
+.scssc
+*.css
+*.css.map
+*.js.map
+
+# Compiled output
+dist
+dist-server
+tmp
+out-tsc
+
+# IDEs and editors
+*.iml
+.idea
+
+# System Files
+.DS_Store
+Thumbs.db
