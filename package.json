@@ -1,6 +1,21 @@
 {
-  "name": "angular-google-maps",
-  "version": "2.1.0",
+  "name": "@boldadmin/angular-google-maps",
+  "version": "1.0.0",
+  "description": "Google Maps adapter for Angular Framework",
+  "keywords": [
+    "google",
+    "maps",
+    "angular"
+  ],
+  "homepage": "https://github.com/boldadmin-com/angular-google-maps#readme",
+  "bugs": {
+    "url": "https://github.com/boldadmin-com/angular-google-maps/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boldadmin-com/angular-google-maps.git"
+  },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.13.8",
     "@angular/animations": "^7.2.13",
