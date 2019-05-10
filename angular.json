@@ -11,7 +11,7 @@
         "build": {
           "builder": "@angular-devkit/build-ng-packagr:build",
           "options": {
-            "tsConfig": "tsconfig.json",
+            "tsConfig": "tsconfig.app.json",
             "project": "ng-package.json"
           }
         },
@@ -20,14 +20,15 @@
           "options": {
             "main": "src/test.ts",
             "tsConfig": "tsconfig.spec.json",
-            "karmaConfig": "karma.conf.js"
+            "karmaConfig": "karma.conf.js",
+            "polyfills": "src/polyfills.ts"
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "tsconfig.json",
+              "tsconfig.app.json",
               "tsconfig.spec.json"
             ],
             "exclude": [
@@ -38,7 +39,7 @@
       }
     }
   },
-  "defaultProject": "glados-frontend",
+  "defaultProject": "angular-google-maps",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",
