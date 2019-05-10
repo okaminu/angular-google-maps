@@ -1,7 +1,8 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "types": ["jasmine", "node"]
+    "module": "commonjs",
+    "types": ["jasmine"]
   },
   "files": [
     "src/test.ts"
