@@ -1,22 +1,21 @@
-import { forwardRef, Inject, Injectable } from '@angular/core'
-import { EventPublisher } from '@boldadmin/event-publisher'
-import { Location } from './location'
-import { GoogleMaps, GoogleMapsApiKey } from './angular-google-maps.module'
 import Map = google.maps.Map
 import MapOptions = google.maps.MapOptions
 import Marker = google.maps.Marker
 import MarkerOptions = google.maps.MarkerOptions
+import { EventPublisher } from '@boldadmin/event-publisher'
+import { GoogleMapsWrapperService } from './google-maps-wrapper.service'
+import { Injectable } from '@angular/core'
+import { Location } from './location'
 
 @Injectable()
 export class AngularGoogleMapsService {
 
-    constructor(@Inject(forwardRef(() => GoogleMapsApiKey)) private readonly googleMapsApiKey,
-                @Inject(forwardRef(() => GoogleMaps)) private readonly googleMaps,
+    constructor(private googleMapsWrapper: GoogleMapsWrapperService,
                 private eventPublisher: EventPublisher) {
     }
 
     initGoogleMaps() {
-        return Promise.resolve(this.googleMaps({key: this.googleMapsApiKey, libraries: ['places']}))
+        return Promise.resolve(this.googleMapsWrapper.load())
     }
 
     createMap(options: MapOptions) {
