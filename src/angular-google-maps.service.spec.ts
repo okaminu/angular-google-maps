@@ -1,16 +1,15 @@
-import { fakeAsync, TestBed, tick } from '@angular/core/testing'
-
-import { EventPublisher } from '@boldadmin/event-publisher'
-import { Location } from './location'
-import { AngularGoogleMapsService } from './angular-google-maps.service'
-import { GoogleMaps, GoogleMapsApiKey } from './angular-google-maps.module'
 import createSpy = jasmine.createSpy
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
+import { AngularGoogleMapsService } from './angular-google-maps.service'
+import { EventPublisher } from '@boldadmin/event-publisher'
+import { fakeAsync, TestBed, tick } from '@angular/core/testing'
+import { GoogleMapsSingleton } from './google-maps-singleton.service'
+import { Location } from './location'
 
 describe('AngularGoogleMapsService:', () => {
 
-    let googleMaps: SpyObj<any>
+    let googleMaps: SpyObj<GoogleMapsSingleton>
     let service: AngularGoogleMapsService
     let eventPublisherSpy: SpyObj<EventPublisher>
 
@@ -18,26 +17,18 @@ describe('AngularGoogleMapsService:', () => {
         TestBed.configureTestingModule({
             providers: [
                 AngularGoogleMapsService,
-                {provide: GoogleMaps, useValue: createSpy('googleMaps')},
-                {provide: GoogleMapsApiKey, useValue: 'secret_key'},
+                {provide: GoogleMapsSingleton, useValue: createSpy('GoogleMapsSingleton')},
                 {provide: EventPublisher, useValue: createSpyObj('EventPublisher', ['notify'])}
             ]
         })
         eventPublisherSpy = TestBed.get(EventPublisher)
-        googleMaps = TestBed.get(GoogleMaps)
+        googleMaps = TestBed.get(GoogleMapsSingleton)
         service = TestBed.get(AngularGoogleMapsService)
     })
 
     afterEach(() =>
         document.getElementById = createSpy('document').and.callThrough()
     )
-
-    it('Inits Google maps', fakeAsync(() => {
-        service.initGoogleMaps()
-            .then(() => {
-                expect(googleMaps).toHaveBeenCalledWith({key: 'secret_key', libraries: ['places']})
-            })
-    }))
 
     it('Creates Google maps', fakeAsync(() => {
         const mapOptions = {draggable: true}
@@ -53,7 +44,7 @@ describe('AngularGoogleMapsService:', () => {
             if (element === elementSpy && options === mapOptions)
                 return mapSpy
         })
-        googleMaps.and.returnValue(Promise.resolve(googleMapsSpy))
+        googleMaps.singleton = googleMapsSpy
 
         service.createMap(mapOptions)
             .then(mapPromise => {
@@ -79,7 +70,7 @@ describe('AngularGoogleMapsService:', () => {
             markerSpy = createSpyObj('google.maps.Marker', ['addListener', 'setPosition', 'setMap'])
             googleMapsSpy = createSpyObj('google.maps', ['Marker', 'LatLng', 'Geocoder', 'addListener'])
             googleMapsSpy.Marker.and.returnValue(markerSpy)
-            googleMaps.and.returnValue(Promise.resolve(googleMapsSpy))
+            googleMaps.singleton = googleMapsSpy
         })
 
         it('Adds marker to map', fakeAsync(() => {
@@ -181,7 +172,7 @@ describe('AngularGoogleMapsService:', () => {
                     }
                 }
             }] as any[])
-            googleMaps.and.returnValue(Promise.resolve({
+            googleMaps.singleton = {
                 ControlPosition: {
                     TOP_LEFT: 'somePosition'
                 },
@@ -192,7 +183,7 @@ describe('AngularGoogleMapsService:', () => {
                         else throw Error()
                     }
                 }
-            }))
+            }
         })
 
         it('Adds search box to map', fakeAsync(() => {
@@ -232,7 +223,7 @@ describe('AngularGoogleMapsService:', () => {
             geocoderSpy = createSpyObj('google.maps.Geocoder', ['geocode'])
             googleMapsSpy = createSpyObj('google.maps', ['Geocoder', 'LatLng'])
             googleMapsSpy.Geocoder.and.returnValue(geocoderSpy)
-            googleMaps.and.returnValue(Promise.resolve(googleMapsSpy))
+            googleMaps.singleton = googleMapsSpy
         })
 
         it('Converts location to address', fakeAsync(() => {
@@ -281,7 +272,7 @@ describe('AngularGoogleMapsService:', () => {
             geocoderSpy = createSpyObj('google.maps.Geocoder', ['geocode'])
             googleMapsSpy = createSpyObj('google.maps', ['Geocoder'])
             googleMapsSpy.Geocoder.and.returnValue(geocoderSpy)
-            googleMaps.and.returnValue(Promise.resolve(googleMapsSpy))
+            googleMaps.singleton = googleMapsSpy
         })
 
 
@@ -334,11 +325,11 @@ describe('AngularGoogleMapsService:', () => {
             mapSpy.controls = {
                 'somePosition': controlSpy
             }
-            googleMaps.and.returnValue(Promise.resolve({
+            googleMaps.singleton = {
                 ControlPosition: {
                     TOP_RIGHT: 'somePosition'
                 }
-            }))
+            }
         })
 
         it('Adds resize control to map', fakeAsync(() => {

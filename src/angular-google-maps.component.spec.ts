@@ -1,14 +1,13 @@
+import createSpyObj = jasmine.createSpyObj
+import SpyObj = jasmine.SpyObj
+import { AngularGoogleMapsComponent } from './angular-google-maps.component'
+import { AngularGoogleMapsService } from './angular-google-maps.service'
 import { DomSanitizer } from '@angular/platform-browser'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { fakeAsync, TestBed, tick } from '@angular/core/testing'
-
-import { AngularGoogleMapsService } from './angular-google-maps.service'
-import { AngularGoogleMapsComponent } from './angular-google-maps.component'
-import { MatIconRegistry } from '@angular/material'
-
+import { GoogleMapsSingleton } from './google-maps-singleton.service'
 import { Location } from './location'
-import createSpyObj = jasmine.createSpyObj
-import SpyObj = jasmine.SpyObj
+import { MatIconRegistry } from '@angular/material'
 
 describe('AngularGoogleMaps Component: ', () => {
 
@@ -17,6 +16,7 @@ describe('AngularGoogleMaps Component: ', () => {
     let eventPublisherSpy: SpyObj<EventPublisher>
     let matIconRegistrySpy: SpyObj<MatIconRegistry>
     let domSanitizerSpy: SpyObj<DomSanitizer>
+    let googleMapsSingletonStub: SpyObj<GoogleMapsSingleton>
     let googleMapsServiceSpy: SpyObj<AngularGoogleMapsService>
 
     const subscribers = new Map<string, Function>()
@@ -35,6 +35,7 @@ describe('AngularGoogleMaps Component: ', () => {
                         ['createMap', 'addMarker', 'addSearchBox', 'reverseGeocode', 'bindMarkerToMapClick',
                             'addResizeControl', 'initGoogleMaps'])
                 },
+                {provide: GoogleMapsSingleton, useValue: createSpyObj('GoogleMapsSingleton', [])},
                 {
                     provide: EventPublisher,
                     useValue: createSpyObj('EvenPublisher', ['subscribe', 'notify', 'unsubscribe'])
@@ -47,8 +48,9 @@ describe('AngularGoogleMaps Component: ', () => {
         eventPublisherSpy.subscribe.and.callFake((e, fun) => subscribers.set(e, fun))
         matIconRegistrySpy = TestBed.get(MatIconRegistry)
         domSanitizerSpy = TestBed.get(DomSanitizer)
+        googleMapsSingletonStub = TestBed.get(GoogleMapsSingleton)
+        googleMapsSingletonStub.singleton = googleMapsStub
         googleMapsServiceSpy = TestBed.get(AngularGoogleMapsService)
-        googleMapsServiceSpy.initGoogleMaps.and.returnValue(Promise.resolve(googleMapsStub))
 
         component = TestBed.get(AngularGoogleMapsComponent)
     })
@@ -90,7 +92,6 @@ describe('AngularGoogleMaps Component: ', () => {
             component.setUpMap(location, [])
             tick()
 
-            expect(googleMapsServiceSpy.initGoogleMaps).toHaveBeenCalled()
             expect(googleMapsServiceSpy.createMap).toHaveBeenCalled()
             expect(googleMapsServiceSpy.addMarker).toHaveBeenCalled()
             expect(googleMapsServiceSpy.bindMarkerToMapClick).toHaveBeenCalled()
