@@ -1,12 +1,13 @@
 import Map = google.maps.Map
 import MapOptions = google.maps.MapOptions
 import MarkerOptions = google.maps.MarkerOptions
+import { AngularGoogleMapsService } from './angular-google-maps.service'
 import { Component, OnDestroy, OnInit, Output } from '@angular/core'
 import { DomSanitizer } from '@angular/platform-browser'
 import { EventPublisher } from '@boldadmin/event-publisher'
+import { GoogleMapsSingleton } from './google-maps-singleton.service'
 import { Location } from './location'
 import { MatIconRegistry } from '@angular/material'
-import { AngularGoogleMapsService } from './angular-google-maps.service'
 
 @Component({
     selector: 'google-maps',
@@ -25,10 +26,30 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
     address = ''
     isMapExpanded = false
 
-    @Output() mapOptions: MapOptions
-    @Output() markerOptions: MarkerOptions
+    @Output() mapOptions: MapOptions = {
+        center: {
+            lat: 0,
+            lng: 0
+        },
+        mapTypeControlOptions: {
+            mapTypeIds: ['roadmap', 'satellite'],
+            position: this.googleMaps.singleton.ControlPosition.LEFT_BOTTOM
+        },
+        zoom: 10,
+        controlSize: 22,
+        fullscreenControl: false
+    }
+    @Output() markerOptions: MarkerOptions = {
+        position: {
+            lat: 0,
+            lng: 0
+        },
+        draggable: true,
+        animation: this.googleMaps.singleton.Animation.DROP
+    }
 
-    constructor(private googleMapsService: AngularGoogleMapsService,
+    constructor(private googleMaps: GoogleMapsSingleton,
+                private googleMapsService: AngularGoogleMapsService,
                 private eventPublisher: EventPublisher,
                 private iconRegistry: MatIconRegistry,
                 private sanitizer: DomSanitizer) {
@@ -39,12 +60,6 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         this.iconRegistry.addSvgIcon('expand', this.sanitizer.bypassSecurityTrustResourceUrl('./assets/expand.svg'))
         this.iconRegistry.addSvgIcon('collapse', this.sanitizer.bypassSecurityTrustResourceUrl('./assets/collapse.svg'))
 
-        this.googleMapsService
-            .initGoogleMaps()
-            .then(googleMaps => {
-                this.mapOptions = AngularGoogleMapsComponent.getDefaultMapOptions(googleMaps)
-                this.markerOptions = AngularGoogleMapsComponent.getDefaultMarkerOptions(googleMaps)
-            })
     }
 
     ngOnDestroy() {
@@ -57,9 +72,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
 
         if (areMarkerLocationsProvided)
             this.googleMapsService.reverseGeocode(focusLocation)
-        this.googleMapsService
-            .initGoogleMaps()
-            .then(() => this.createMap(focusLocation))
+        this.createMap(focusLocation)
             .then(mapPromise => {
                 map = mapPromise
                 this.bindMarkerToMapsIfLocationIsProvided(map, areMarkerLocationsProvided)
@@ -91,30 +104,4 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
             this.markerOptions.map = map
     }
 
-    private static getDefaultMapOptions(googleMaps): MapOptions {
-        return {
-            center: {
-                lat: 0,
-                lng: 0
-            },
-            mapTypeControlOptions: {
-                mapTypeIds: ['roadmap', 'satellite'],
-                position: googleMaps.ControlPosition.LEFT_BOTTOM
-            },
-            zoom: 10,
-            controlSize: 22,
-            fullscreenControl: false
-        }
-    }
-
-    private static getDefaultMarkerOptions(googleMaps): MarkerOptions {
-        return {
-            position: {
-                lat: 0,
-                lng: 0
-            },
-            draggable: true,
-            animation: googleMaps.Animation.DROP
-        }
-    }
 }

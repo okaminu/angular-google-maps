@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core'
 import { MatIconModule } from '@angular/material'
 import { AngularGoogleMapsComponent } from './angular-google-maps.component'
 import { AngularGoogleMapsService } from './angular-google-maps.service'
-import { GoogleMapsWrapperService } from './google-maps-wrapper.service'
+import { GoogleMapsSingleton } from './google-maps-singleton.service'
 
 @NgModule({
     declarations: [
@@ -18,7 +18,7 @@ import { GoogleMapsWrapperService } from './google-maps-wrapper.service'
     ],
     providers: [
         AngularGoogleMapsService,
-        GoogleMapsWrapperService
+        GoogleMapsSingleton
     ]
 })
 export class AngularGoogleMapsModule {
