@@ -21,29 +21,14 @@ export class AngularGoogleMapsService {
     addMarker(options: MarkerOptions) {
         const marker: Marker = new this.googleMaps.singleton.Marker(options)
 
-        marker.addListener('dragend', mouseEvent => {
-            this.notifyLocationChange(mouseEvent.latLng.lat(), mouseEvent.latLng.lng())
-            this.reverseGeocode(new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng()))
-        })
-
-        marker.addListener('dblclick', () => {
-            marker.setMap(null)
-            this.eventPublisher.notify('locationDeleted')
-
-            const searchBoxInput = <HTMLInputElement>document.getElementById('search-input')
-            searchBoxInput.value = ''
-        })
+        marker.addListener('dragend', this.getLocationChangedMarkerHandler())
+        marker.addListener('dblclick', this.getLocationDeletedMarkerHandler(marker))
 
         return Promise.resolve(marker)
     }
 
     bindMarkerToMapClick(marker: Marker, map: Map) {
-        map.addListener('click', mouseEvent => {
-            marker.setPosition(mouseEvent.latLng)
-            marker.setMap(map)
-            this.notifyLocationChange(mouseEvent.latLng.lat(), mouseEvent.latLng.lng())
-            this.reverseGeocode(new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng()))
-        })
+        map.addListener('click', this.getLocationChangedMapHandler(marker, map))
     }
 
     addSearchBox(map: Map, markerToBind: Marker) {
@@ -52,16 +37,7 @@ export class AngularGoogleMapsService {
 
         map.controls[this.googleMaps.singleton.ControlPosition.TOP_LEFT].push(searchBoxInput)
 
-        searchBox.addListener('places_changed', () => {
-            const placesFirstResult = searchBox.getPlaces()[0]
-            map.panTo(placesFirstResult.geometry.location)
-            map.setZoom(15)
-            markerToBind.setMap(map)
-            markerToBind.setPosition(placesFirstResult.geometry.location)
-            this.notifyLocationChange(
-                placesFirstResult.geometry.location.lat(), placesFirstResult.geometry.location.lng()
-            )
-        })
+        searchBox.addListener('places_changed', this.getLocationChangedSearchBoxHandler(searchBox, map, markerToBind))
 
         return Promise.resolve(searchBox)
     }
@@ -93,8 +69,40 @@ export class AngularGoogleMapsService {
         return Promise.resolve(resizeControl)
     }
 
-    private notifyLocationChange(lat: number, lng: number) {
-        this.eventPublisher.notify('locationChanged', new Location(lat, lng))
+    private getLocationDeletedMarkerHandler(marker: google.maps.Marker) {
+        return () => {
+            marker.setMap(null)
+            this.eventPublisher.notify('locationDeleted')
+
+            const searchBoxInput = <HTMLInputElement>document.getElementById('search-input')
+            searchBoxInput.value = ''
+        }
     }
 
+    private getLocationChangedMarkerHandler() {
+        return mouseEvent => {
+            this.eventPublisher.notify('locationChanged', new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng()))
+            this.reverseGeocode(new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng()))
+        }
+    }
+
+    private getLocationChangedMapHandler(marker: google.maps.Marker, map: google.maps.Map) {
+        return mouseEvent => {
+            marker.setPosition(mouseEvent.latLng)
+            marker.setMap(map)
+            this.eventPublisher.notify('locationChanged', new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng()))
+            this.reverseGeocode(new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng()))
+        }
+    }
+
+    private getLocationChangedSearchBoxHandler(searchBox, map: google.maps.Map, markerToBind: google.maps.Marker) {
+        return () => {
+            const placesFirstResult = searchBox.getPlaces()[0]
+            map.panTo(placesFirstResult.geometry.location)
+            map.setZoom(15)
+            markerToBind.setMap(map)
+            markerToBind.setPosition(placesFirstResult.geometry.location)
+            this.eventPublisher.notify('locationChanged', new Location(placesFirstResult.geometry.location.lat(), placesFirstResult.geometry.location.lng()))
+        }
+    }
 }
