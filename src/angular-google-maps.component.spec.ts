@@ -35,7 +35,7 @@ describe('AngularGoogleMaps Component: ', () => {
                         ['createMap', 'addMarker', 'addSearchBox', 'reverseGeocode', 'bindMarkerToMapClick',
                             'addResizeControl', 'initGoogleMaps'])
                 },
-                {provide: GoogleMapsSingleton, useValue: createSpyObj('GoogleMapsSingleton', [])},
+                {provide: GoogleMapsSingleton, useValue: createSpyObj('GoogleMapsSingleton', [''])},
                 {
                     provide: EventPublisher,
                     useValue: createSpyObj('EvenPublisher', ['subscribe', 'notify', 'unsubscribe'])

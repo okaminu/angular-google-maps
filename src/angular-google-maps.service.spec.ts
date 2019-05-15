@@ -47,10 +47,9 @@ describe('AngularGoogleMapsService:', () => {
         googleMaps.singleton = googleMapsSpy
 
         service.createMap(mapOptions)
-            .then(mapPromise => {
+            .then(mapPromise =>
                 expect(mapPromise).toBe(mapSpy)
-                expect(googleMaps).toHaveBeenCalledWith({key: 'secret_key', libraries: ['places']})
-            })
+            )
     }))
 
     describe('Marker: ', () => {
@@ -177,7 +176,7 @@ describe('AngularGoogleMapsService:', () => {
                     TOP_LEFT: 'somePosition'
                 },
                 places: {
-                    SearchBox: element => {
+                    SearchBox: function (element) {
                         if (element === elementSpy)
                             return searchBoxSpy
                         else throw Error()
