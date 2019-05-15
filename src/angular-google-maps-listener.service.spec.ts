@@ -5,6 +5,8 @@ import { AngularGoogleMapsService } from './angular-google-maps.service'
 import { Location } from './location'
 import Map = google.maps.Map
 import Marker = google.maps.Marker
+import SearchBox = google.maps.places.SearchBox
+import any = jasmine.any
 import createSpy = jasmine.createSpy
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
@@ -16,11 +18,12 @@ describe('AngularGoogleMapsListenerService', () => {
     let eventPublisherSpy: SpyObj<EventPublisher>
 
     const position = {lat: 10, lng: 10}
+    const location = {
+        lat: () => position.lat,
+        lng: () => position.lng
+    }
     const mouseEvent = {
-        latLng: {
-            lat: () => position.lat,
-            lng: () => position.lng
-        }
+        latLng: location
     }
 
     beforeEach(() => {
@@ -74,6 +77,26 @@ describe('AngularGoogleMapsListenerService', () => {
         expect(eventPublisherSpy.notify.calls.first().args[0]).toEqual('locationChanged')
         expect(eventPublisherSpy.notify.calls.first().args[1]).toEqual(new Location(position.lat, position.lng))
         expect(googleMapsService.reverseGeocode).toHaveBeenCalledWith(new Location(position.lat, position.lng))
+    })
+
+    it('should handle location change for search box', () => {
+        const markerSpy: SpyObj<Marker> = createSpyObj('google.maps.Marker', ['setMap', 'setPosition'])
+        const mapSpy: SpyObj<Map> = createSpyObj('google.maps.Map', ['panTo', 'setZoom'])
+        const searchBoxSpy: SpyObj<SearchBox> = createSpyObj('google.maps.places.SearchBox', ['getPlaces'])
+        searchBoxSpy.getPlaces.and.returnValue([{
+            geometry: {
+                location: location
+            }
+        }] as any[])
+
+        service.getLocationChangedSearchBoxHandler(searchBoxSpy, mapSpy, markerSpy)()
+
+        expect(mapSpy.panTo).toHaveBeenCalledWith(location)
+        expect(mapSpy.setZoom).toHaveBeenCalledWith(any(Number))
+        expect(markerSpy.setMap).toHaveBeenCalledWith(mapSpy)
+        expect(markerSpy.setPosition).toHaveBeenCalledWith(location)
+        expect(eventPublisherSpy.notify.calls.first().args[0]).toEqual('locationChanged')
+        expect(eventPublisherSpy.notify.calls.first().args[1]).toEqual(new Location(position.lat, position.lng))
     })
 
 })

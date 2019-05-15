@@ -4,6 +4,7 @@ import { AngularGoogleMapsService } from './angular-google-maps.service'
 import { Location } from './location'
 import Map = google.maps.Map
 import Marker = google.maps.Marker
+import SearchBox = google.maps.places.SearchBox
 
 @Injectable()
 export class AngularGoogleMapsListenerService {
@@ -43,4 +44,14 @@ export class AngularGoogleMapsListenerService {
         }
     }
 
+    getLocationChangedSearchBoxHandler(searchBox: SearchBox, map: Map, markerToBind: Marker) {
+        return () => {
+            const placeLocation = searchBox.getPlaces()[0].geometry.location
+            map.panTo(placeLocation)
+            map.setZoom(15)
+            markerToBind.setMap(map)
+            markerToBind.setPosition(placeLocation)
+            this.eventPublisher.notify('locationChanged', new Location(placeLocation.lat(), placeLocation.lng()))
+        }
+    }
 }
