@@ -1,13 +1,13 @@
+import { Component, OnDestroy, OnInit, Output } from '@angular/core'
+import { MatIconRegistry } from '@angular/material'
+import { DomSanitizer } from '@angular/platform-browser'
+import { EventPublisher } from '@boldadmin/event-publisher'
+import { AngularGoogleMapsService } from './angular-google-maps.service'
+import { GoogleMapsSingleton } from './google-maps-singleton.service'
+import { Location } from './location'
 import Map = google.maps.Map
 import MapOptions = google.maps.MapOptions
 import MarkerOptions = google.maps.MarkerOptions
-import { AngularGoogleMapsService } from './angular-google-maps.service'
-import { Component, OnDestroy, OnInit, Output } from '@angular/core'
-import { DomSanitizer } from '@angular/platform-browser'
-import { EventPublisher } from '@boldadmin/event-publisher'
-import { GoogleMapsSingleton } from './google-maps-singleton.service'
-import { Location } from './location'
-import { MatIconRegistry } from '@angular/material'
 
 @Component({
     selector: 'google-maps',

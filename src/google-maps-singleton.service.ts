@@ -1,5 +1,5 @@
-import GoogleMapsApi from 'load-google-maps-api'
 import { Injectable } from '@angular/core'
+import GoogleMapsApi from 'load-google-maps-api'
 
 @Injectable()
 export class GoogleMapsSingleton {

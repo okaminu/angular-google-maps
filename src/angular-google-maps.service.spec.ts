@@ -1,11 +1,11 @@
+import { fakeAsync, TestBed, tick } from '@angular/core/testing'
+import { EventPublisher } from '@boldadmin/event-publisher'
+import { AngularGoogleMapsService } from './angular-google-maps.service'
+import { GoogleMapsSingleton } from './google-maps-singleton.service'
+import { Location } from './location'
 import createSpy = jasmine.createSpy
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
-import { AngularGoogleMapsService } from './angular-google-maps.service'
-import { EventPublisher } from '@boldadmin/event-publisher'
-import { fakeAsync, TestBed, tick } from '@angular/core/testing'
-import { GoogleMapsSingleton } from './google-maps-singleton.service'
-import { Location } from './location'
 
 describe('AngularGoogleMapsService:', () => {
 
