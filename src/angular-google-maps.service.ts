@@ -6,6 +6,7 @@ import Map = google.maps.Map
 import MapOptions = google.maps.MapOptions
 import Marker = google.maps.Marker
 import MarkerOptions = google.maps.MarkerOptions
+import SearchBox = google.maps.places.SearchBox
 
 @Injectable()
 export class AngularGoogleMapsService {
@@ -69,7 +70,7 @@ export class AngularGoogleMapsService {
         return Promise.resolve(resizeControl)
     }
 
-    private getLocationDeletedMarkerHandler(marker: google.maps.Marker) {
+    private getLocationDeletedMarkerHandler(marker: Marker) {
         return () => {
             marker.setMap(null)
             this.eventPublisher.notify('locationDeleted')
@@ -86,7 +87,7 @@ export class AngularGoogleMapsService {
         }
     }
 
-    private getLocationChangedMapHandler(marker: google.maps.Marker, map: google.maps.Map) {
+    private getLocationChangedMapHandler(marker: Marker, map: Map) {
         return mouseEvent => {
             marker.setPosition(mouseEvent.latLng)
             marker.setMap(map)
@@ -95,14 +96,14 @@ export class AngularGoogleMapsService {
         }
     }
 
-    private getLocationChangedSearchBoxHandler(searchBox, map: google.maps.Map, markerToBind: google.maps.Marker) {
+    private getLocationChangedSearchBoxHandler(searchBox: SearchBox, map: Map, markerToBind: Marker) {
         return () => {
-            const placesFirstResult = searchBox.getPlaces()[0]
-            map.panTo(placesFirstResult.geometry.location)
+            const placeLocation = searchBox.getPlaces()[0].geometry.location
+            map.panTo(placeLocation)
             map.setZoom(15)
             markerToBind.setMap(map)
-            markerToBind.setPosition(placesFirstResult.geometry.location)
-            this.eventPublisher.notify('locationChanged', new Location(placesFirstResult.geometry.location.lat(), placesFirstResult.geometry.location.lng()))
+            markerToBind.setPosition(placeLocation)
+            this.eventPublisher.notify('locationChanged', new Location(placeLocation.lat(), placeLocation.lng()))
         }
     }
 }
