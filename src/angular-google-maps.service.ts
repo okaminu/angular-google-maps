@@ -29,7 +29,7 @@ export class AngularGoogleMapsService {
     }
 
     bindMarkerToMapClick(marker: Marker, map: Map) {
-        map.addListener('click', this.getLocationChangedMapHandler(marker, map))
+        map.addListener('click', this.getLocationChangedMapHandler(map, marker))
     }
 
     addSearchBox(map: Map, markerToBind: Marker) {
@@ -89,10 +89,10 @@ export class AngularGoogleMapsService {
         }
     }
 
-    private getLocationChangedMapHandler(marker: Marker, map: Map) {
+    private getLocationChangedMapHandler(map: Map, marker: Marker) {
         return mouseEvent => {
-            marker.setPosition(mouseEvent.latLng)
             marker.setMap(map)
+            marker.setPosition(mouseEvent.latLng)
             this.eventPublisher.notify('locationChanged',
                 new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng())
             )
@@ -100,13 +100,13 @@ export class AngularGoogleMapsService {
         }
     }
 
-    private getLocationChangedSearchBoxHandler(searchBox: SearchBox, map: Map, markerToBind: Marker) {
+    private getLocationChangedSearchBoxHandler(searchBox: SearchBox, map: Map, marker: Marker) {
         return () => {
             const placeLocation = searchBox.getPlaces()[0].geometry.location
             map.panTo(placeLocation)
             map.setZoom(15)
-            markerToBind.setMap(map)
-            markerToBind.setPosition(placeLocation)
+            marker.setMap(map)
+            marker.setPosition(placeLocation)
             this.eventPublisher.notify('locationChanged', new Location(placeLocation.lat(), placeLocation.lng()))
         }
     }
