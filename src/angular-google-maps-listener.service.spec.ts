@@ -57,19 +57,19 @@ describe('AngularGoogleMapsListenerService', () => {
         expect(elementStub.value).toEqual('')
     })
 
-    it('should handle location change for marker', () => {
-        service.getLocationChangedMarkerHandler()(mouseEvent)
+    it('should handle location change', () => {
+        service.getLocationChangedHandler()(mouseEvent)
 
         expect(eventPublisherSpy.notify.calls.first().args[0]).toEqual('locationChanged')
         expect(eventPublisherSpy.notify.calls.first().args[1]).toEqual(new Location(location.lat(), location.lng()))
         expect(googleMapsService.reverseGeocode).toHaveBeenCalledWith(new Location(location.lat(), location.lng()))
     })
 
-    it('should handle location change for map', () => {
+    it('should bind marker to map', () => {
         const markerSpy: SpyObj<Marker> = createSpyObj('google.maps.Marker', ['setMap', 'setPosition'])
         const mapDummy: SpyObj<Map> = createSpyObj('google.maps.Map', [''])
 
-        service.getLocationChangedMapHandler(markerSpy, mapDummy)(mouseEvent)
+        service.getBindMarkerToMapHandler(markerSpy, mapDummy)(mouseEvent)
 
         expect(markerSpy.setMap).toHaveBeenCalledWith(mapDummy)
         expect(markerSpy.setPosition).toHaveBeenCalledWith(mouseEvent.latLng)
@@ -78,7 +78,7 @@ describe('AngularGoogleMapsListenerService', () => {
         expect(googleMapsService.reverseGeocode).toHaveBeenCalledWith(new Location(location.lat(), location.lng()))
     })
 
-    it('should handle location change for search box', () => {
+    it('should handle location change for search box, map and marker', () => {
         const markerSpy: SpyObj<Marker> = createSpyObj('google.maps.Marker', ['setMap', 'setPosition'])
         const mapSpy: SpyObj<Map> = createSpyObj('google.maps.Map', ['panTo', 'setZoom'])
         const searchBoxStub: SpyObj<SearchBox> = createSpyObj('google.maps.places.SearchBox', ['getPlaces'])
@@ -88,7 +88,7 @@ describe('AngularGoogleMapsListenerService', () => {
             }
         }] as any[])
 
-        service.getLocationChangedSearchBoxHandler(searchBoxStub, mapSpy, markerSpy)()
+        service.getLocationChangedSearchBoxMapMarkerHandler(searchBoxStub, mapSpy, markerSpy)()
 
         expect(mapSpy.panTo).toHaveBeenCalledWith(location)
         expect(mapSpy.setZoom).toHaveBeenCalledWith(any(Number))

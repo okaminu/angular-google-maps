@@ -24,7 +24,7 @@ export class AngularGoogleMapsListenerService {
         }
     }
 
-    getLocationChangedMarkerHandler() {
+    getLocationChangedHandler() {
         return mouseEvent => {
             this.eventPublisher.notify('locationChanged',
                 new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng())
@@ -33,7 +33,7 @@ export class AngularGoogleMapsListenerService {
         }
     }
 
-    getLocationChangedMapHandler(marker: Marker, map: Map) {
+    getBindMarkerToMapHandler(marker: Marker, map: Map) {
         return mouseEvent => {
             marker.setMap(map)
             marker.setPosition(mouseEvent.latLng)
@@ -44,7 +44,7 @@ export class AngularGoogleMapsListenerService {
         }
     }
 
-    getLocationChangedSearchBoxHandler(searchBox: SearchBox, map: Map, markerToBind: Marker) {
+    getLocationChangedSearchBoxMapMarkerHandler(searchBox: SearchBox, map: Map, markerToBind: Marker) {
         return () => {
             const placeLocation = searchBox.getPlaces()[0].geometry.location
             map.panTo(placeLocation)

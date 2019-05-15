@@ -22,14 +22,14 @@ export class AngularGoogleMapsService {
     addMarker(options: MarkerOptions) {
         const marker: Marker = new this.googleMaps.singleton.Marker(options)
 
-        marker.addListener('dragend', this.getLocationChangedMarkerHandler())
+        marker.addListener('dragend', this.getLocationChangedHandler())
         marker.addListener('dblclick', this.getLocationDeletedMarkerHandler(marker))
 
         return Promise.resolve(marker)
     }
 
     bindMarkerToMapClick(marker: Marker, map: Map) {
-        map.addListener('click', this.getLocationChangedMapHandler(map, marker))
+        map.addListener('click', this.getBindMarkerToMapHandler(marker, map))
     }
 
     addSearchBox(map: Map, markerToBind: Marker) {
@@ -38,7 +38,8 @@ export class AngularGoogleMapsService {
 
         map.controls[this.googleMaps.singleton.ControlPosition.TOP_LEFT].push(searchBoxInput)
 
-        searchBox.addListener('places_changed', this.getLocationChangedSearchBoxHandler(searchBox, map, markerToBind))
+        searchBox.addListener('places_changed',
+            this.getLocationChangedSearchBoxMapMarkerHandler(searchBox, map, markerToBind))
 
         return Promise.resolve(searchBox)
     }
@@ -80,7 +81,7 @@ export class AngularGoogleMapsService {
         }
     }
 
-    private getLocationChangedMarkerHandler() {
+    private getLocationChangedHandler() {
         return mouseEvent => {
             this.eventPublisher.notify('locationChanged',
                 new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng())
@@ -89,7 +90,7 @@ export class AngularGoogleMapsService {
         }
     }
 
-    private getLocationChangedMapHandler(map: Map, marker: Marker) {
+    private getBindMarkerToMapHandler(marker: Marker, map: Map) {
         return mouseEvent => {
             marker.setMap(map)
             marker.setPosition(mouseEvent.latLng)
@@ -100,7 +101,7 @@ export class AngularGoogleMapsService {
         }
     }
 
-    private getLocationChangedSearchBoxHandler(searchBox: SearchBox, map: Map, marker: Marker) {
+    private getLocationChangedSearchBoxMapMarkerHandler(searchBox: SearchBox, map: Map, marker: Marker) {
         return () => {
             const placeLocation = searchBox.getPlaces()[0].geometry.location
             map.panTo(placeLocation)
