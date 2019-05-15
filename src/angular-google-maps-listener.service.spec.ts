@@ -17,10 +17,9 @@ describe('AngularGoogleMapsListenerService', () => {
     let googleMapsService: AngularGoogleMapsService
     let eventPublisherSpy: SpyObj<EventPublisher>
 
-    const position = {lat: 10, lng: 10}
     const location = {
-        lat: () => position.lat,
-        lng: () => position.lng
+        lat: () => 10,
+        lng: () => 15
     }
     const mouseEvent = {
         latLng: location
@@ -62,8 +61,8 @@ describe('AngularGoogleMapsListenerService', () => {
         service.getLocationChangedMarkerHandler()(mouseEvent)
 
         expect(eventPublisherSpy.notify.calls.first().args[0]).toEqual('locationChanged')
-        expect(eventPublisherSpy.notify.calls.first().args[1]).toEqual(new Location(position.lat, position.lng))
-        expect(googleMapsService.reverseGeocode).toHaveBeenCalledWith(new Location(position.lat, position.lng))
+        expect(eventPublisherSpy.notify.calls.first().args[1]).toEqual(new Location(location.lat(), location.lng()))
+        expect(googleMapsService.reverseGeocode).toHaveBeenCalledWith(new Location(location.lat(), location.lng()))
     })
 
     it('should handle location change for map', () => {
@@ -75,28 +74,28 @@ describe('AngularGoogleMapsListenerService', () => {
         expect(markerSpy.setMap).toHaveBeenCalledWith(mapDummy)
         expect(markerSpy.setPosition).toHaveBeenCalledWith(mouseEvent.latLng)
         expect(eventPublisherSpy.notify.calls.first().args[0]).toEqual('locationChanged')
-        expect(eventPublisherSpy.notify.calls.first().args[1]).toEqual(new Location(position.lat, position.lng))
-        expect(googleMapsService.reverseGeocode).toHaveBeenCalledWith(new Location(position.lat, position.lng))
+        expect(eventPublisherSpy.notify.calls.first().args[1]).toEqual(new Location(location.lat(), location.lng()))
+        expect(googleMapsService.reverseGeocode).toHaveBeenCalledWith(new Location(location.lat(), location.lng()))
     })
 
     it('should handle location change for search box', () => {
         const markerSpy: SpyObj<Marker> = createSpyObj('google.maps.Marker', ['setMap', 'setPosition'])
         const mapSpy: SpyObj<Map> = createSpyObj('google.maps.Map', ['panTo', 'setZoom'])
-        const searchBoxSpy: SpyObj<SearchBox> = createSpyObj('google.maps.places.SearchBox', ['getPlaces'])
-        searchBoxSpy.getPlaces.and.returnValue([{
+        const searchBoxStub: SpyObj<SearchBox> = createSpyObj('google.maps.places.SearchBox', ['getPlaces'])
+        searchBoxStub.getPlaces.and.returnValue([{
             geometry: {
                 location: location
             }
         }] as any[])
 
-        service.getLocationChangedSearchBoxHandler(searchBoxSpy, mapSpy, markerSpy)()
+        service.getLocationChangedSearchBoxHandler(searchBoxStub, mapSpy, markerSpy)()
 
         expect(mapSpy.panTo).toHaveBeenCalledWith(location)
         expect(mapSpy.setZoom).toHaveBeenCalledWith(any(Number))
         expect(markerSpy.setMap).toHaveBeenCalledWith(mapSpy)
         expect(markerSpy.setPosition).toHaveBeenCalledWith(location)
         expect(eventPublisherSpy.notify.calls.first().args[0]).toEqual('locationChanged')
-        expect(eventPublisherSpy.notify.calls.first().args[1]).toEqual(new Location(position.lat, position.lng))
+        expect(eventPublisherSpy.notify.calls.first().args[1]).toEqual(new Location(location.lat(), location.lng()))
     })
 
 })
