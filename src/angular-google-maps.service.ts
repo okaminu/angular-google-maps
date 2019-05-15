@@ -82,7 +82,9 @@ export class AngularGoogleMapsService {
 
     private getLocationChangedMarkerHandler() {
         return mouseEvent => {
-            this.eventPublisher.notify('locationChanged', new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng()))
+            this.eventPublisher.notify('locationChanged',
+                new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng())
+            )
             this.reverseGeocode(new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng()))
         }
     }
@@ -91,7 +93,9 @@ export class AngularGoogleMapsService {
         return mouseEvent => {
             marker.setPosition(mouseEvent.latLng)
             marker.setMap(map)
-            this.eventPublisher.notify('locationChanged', new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng()))
+            this.eventPublisher.notify('locationChanged',
+                new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng())
+            )
             this.reverseGeocode(new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng()))
         }
     }
