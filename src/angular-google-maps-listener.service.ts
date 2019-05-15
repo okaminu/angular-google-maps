@@ -14,16 +14,6 @@ export class AngularGoogleMapsListenerService {
         private eventPublisher: EventPublisher) {
     }
 
-    getLocationDeletedMarkerHandler(marker: Marker) {
-        return () => {
-            marker.setMap(null)
-            this.eventPublisher.notify('locationDeleted')
-
-            const searchBoxInput = <HTMLInputElement>document.getElementById('search-input')
-            searchBoxInput.value = ''
-        }
-    }
-
     getLocationChangedHandler() {
         return mouseEvent => {
             this.eventPublisher.notify('locationChanged',
@@ -52,6 +42,16 @@ export class AngularGoogleMapsListenerService {
             markerToBind.setMap(map)
             markerToBind.setPosition(placeLocation)
             this.eventPublisher.notify('locationChanged', new Location(placeLocation.lat(), placeLocation.lng()))
+        }
+    }
+
+    getLocationDeletedMarkerHandler(marker: Marker) {
+        return () => {
+            marker.setMap(null)
+            this.eventPublisher.notify('locationDeleted')
+
+            const searchBoxInput = <HTMLInputElement>document.getElementById('search-input')
+            searchBoxInput.value = ''
         }
     }
 }

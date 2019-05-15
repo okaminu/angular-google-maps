@@ -41,22 +41,6 @@ describe('AngularGoogleMapsListenerService', () => {
         service = TestBed.get(AngularGoogleMapsListenerService)
     })
 
-    it('should handle marker deletion', () => {
-        const elementStub: SpyObj<HTMLInputElement> = createSpyObj('HTMLInputElement', [''])
-        const markerSpy: SpyObj<Marker> = createSpyObj('google.maps.Marker', ['setMap'])
-        document.getElementById = createSpy('document').and.callFake(id => {
-            if (id === 'search-input')
-                return elementStub
-            else throw Error()
-        })
-
-        service.getLocationDeletedMarkerHandler(markerSpy)()
-
-        expect(markerSpy.setMap).toHaveBeenCalledWith(null)
-        expect(eventPublisherSpy.notify).toHaveBeenCalledWith('locationDeleted')
-        expect(elementStub.value).toEqual('')
-    })
-
     it('should handle location change', () => {
         service.getLocationChangedHandler()(mouseEvent)
 
@@ -96,6 +80,22 @@ describe('AngularGoogleMapsListenerService', () => {
         expect(markerSpy.setPosition).toHaveBeenCalledWith(location)
         expect(eventPublisherSpy.notify.calls.first().args[0]).toEqual('locationChanged')
         expect(eventPublisherSpy.notify.calls.first().args[1]).toEqual(new Location(location.lat(), location.lng()))
+    })
+
+    it('should handle marker deletion', () => {
+        const elementStub: SpyObj<HTMLInputElement> = createSpyObj('HTMLInputElement', [''])
+        const markerSpy: SpyObj<Marker> = createSpyObj('google.maps.Marker', ['setMap'])
+        document.getElementById = createSpy('document').and.callFake(id => {
+            if (id === 'search-input')
+                return elementStub
+            else throw Error()
+        })
+
+        service.getLocationDeletedMarkerHandler(markerSpy)()
+
+        expect(markerSpy.setMap).toHaveBeenCalledWith(null)
+        expect(eventPublisherSpy.notify).toHaveBeenCalledWith('locationDeleted')
+        expect(elementStub.value).toEqual('')
     })
 
 })
