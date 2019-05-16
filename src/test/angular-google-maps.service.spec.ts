@@ -4,8 +4,6 @@ import { Location } from '../location'
 import { AngularGoogleMapsService } from '../service/angular-google-maps.service'
 import { GoogleMapsSingleton } from '../service/google-maps-singleton.service'
 import Geocoder = google.maps.Geocoder
-import Map = google.maps.Map
-import Marker = google.maps.Marker
 import createSpy = jasmine.createSpy
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
