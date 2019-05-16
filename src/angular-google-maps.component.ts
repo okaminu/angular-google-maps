@@ -3,6 +3,7 @@ import { MatIconRegistry } from '@angular/material'
 import { DomSanitizer } from '@angular/platform-browser'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from './location'
+import { AngularGoogleMapsGeocoderService } from './service/angular-google-maps-geocoder.service'
 import { AngularGoogleMapsListenerService } from './service/angular-google-maps-listener.service'
 import { AngularGoogleMapsService } from './service/angular-google-maps.service'
 import { GoogleMapsService } from './service/google-maps.service'
@@ -53,6 +54,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
 
     constructor(private googleMaps: GoogleMapsService,
                 private googleMapsService: AngularGoogleMapsService,
+                private googleMapsGeocoderService: AngularGoogleMapsGeocoderService,
                 private googleMapsListeners: AngularGoogleMapsListenerService,
                 private eventPublisher: EventPublisher,
                 private iconRegistry: MatIconRegistry,
@@ -77,7 +79,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         const areMarkerLocationsProvided = markerLocations.length > 0
 
         if (areMarkerLocationsProvided)
-            this.googleMapsService.reverseGeocode(focusLocation)
+            this.googleMapsGeocoderService.reverseGeocode(focusLocation)
         map = this.createMap(focusLocation)
         this.bindMarkerToMapsIfLocationIsProvided(map, areMarkerLocationsProvided)
         marker = this.googleMaps.createMarker(this.markerOptions)

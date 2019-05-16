@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from '../location'
-import { AngularGoogleMapsService } from './angular-google-maps.service'
+import { AngularGoogleMapsGeocoderService } from './angular-google-maps-geocoder.service'
 import Map = google.maps.Map
 import Marker = google.maps.Marker
 import SearchBox = google.maps.places.SearchBox
@@ -10,7 +10,7 @@ import SearchBox = google.maps.places.SearchBox
 export class AngularGoogleMapsListenerService {
 
     constructor(
-        private googleMapsService: AngularGoogleMapsService,
+        private geocoder: AngularGoogleMapsGeocoderService,
         private eventPublisher: EventPublisher) {
     }
 
@@ -19,7 +19,7 @@ export class AngularGoogleMapsListenerService {
             this.eventPublisher.notify('locationChanged',
                 new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng())
             )
-            this.googleMapsService.reverseGeocode(new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng()))
+            this.geocoder.reverseGeocode(new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng()))
         }
     }
 
@@ -30,7 +30,7 @@ export class AngularGoogleMapsListenerService {
             this.eventPublisher.notify('locationChanged',
                 new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng())
             )
-            this.googleMapsService.reverseGeocode(new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng()))
+            this.geocoder.reverseGeocode(new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng()))
         }
     }
 

@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing'
 import { MatIconRegistry } from '@angular/material'
 import { DomSanitizer } from '@angular/platform-browser'
 import { EventPublisher } from '@boldadmin/event-publisher'
+import { AngularGoogleMapsGeocoderService } from 'src/service/angular-google-maps-geocoder.service'
 import { AngularGoogleMapsComponent } from '../angular-google-maps.component'
 import { Location } from '../location'
 import { AngularGoogleMapsListenerService } from '../service/angular-google-maps-listener.service'
@@ -20,6 +21,7 @@ describe('AngularGoogleMapsComponent', () => {
     let matIconRegistrySpy: SpyObj<MatIconRegistry>
     let domSanitizerSpy: SpyObj<DomSanitizer>
     let angularGoogleMapsServiceSpy: SpyObj<AngularGoogleMapsService>
+    let geocoderSpy: SpyObj<AngularGoogleMapsGeocoderService>
     let googleMapsServiceSpy: SpyObj<GoogleMapsService>
     let googleMapsListenerServiceSpy: SpyObj<AngularGoogleMapsListenerService>
 
@@ -45,6 +47,10 @@ describe('AngularGoogleMapsComponent', () => {
                             'getLocationChangedSearchBoxMapMarkerHandler', 'getLocationDeletedMarkerHandler'])
                 },
                 {
+                    provide: AngularGoogleMapsGeocoderService,
+                    useValue: createSpyObj('AngularGoogleMapsGeocoderService', ['reverseGeocode'])
+                },
+                {
                     provide: GoogleMapsService,
                     useValue: createSpyObj('GoogleMapsService', ['getGoogleMaps', 'createMap', 'createMarker'])
                 },
@@ -61,6 +67,7 @@ describe('AngularGoogleMapsComponent', () => {
         matIconRegistrySpy = TestBed.get(MatIconRegistry)
         domSanitizerSpy = TestBed.get(DomSanitizer)
         angularGoogleMapsServiceSpy = TestBed.get(AngularGoogleMapsService)
+        geocoderSpy = TestBed.get(AngularGoogleMapsGeocoderService)
         googleMapsServiceSpy = TestBed.get(GoogleMapsService)
         googleMapsServiceSpy.getGoogleMaps.and.returnValue(googleMapsStub)
         googleMapsListenerServiceSpy = TestBed.get(AngularGoogleMapsListenerService)
@@ -173,7 +180,7 @@ describe('AngularGoogleMapsComponent', () => {
 
             component.setUpMap(location, [new Location(0.0, 1.0)])
 
-            expect(angularGoogleMapsServiceSpy.reverseGeocode).toHaveBeenCalled()
+            expect(geocoderSpy.reverseGeocode).toHaveBeenCalled()
         })
 
         it('does not reverse geocode when there is no location', () => {
@@ -181,7 +188,7 @@ describe('AngularGoogleMapsComponent', () => {
 
             component.setUpMap(location, [])
 
-            expect(angularGoogleMapsServiceSpy.reverseGeocode).not.toHaveBeenCalled()
+            expect(geocoderSpy.reverseGeocode).not.toHaveBeenCalled()
         })
 
         it('adds resize control', () => {

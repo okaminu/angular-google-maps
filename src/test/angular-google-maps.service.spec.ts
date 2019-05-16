@@ -1,9 +1,6 @@
-import { fakeAsync, TestBed, tick } from '@angular/core/testing'
-import { EventPublisher } from '@boldadmin/event-publisher'
-import { Location } from '../location'
+import { fakeAsync, TestBed } from '@angular/core/testing'
 import { AngularGoogleMapsService } from '../service/angular-google-maps.service'
 import { GoogleMapsSingleton } from '../service/google-maps-singleton.service'
-import Geocoder = google.maps.Geocoder
 import createSpy = jasmine.createSpy
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
@@ -12,17 +9,14 @@ describe('AngularGoogleMapsService', () => {
 
     let googleMaps: SpyObj<GoogleMapsSingleton>
     let service: AngularGoogleMapsService
-    let eventPublisherSpy: SpyObj<EventPublisher>
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             providers: [
                 AngularGoogleMapsService,
-                {provide: GoogleMapsSingleton, useValue: createSpy('GoogleMapsSingleton')},
-                {provide: EventPublisher, useValue: createSpyObj('EventPublisher', ['notify'])}
+                {provide: GoogleMapsSingleton, useValue: createSpy('GoogleMapsSingleton')}
             ]
         })
-        eventPublisherSpy = TestBed.get(EventPublisher)
         googleMaps = TestBed.get(GoogleMapsSingleton)
         service = TestBed.get(AngularGoogleMapsService)
     })
@@ -83,99 +77,6 @@ describe('AngularGoogleMapsService', () => {
             expect(searchBox).toBe(searchBoxSpy)
             expect(controlSpy.push).toHaveBeenCalledWith(elementSpy)
         }))
-    })
-
-    describe('Reverse geocoding: ', () => {
-
-        let geocoderSpy: SpyObj<google.maps.Geocoder>
-        let googleMapsSpy: SpyObj<any>
-
-        beforeEach(() => {
-            geocoderSpy = createSpyObj('google.maps.Geocoder', ['geocode'])
-            googleMapsSpy = createSpyObj('google.maps', ['Geocoder', 'LatLng'])
-            googleMapsSpy.Geocoder.and.returnValue(geocoderSpy)
-            googleMaps.singleton = googleMapsSpy
-        })
-
-        it('converts location to address', fakeAsync(() => {
-            geocoderSpy.geocode.and.callFake(
-                (request, callback: any) => callback([{formatted_address: 'address'}], null)
-            )
-
-            service.reverseGeocode(new Location(1, 1))
-            tick()
-
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), 'address')
-        }))
-
-        it('returns location on no results', fakeAsync(() => {
-            const latLngSpy = createSpyObj('google.maps.LatLng', ['toString'])
-            googleMapsSpy.LatLng.and.returnValue(latLngSpy)
-            geocoderSpy.geocode.and.callFake((request, callback) => callback(null, null))
-            latLngSpy.toString.and.returnValue('location')
-
-            service.reverseGeocode(new Location(1, 1))
-            tick()
-
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), 'location')
-        }))
-
-        it('returns location on empty results', fakeAsync(() => {
-            const latLngSpy = createSpyObj('google.maps.LatLng', ['toString'])
-            googleMapsSpy.LatLng.and.returnValue(latLngSpy)
-            geocoderSpy.geocode.and.callFake((request, callback) => callback([], null))
-            latLngSpy.toString.and.returnValue('location')
-
-            service.reverseGeocode(new Location(1, 1))
-            tick()
-
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), 'location')
-        }))
-
-    })
-
-    describe('Geocoder', () => {
-
-        let geocoderSpy: SpyObj<Geocoder>
-        let googleMapsSpy: SpyObj<any>
-
-        beforeEach(() => {
-            geocoderSpy = createSpyObj('google.maps.Geocoder', ['geocode'])
-            googleMapsSpy = createSpyObj('google.maps', ['Geocoder'])
-            googleMapsSpy.Geocoder.and.returnValue(geocoderSpy)
-            googleMaps.singleton = googleMapsSpy
-        })
-
-
-        it('converts address to location', fakeAsync(() => {
-            geocoderSpy.geocode.and.callFake(
-                (request, callback: any) => callback([{geometry: {location: {lat: () => 1.0, lng: () => 2.0}}}], null)
-            )
-
-            service.geocode('address')
-            tick()
-
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), new Location(1.0, 2.0))
-        }))
-
-        it('returns default location on no results', fakeAsync(() => {
-            geocoderSpy.geocode.and.callFake((request, callback) => callback(null, null))
-
-            service.geocode('address')
-            tick()
-
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(Location))
-        }))
-
-        it('returns default location on empty results', fakeAsync(() => {
-            geocoderSpy.geocode.and.callFake((request, callback) => callback([], null))
-
-            service.geocode('address')
-            tick()
-
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(Location))
-        }))
-
     })
 
     describe('Custom expand control', () => {
