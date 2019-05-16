@@ -1,23 +1,26 @@
 import { fakeAsync, TestBed } from '@angular/core/testing'
 import { AngularGoogleMapsService } from '../service/angular-google-maps.service'
-import { GoogleMapsSingleton } from '../service/google-maps-singleton.service'
+import { GoogleMapsService } from '../service/google-maps.service'
 import createSpy = jasmine.createSpy
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
 
 describe('AngularGoogleMapsService', () => {
 
-    let googleMaps: SpyObj<GoogleMapsSingleton>
+    let googleMaps: SpyObj<GoogleMapsService>
     let service: AngularGoogleMapsService
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             providers: [
                 AngularGoogleMapsService,
-                {provide: GoogleMapsSingleton, useValue: createSpy('GoogleMapsSingleton')}
+                {
+                    provide: GoogleMapsService,
+                    useValue: createSpyObj('GoogleMapsService', ['getGoogleMaps', 'createSearchBox'])
+                }
             ]
         })
-        googleMaps = TestBed.get(GoogleMapsSingleton)
+        googleMaps = TestBed.get(GoogleMapsService)
         service = TestBed.get(AngularGoogleMapsService)
     })
 
@@ -57,18 +60,12 @@ describe('AngularGoogleMapsService', () => {
                     }
                 }
             }] as any[])
-            googleMaps.singleton = {
+            googleMaps.createSearchBox.and.returnValue(searchBoxSpy)
+            googleMaps.getGoogleMaps.and.returnValue({
                 ControlPosition: {
                     TOP_LEFT: 'somePosition'
-                },
-                places: {
-                    SearchBox: function (element) {
-                        if (element === elementSpy)
-                            return searchBoxSpy
-                        else throw Error()
-                    }
                 }
-            }
+            })
         })
 
         it('is added to map', fakeAsync(() => {
@@ -97,11 +94,11 @@ describe('AngularGoogleMapsService', () => {
             mapSpy.controls = {
                 'somePosition': controlSpy
             }
-            googleMaps.singleton = {
+            googleMaps.getGoogleMaps.and.returnValue({
                 ControlPosition: {
                     TOP_RIGHT: 'somePosition'
                 }
-            }
+            })
         })
 
         it('adds resize control to map', fakeAsync(() => {

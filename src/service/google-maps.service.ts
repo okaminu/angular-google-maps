@@ -18,8 +18,7 @@ export class GoogleMapsService {
         return new google.maps.Marker(options)
     }
 
-    createSearchBox() {
-        const searchBoxInput = <HTMLInputElement>document.getElementById('search-input')
+    createSearchBox(searchBoxInput: HTMLInputElement) {
         return new google.maps.places.SearchBox(searchBoxInput)
     }
 
