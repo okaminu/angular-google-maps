@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { EventPublisher } from '@boldadmin/event-publisher'
+import { Location } from '../location'
 import { AngularGoogleMapsService } from './angular-google-maps.service'
-import { Location } from './location'
 import Map = google.maps.Map
 import Marker = google.maps.Marker
 import SearchBox = google.maps.places.SearchBox

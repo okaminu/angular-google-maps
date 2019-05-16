@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing'
 import { EventPublisher } from '@boldadmin/event-publisher'
-import { AngularGoogleMapsListenerService } from './angular-google-maps-listener.service'
-import { AngularGoogleMapsService } from './angular-google-maps.service'
-import { Location } from './location'
+import { Location } from '../location'
+import { AngularGoogleMapsListenerService } from '../service/angular-google-maps-listener.service'
+import { AngularGoogleMapsService } from '../service/angular-google-maps.service'
 import Map = google.maps.Map
 import Marker = google.maps.Marker
 import SearchBox = google.maps.places.SearchBox

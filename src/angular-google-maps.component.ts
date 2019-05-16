@@ -2,9 +2,9 @@ import { Component, OnDestroy, OnInit, Output } from '@angular/core'
 import { MatIconRegistry } from '@angular/material'
 import { DomSanitizer } from '@angular/platform-browser'
 import { EventPublisher } from '@boldadmin/event-publisher'
-import { AngularGoogleMapsService } from './angular-google-maps.service'
-import { GoogleMapsSingleton } from './google-maps-singleton.service'
 import { Location } from './location'
+import { AngularGoogleMapsService } from './service/angular-google-maps.service'
+import { GoogleMapsSingleton } from './service/google-maps-singleton.service'
 import Map = google.maps.Map
 import MapOptions = google.maps.MapOptions
 import MarkerOptions = google.maps.MarkerOptions

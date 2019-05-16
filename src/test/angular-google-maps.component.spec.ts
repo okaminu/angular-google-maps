@@ -2,10 +2,10 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing'
 import { MatIconRegistry } from '@angular/material'
 import { DomSanitizer } from '@angular/platform-browser'
 import { EventPublisher } from '@boldadmin/event-publisher'
-import { AngularGoogleMapsComponent } from './angular-google-maps.component'
-import { AngularGoogleMapsService } from './angular-google-maps.service'
-import { GoogleMapsSingleton } from './google-maps-singleton.service'
-import { Location } from './location'
+import { AngularGoogleMapsComponent } from '../angular-google-maps.component'
+import { Location } from '../location'
+import { AngularGoogleMapsService } from '../service/angular-google-maps.service'
+import { GoogleMapsSingleton } from '../service/google-maps-singleton.service'
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
 

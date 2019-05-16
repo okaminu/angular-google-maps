@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { EventPublisher } from '@boldadmin/event-publisher'
+import { Location } from '../location'
 import { GoogleMapsSingleton } from './google-maps-singleton.service'
-import { Location } from './location'
 import Map = google.maps.Map
 import MapOptions = google.maps.MapOptions
 import Marker = google.maps.Marker
