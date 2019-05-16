@@ -3,9 +3,6 @@ import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from '../location'
 import { GoogleMapsSingleton } from './google-maps-singleton.service'
 import Map = google.maps.Map
-import MapOptions = google.maps.MapOptions
-import Marker = google.maps.Marker
-import MarkerOptions = google.maps.MarkerOptions
 
 @Injectable()
 export class AngularGoogleMapsService {
@@ -14,22 +11,13 @@ export class AngularGoogleMapsService {
                 private eventPublisher: EventPublisher) {
     }
 
-    createMap(options: MapOptions) {
-        return Promise.resolve(new this.googleMaps.singleton.Map(document.getElementById('map'), options))
-    }
-
-    addMarker(options: MarkerOptions) {
-        const marker: Marker = new this.googleMaps.singleton.Marker(options)
-        return Promise.resolve(marker)
-    }
-
-    addSearchBox(map: Map) {
+    createSearchBox(map: Map) {
         const searchBoxInput = <HTMLInputElement>document.getElementById('search-input')
         const searchBox = new this.googleMaps.singleton.places.SearchBox(searchBoxInput)
 
         map.controls[this.googleMaps.singleton.ControlPosition.TOP_LEFT].push(searchBoxInput)
 
-        return Promise.resolve(searchBox)
+        return searchBox
     }
 
     reverseGeocode(location: Location) {

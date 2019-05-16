@@ -5,11 +5,12 @@ import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from './location'
 import { AngularGoogleMapsListenerService } from './service/angular-google-maps-listener.service'
 import { AngularGoogleMapsService } from './service/angular-google-maps.service'
-import { GoogleMapsSingleton } from './service/google-maps-singleton.service'
+import { GoogleMapsService } from './service/google-maps.service'
 import Map = google.maps.Map
 import MapOptions = google.maps.MapOptions
 import Marker = google.maps.Marker
 import MarkerOptions = google.maps.MarkerOptions
+import SearchBox = google.maps.places.SearchBox
 
 @Component({
     selector: 'google-maps',
@@ -35,7 +36,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         },
         mapTypeControlOptions: {
             mapTypeIds: ['roadmap', 'satellite'],
-            position: this.googleMaps.singleton.ControlPosition.LEFT_BOTTOM
+            position: this.googleMaps.getGoogleMaps().ControlPosition.LEFT_BOTTOM
         },
         zoom: 10,
         controlSize: 22,
@@ -47,10 +48,10 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
             lng: 0
         },
         draggable: true,
-        animation: this.googleMaps.singleton.Animation.DROP
+        animation: this.googleMaps.getGoogleMaps().Animation.DROP
     }
 
-    constructor(private googleMaps: GoogleMapsSingleton,
+    constructor(private googleMaps: GoogleMapsService,
                 private googleMapsService: AngularGoogleMapsService,
                 private googleMapsListeners: AngularGoogleMapsListenerService,
                 private eventPublisher: EventPublisher,
@@ -72,28 +73,21 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
     setUpMap(focusLocation: Location, markerLocations: Array<Location>) {
         let map: Map
         let marker: Marker
+        let searchBox: SearchBox
         const areMarkerLocationsProvided = markerLocations.length > 0
 
         if (areMarkerLocationsProvided)
             this.googleMapsService.reverseGeocode(focusLocation)
-        this.createMap(focusLocation)
-            .then(mapPromise => {
-                map = mapPromise
-                this.bindMarkerToMapsIfLocationIsProvided(map, areMarkerLocationsProvided)
-                return this.googleMapsService.addMarker(this.markerOptions)
-            })
-            .then(markerPromise => {
-                marker = markerPromise
-                marker.addListener('dragend', this.googleMapsListeners.getLocationChangedHandler())
-                marker.addListener('dblclick', this.googleMapsListeners.getLocationDeletedMarkerHandler(marker))
-                map.addListener('click', this.googleMapsListeners.getBindMarkerToMapHandler(marker, map))
-                this.googleMapsService.addResizeControl(map)
-                return this.googleMapsService.addSearchBox(map)
-            })
-            .then(searchBoxPromise => {
-                searchBoxPromise.addListener('places_changed',
-                    this.googleMapsListeners.getLocationChangedSearchBoxMapMarkerHandler(searchBoxPromise, map, marker))
-            })
+        map = this.createMap(focusLocation)
+        this.bindMarkerToMapsIfLocationIsProvided(map, areMarkerLocationsProvided)
+        marker = this.googleMaps.createMarker(this.markerOptions)
+        marker.addListener('dragend', this.googleMapsListeners.getLocationChangedHandler())
+        marker.addListener('dblclick', this.googleMapsListeners.getLocationDeletedMarkerHandler(marker))
+        map.addListener('click', this.googleMapsListeners.getBindMarkerToMapHandler(marker, map))
+        this.googleMapsService.addResizeControl(map)
+        searchBox = this.googleMapsService.createSearchBox(map)
+        searchBox.addListener('places_changed',
+            this.googleMapsListeners.getLocationChangedSearchBoxMapMarkerHandler(searchBox, map, marker))
     }
 
     onMapResize() {
@@ -106,7 +100,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
             lat: focusLocation.latitude,
             lng: focusLocation.longitude
         }
-        return this.googleMapsService.createMap(this.mapOptions)
+        return this.googleMaps.createMap(this.mapOptions)
     }
 
     private bindMarkerToMapsIfLocationIsProvided(map: Map, isLocationProvided: boolean) {

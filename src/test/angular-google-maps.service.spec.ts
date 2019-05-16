@@ -33,46 +33,6 @@ describe('AngularGoogleMapsService', () => {
         document.getElementById = createSpy('document').and.callThrough()
     )
 
-    it('creates Google maps', fakeAsync(() => {
-        const mapOptions = {draggable: true}
-        const elementSpy = createSpyObj('HTMLElement', [''])
-        const mapSpy = createSpyObj('google.maps.Map', [''])
-        const googleMapsSpy = createSpyObj('google.maps', ['Map'])
-        document.getElementById = createSpy('document').and.callFake(id => {
-            if (id === 'map')
-                return elementSpy
-            else throw Error()
-        })
-        googleMapsSpy.Map.and.callFake((element, options) => {
-            if (element === elementSpy && options === mapOptions)
-                return mapSpy
-        })
-        googleMaps.singleton = googleMapsSpy
-
-        service.createMap(mapOptions)
-            .then(mapPromise =>
-                expect(mapPromise).toBe(mapSpy)
-            )
-    }))
-
-    it('adds marker to map', fakeAsync(() => {
-        const position = {lat: 10, lng: 10}
-        const markerOptions = {position: position}
-        const markerSpy: SpyObj<Marker> =
-            createSpyObj('google.maps.Marker', ['addListener', 'setPosition', 'setMap'])
-        const googleMapsSpy: SpyObj<any> =
-            createSpyObj('google.maps', ['Marker', 'LatLng', 'Geocoder', 'addListener'])
-        googleMapsSpy.Marker.and.returnValue(markerSpy)
-        googleMaps.singleton = googleMapsSpy
-
-        service
-            .addMarker(markerOptions)
-            .then(marker => {
-                expect(marker).toBe(markerSpy)
-                expect(googleMapsSpy.Marker).toHaveBeenCalledWith(markerOptions)
-            })
-    }))
-
     describe('SearchBox', () => {
 
         const position = {lat: 10, lng: 10}
@@ -120,12 +80,10 @@ describe('AngularGoogleMapsService', () => {
         })
 
         it('is added to map', fakeAsync(() => {
-            service
-                .addSearchBox(mapSpy)
-                .then(searchBox => {
-                    expect(searchBox).toBe(searchBoxSpy)
-                    expect(controlSpy.push).toHaveBeenCalledWith(elementSpy)
-                })
+            const searchBox = service.createSearchBox(mapSpy)
+
+            expect(searchBox).toBe(searchBoxSpy)
+            expect(controlSpy.push).toHaveBeenCalledWith(elementSpy)
         }))
     })
 

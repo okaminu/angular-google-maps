@@ -6,7 +6,7 @@ import MarkerOptions = google.maps.MarkerOptions
 @Injectable()
 export class GoogleMapsService {
 
-    getGoogleMaps() {
+    getGoogleMaps(): any {
         return google.maps
     }
 
