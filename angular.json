@@ -4,8 +4,8 @@
   "newProjectRoot": "projects",
   "projects": {
     "angular-google-maps": {
-      "root": "projects/angular-google-maps",
-      "sourceRoot": "projects/angular-google-maps/src",
+      "root": "",
+      "sourceRoot": "src",
       "projectType": "library",
       "architect": {
         "build": {
