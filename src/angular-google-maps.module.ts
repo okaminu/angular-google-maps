@@ -5,6 +5,7 @@ import { AngularGoogleMapsComponent } from './angular-google-maps.component'
 import { AngularGoogleMapsListenerService } from './service/angular-google-maps-listener.service'
 import { AngularGoogleMapsService } from './service/angular-google-maps.service'
 import { GoogleMapsSingleton } from './service/google-maps-singleton.service'
+import { GoogleMapsService } from './service/google-maps.service'
 
 @NgModule({
     declarations: [
@@ -20,6 +21,7 @@ import { GoogleMapsSingleton } from './service/google-maps-singleton.service'
     providers: [
         AngularGoogleMapsListenerService,
         AngularGoogleMapsService,
+        GoogleMapsService,
         GoogleMapsSingleton
     ]
 })
