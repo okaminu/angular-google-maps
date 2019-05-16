@@ -3,11 +3,14 @@ import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from '../location'
 import { AngularGoogleMapsService } from '../service/angular-google-maps.service'
 import { GoogleMapsSingleton } from '../service/google-maps-singleton.service'
+import Geocoder = google.maps.Geocoder
+import Map = google.maps.Map
+import Marker = google.maps.Marker
 import createSpy = jasmine.createSpy
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
 
-describe('AngularGoogleMapsService:', () => {
+describe('AngularGoogleMapsService', () => {
 
     let googleMaps: SpyObj<GoogleMapsSingleton>
     let service: AngularGoogleMapsService
@@ -30,7 +33,7 @@ describe('AngularGoogleMapsService:', () => {
         document.getElementById = createSpy('document').and.callThrough()
     )
 
-    it('Creates Google maps', fakeAsync(() => {
+    it('creates Google maps', fakeAsync(() => {
         const mapOptions = {draggable: true}
         const elementSpy = createSpyObj('HTMLElement', [''])
         const mapSpy = createSpyObj('google.maps.Map', [''])
@@ -52,94 +55,25 @@ describe('AngularGoogleMapsService:', () => {
             )
     }))
 
-    describe('Marker: ', () => {
-
+    it('adds marker to map', fakeAsync(() => {
         const position = {lat: 10, lng: 10}
         const markerOptions = {position: position}
-        const mouseEvent = {
-            latLng: {
-                lat: () => position.lat,
-                lng: () => position.lng
-            }
-        }
-        let markerSpy: SpyObj<google.maps.Marker>
-        let googleMapsSpy: SpyObj<any>
+        const markerSpy: SpyObj<Marker> =
+            createSpyObj('google.maps.Marker', ['addListener', 'setPosition', 'setMap'])
+        const googleMapsSpy: SpyObj<any> =
+            createSpyObj('google.maps', ['Marker', 'LatLng', 'Geocoder', 'addListener'])
+        googleMapsSpy.Marker.and.returnValue(markerSpy)
+        googleMaps.singleton = googleMapsSpy
 
-        beforeEach(() => {
-            markerSpy = createSpyObj('google.maps.Marker', ['addListener', 'setPosition', 'setMap'])
-            googleMapsSpy = createSpyObj('google.maps', ['Marker', 'LatLng', 'Geocoder', 'addListener'])
-            googleMapsSpy.Marker.and.returnValue(markerSpy)
-            googleMaps.singleton = googleMapsSpy
-        })
-
-        it('Adds marker to map', fakeAsync(() => {
-            service
-                .addMarker(markerOptions)
-                .then(marker => {
-                    expect(marker).toBe(markerSpy)
-                    expect(googleMapsSpy.Marker).toHaveBeenCalledWith(markerOptions)
-                })
-        }))
-
-        it('Adds drag listener for a marker', fakeAsync(() => {
-            const geocoderSpy = createSpyObj('google.maps.Geocoder', ['geocode'])
-            googleMapsSpy.Geocoder.and.returnValue(geocoderSpy)
-            geocoderSpy.geocode.and.callFake((request, callback) => callback([{formatted_address: 'address'}]))
-
-            service
-                .addMarker(markerOptions)
-                .then(() => {
-                    markerSpy.addListener.calls.first().args[1](mouseEvent)
-
-                    tick()
-
-                    expect(markerSpy.addListener).toHaveBeenCalledWith('dragend', jasmine.any(Function))
-                    expect(eventPublisherSpy.notify.calls.first().args[0])
-                        .toEqual('locationChanged')
-                    expect(eventPublisherSpy.notify.calls.first().args[1])
-                        .toEqual(new Location(position.lat, position.lng))
-                })
-        }))
-
-        it('Adds delete listener for marker', fakeAsync(() => {
-            let elementSpy: SpyObj<HTMLInputElement>
-            document.getElementById = createSpy('document').and.callFake(id => {
-                if (id === 'search-input')
-                    return elementSpy
-                else throw Error()
+        service
+            .addMarker(markerOptions)
+            .then(marker => {
+                expect(marker).toBe(markerSpy)
+                expect(googleMapsSpy.Marker).toHaveBeenCalledWith(markerOptions)
             })
-            elementSpy = createSpyObj('HTMLInputElement', [''])
+    }))
 
-            service
-                .addMarker(markerOptions)
-                .then(() => {
-                    markerSpy.addListener.calls.mostRecent().args[1]()
-
-                    expect(markerSpy.addListener).toHaveBeenCalledWith('dblclick', jasmine.any(Function))
-                    expect(markerSpy.setMap).toHaveBeenCalledWith(null)
-                    expect(elementSpy.value).toEqual('')
-                    expect(eventPublisherSpy.notify).toHaveBeenCalledWith('locationDeleted')
-                })
-        }))
-
-        it('Bind marker to map click', fakeAsync(() => {
-            const geocoderSpy = createSpyObj('google.maps.Geocoder', ['geocode'])
-            googleMapsSpy.Geocoder.and.returnValue(geocoderSpy)
-
-            service.bindMarkerToMapClick(markerSpy, googleMapsSpy)
-            googleMapsSpy.addListener.calls.first().args[1](mouseEvent)
-            tick()
-
-            expect(googleMapsSpy.addListener).toHaveBeenCalledWith('click', jasmine.any(Function))
-            expect(markerSpy.setPosition).toHaveBeenCalledWith(mouseEvent.latLng)
-            expect(markerSpy.setMap).toHaveBeenCalledWith(googleMapsSpy)
-            expect(eventPublisherSpy.notify.calls.first().args[0]).toEqual('locationChanged')
-            expect(eventPublisherSpy.notify.calls.first().args[1]).toEqual(new Location(position.lat, position.lng))
-            expect(geocoderSpy.geocode).toHaveBeenCalled()
-        }))
-    })
-
-    describe('SearchBox: ', () => {
+    describe('SearchBox', () => {
 
         const position = {lat: 10, lng: 10}
         let elementSpy: SpyObj<HTMLElement>
@@ -185,30 +119,12 @@ describe('AngularGoogleMapsService:', () => {
             }
         })
 
-        it('Adds search box to map', fakeAsync(() => {
+        it('is added to map', fakeAsync(() => {
             service
-                .addSearchBox(mapSpy, markerSpy)
+                .addSearchBox(mapSpy)
                 .then(searchBox => {
                     expect(searchBox).toBe(searchBoxSpy)
                     expect(controlSpy.push).toHaveBeenCalledWith(elementSpy)
-                })
-        }))
-
-        it('Adds listener for a searchBox', fakeAsync(() => {
-            service
-                .addSearchBox(mapSpy, markerSpy)
-                .then(() => {
-                    searchBoxSpy.addListener.calls.first().args[1]()
-
-                    expect(searchBoxSpy.addListener).toHaveBeenCalledWith('places_changed', jasmine.any(Function))
-                    expect(mapSpy.panTo).toHaveBeenCalled()
-                    expect(mapSpy.setZoom).toHaveBeenCalled()
-                    expect(markerSpy.setPosition).toHaveBeenCalled()
-                    expect(markerSpy.setMap).toHaveBeenCalledWith(mapSpy)
-                    expect(eventPublisherSpy.notify.calls.first().args[0])
-                        .toEqual('locationChanged')
-                    expect(eventPublisherSpy.notify.calls.first().args[1])
-                        .toEqual(new Location(position.lat, position.lng))
                 })
         }))
     })
@@ -225,7 +141,7 @@ describe('AngularGoogleMapsService:', () => {
             googleMaps.singleton = googleMapsSpy
         })
 
-        it('Converts location to address', fakeAsync(() => {
+        it('converts location to address', fakeAsync(() => {
             geocoderSpy.geocode.and.callFake(
                 (request, callback: any) => callback([{formatted_address: 'address'}], null)
             )
@@ -236,7 +152,7 @@ describe('AngularGoogleMapsService:', () => {
             expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), 'address')
         }))
 
-        it('Returns location on no results', fakeAsync(() => {
+        it('returns location on no results', fakeAsync(() => {
             const latLngSpy = createSpyObj('google.maps.LatLng', ['toString'])
             googleMapsSpy.LatLng.and.returnValue(latLngSpy)
             geocoderSpy.geocode.and.callFake((request, callback) => callback(null, null))
@@ -248,7 +164,7 @@ describe('AngularGoogleMapsService:', () => {
             expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), 'location')
         }))
 
-        it('Returns location on empty results', fakeAsync(() => {
+        it('returns location on empty results', fakeAsync(() => {
             const latLngSpy = createSpyObj('google.maps.LatLng', ['toString'])
             googleMapsSpy.LatLng.and.returnValue(latLngSpy)
             geocoderSpy.geocode.and.callFake((request, callback) => callback([], null))
@@ -262,9 +178,9 @@ describe('AngularGoogleMapsService:', () => {
 
     })
 
-    describe('Geocoding: ', () => {
+    describe('Geocoder', () => {
 
-        let geocoderSpy: SpyObj<google.maps.Geocoder>
+        let geocoderSpy: SpyObj<Geocoder>
         let googleMapsSpy: SpyObj<any>
 
         beforeEach(() => {
@@ -275,7 +191,7 @@ describe('AngularGoogleMapsService:', () => {
         })
 
 
-        it('Converts address to location', fakeAsync(() => {
+        it('converts address to location', fakeAsync(() => {
             geocoderSpy.geocode.and.callFake(
                 (request, callback: any) => callback([{geometry: {location: {lat: () => 1.0, lng: () => 2.0}}}], null)
             )
@@ -286,7 +202,7 @@ describe('AngularGoogleMapsService:', () => {
             expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), new Location(1.0, 2.0))
         }))
 
-        it('Returns default location on no results', fakeAsync(() => {
+        it('returns default location on no results', fakeAsync(() => {
             geocoderSpy.geocode.and.callFake((request, callback) => callback(null, null))
 
             service.geocode('address')
@@ -295,7 +211,7 @@ describe('AngularGoogleMapsService:', () => {
             expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(Location))
         }))
 
-        it('Returns default location on empty results', fakeAsync(() => {
+        it('returns default location on empty results', fakeAsync(() => {
             geocoderSpy.geocode.and.callFake((request, callback) => callback([], null))
 
             service.geocode('address')
@@ -306,7 +222,7 @@ describe('AngularGoogleMapsService:', () => {
 
     })
 
-    describe('Custom expand control: ', () => {
+    describe('Custom expand control', () => {
         let elementSpy: SpyObj<HTMLElement>
         let controlSpy: SpyObj<google.maps.MVCArray<Node>[]>
         let mapSpy: SpyObj<any>
@@ -331,7 +247,7 @@ describe('AngularGoogleMapsService:', () => {
             }
         })
 
-        it('Adds resize control to map', fakeAsync(() => {
+        it('adds resize control to map', fakeAsync(() => {
             service
                 .addResizeControl(mapSpy)
                 .then(control => {

@@ -6,7 +6,6 @@ import Map = google.maps.Map
 import MapOptions = google.maps.MapOptions
 import Marker = google.maps.Marker
 import MarkerOptions = google.maps.MarkerOptions
-import SearchBox = google.maps.places.SearchBox
 
 @Injectable()
 export class AngularGoogleMapsService {
@@ -21,25 +20,14 @@ export class AngularGoogleMapsService {
 
     addMarker(options: MarkerOptions) {
         const marker: Marker = new this.googleMaps.singleton.Marker(options)
-
-        marker.addListener('dragend', this.getLocationChangedHandler())
-        marker.addListener('dblclick', this.getLocationDeletedMarkerHandler(marker))
-
         return Promise.resolve(marker)
     }
 
-    bindMarkerToMapClick(marker: Marker, map: Map) {
-        map.addListener('click', this.getBindMarkerToMapHandler(marker, map))
-    }
-
-    addSearchBox(map: Map, markerToBind: Marker) {
+    addSearchBox(map: Map) {
         const searchBoxInput = <HTMLInputElement>document.getElementById('search-input')
         const searchBox = new this.googleMaps.singleton.places.SearchBox(searchBoxInput)
 
         map.controls[this.googleMaps.singleton.ControlPosition.TOP_LEFT].push(searchBoxInput)
-
-        searchBox.addListener('places_changed',
-            this.getLocationChangedSearchBoxMapMarkerHandler(searchBox, map, markerToBind))
 
         return Promise.resolve(searchBox)
     }
@@ -71,44 +59,4 @@ export class AngularGoogleMapsService {
         return Promise.resolve(resizeControl)
     }
 
-    private getLocationDeletedMarkerHandler(marker: Marker) {
-        return () => {
-            marker.setMap(null)
-            this.eventPublisher.notify('locationDeleted')
-
-            const searchBoxInput = <HTMLInputElement>document.getElementById('search-input')
-            searchBoxInput.value = ''
-        }
-    }
-
-    private getLocationChangedHandler() {
-        return mouseEvent => {
-            this.eventPublisher.notify('locationChanged',
-                new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng())
-            )
-            this.reverseGeocode(new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng()))
-        }
-    }
-
-    private getBindMarkerToMapHandler(marker: Marker, map: Map) {
-        return mouseEvent => {
-            marker.setMap(map)
-            marker.setPosition(mouseEvent.latLng)
-            this.eventPublisher.notify('locationChanged',
-                new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng())
-            )
-            this.reverseGeocode(new Location(mouseEvent.latLng.lat(), mouseEvent.latLng.lng()))
-        }
-    }
-
-    private getLocationChangedSearchBoxMapMarkerHandler(searchBox: SearchBox, map: Map, marker: Marker) {
-        return () => {
-            const placeLocation = searchBox.getPlaces()[0].geometry.location
-            map.panTo(placeLocation)
-            map.setZoom(15)
-            marker.setMap(map)
-            marker.setPosition(placeLocation)
-            this.eventPublisher.notify('locationChanged', new Location(placeLocation.lat(), placeLocation.lng()))
-        }
-    }
 }

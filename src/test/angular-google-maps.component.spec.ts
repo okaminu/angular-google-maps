@@ -4,12 +4,15 @@ import { DomSanitizer } from '@angular/platform-browser'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { AngularGoogleMapsComponent } from '../angular-google-maps.component'
 import { Location } from '../location'
+import { AngularGoogleMapsListenerService } from '../service/angular-google-maps-listener.service'
 import { AngularGoogleMapsService } from '../service/angular-google-maps.service'
 import { GoogleMapsSingleton } from '../service/google-maps-singleton.service'
+import Marker = google.maps.Marker
+import SearchBox = google.maps.places.SearchBox
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
 
-describe('AngularGoogleMaps Component: ', () => {
+describe('AngularGoogleMapsComponent', () => {
 
     let component: AngularGoogleMapsComponent
 
@@ -18,6 +21,7 @@ describe('AngularGoogleMaps Component: ', () => {
     let domSanitizerSpy: SpyObj<DomSanitizer>
     let googleMapsSingletonStub: SpyObj<GoogleMapsSingleton>
     let googleMapsServiceSpy: SpyObj<AngularGoogleMapsService>
+    let googleMapsListenerServiceSpy: SpyObj<AngularGoogleMapsListenerService>
 
     const subscribers = new Map<string, Function>()
     const location = new Location(10, 20)
@@ -32,8 +36,13 @@ describe('AngularGoogleMaps Component: ', () => {
                 {
                     provide: AngularGoogleMapsService,
                     useValue: createSpyObj('AngularGoogleMapsService',
-                        ['createMap', 'addMarker', 'addSearchBox', 'reverseGeocode', 'bindMarkerToMapClick',
-                            'addResizeControl', 'initGoogleMaps'])
+                        ['createMap', 'addMarker', 'addSearchBox', 'reverseGeocode', 'addResizeControl'])
+                },
+                {
+                    provide: AngularGoogleMapsListenerService,
+                    useValue: createSpyObj('AngularGoogleMapsListenerService',
+                        ['getLocationChangedHandler', 'getBindMarkerToMapHandler',
+                            'getLocationChangedSearchBoxMapMarkerHandler', 'getLocationDeletedMarkerHandler'])
                 },
                 {provide: GoogleMapsSingleton, useValue: createSpyObj('GoogleMapsSingleton', [''])},
                 {
@@ -51,11 +60,12 @@ describe('AngularGoogleMaps Component: ', () => {
         googleMapsSingletonStub = TestBed.get(GoogleMapsSingleton)
         googleMapsSingletonStub.singleton = googleMapsStub
         googleMapsServiceSpy = TestBed.get(AngularGoogleMapsService)
+        googleMapsListenerServiceSpy = TestBed.get(AngularGoogleMapsListenerService)
 
         component = TestBed.get(AngularGoogleMapsComponent)
     })
 
-    it('Registers icons', () => {
+    it('registers an icon', () => {
         const safeResource = createSpyObj('SafeResourceUrl', [''])
         domSanitizerSpy.bypassSecurityTrustResourceUrl.and.returnValue(safeResource)
 
@@ -67,38 +77,55 @@ describe('AngularGoogleMaps Component: ', () => {
         expect(domSanitizerSpy.bypassSecurityTrustResourceUrl).toHaveBeenCalledTimes(2)
     })
 
-    it('Unsubscribes on destroy', () => {
+    it('unsubscribes on destroy', () => {
         component.ngOnDestroy()
 
         expect(eventPublisherSpy.unsubscribe).toHaveBeenCalledWith('addressReverseGeocoded')
     })
 
-    describe('Loading Google Maps: ', () => {
+    describe('Loaded Google Maps', () => {
 
         let mapSpy: SpyObj<google.maps.Map>
-        let markerSpy: SpyObj<google.maps.Marker>
+        let markerSpy: SpyObj<Marker>
+        let searchBoxSpy: SpyObj<SearchBox>
+        let handlerDummy: SpyObj<() => void>
 
         beforeEach(() => {
-            mapSpy = createSpyObj('google.maps.Map', ['getCenter'])
-            markerSpy = createSpyObj('google.maps.Marker', [''])
+            mapSpy = createSpyObj('google.maps.Map', ['getCenter', 'addListener'])
+            markerSpy = createSpyObj('google.maps.Marker', ['addListener'])
+            searchBoxSpy = createSpyObj('google.maps.places.SearchBox', ['addListener'])
+            handlerDummy = createSpyObj('ListenerHandler', [''])
 
             googleMapsServiceSpy.createMap.and.returnValue(Promise.resolve(mapSpy))
             googleMapsServiceSpy.addMarker.and.returnValue(Promise.resolve(markerSpy))
+            googleMapsServiceSpy.addSearchBox.and.returnValue(Promise.resolve(searchBoxSpy))
         })
 
-        it('Creates a map with a marker and searchBox', fakeAsync(() => {
+        it('creates a map', () => {
+            component.ngOnInit()
+
+            component.setUpMap(location, [])
+
+            expect(googleMapsServiceSpy.createMap).toHaveBeenCalled()
+        })
+
+        it('creates a map with a search box', fakeAsync(() => {
+            googleMapsListenerServiceSpy.getLocationChangedSearchBoxMapMarkerHandler.and.returnValue(handlerDummy)
             component.ngOnInit()
 
             component.setUpMap(location, [])
             tick()
 
-            expect(googleMapsServiceSpy.createMap).toHaveBeenCalled()
-            expect(googleMapsServiceSpy.addMarker).toHaveBeenCalled()
-            expect(googleMapsServiceSpy.bindMarkerToMapClick).toHaveBeenCalled()
-            expect(googleMapsServiceSpy.addSearchBox).toHaveBeenCalled()
+            expect(googleMapsServiceSpy.addSearchBox).toHaveBeenCalledWith(mapSpy)
+            expect(searchBoxSpy.addListener).toHaveBeenCalledWith('places_changed', handlerDummy)
+            expect(googleMapsListenerServiceSpy.getLocationChangedSearchBoxMapMarkerHandler)
+                .toHaveBeenCalledWith(searchBoxSpy, mapSpy, markerSpy)
         }))
 
-        it('Creates a map with a marked location', fakeAsync(() => {
+        it('creates a map with a configured marked', fakeAsync(() => {
+            googleMapsListenerServiceSpy.getLocationChangedHandler.and.returnValue(handlerDummy)
+            googleMapsListenerServiceSpy.getBindMarkerToMapHandler.and.returnValue(handlerDummy)
+            googleMapsListenerServiceSpy.getLocationDeletedMarkerHandler.and.returnValue(handlerDummy)
             component.ngOnInit()
 
             component.setUpMap(location, [new Location(0.0, 1.0)])
@@ -107,9 +134,15 @@ describe('AngularGoogleMaps Component: ', () => {
             expect(googleMapsServiceSpy.addMarker).toHaveBeenCalledWith(jasmine.objectContaining({
                 map: jasmine.anything()
             }))
+            expect(markerSpy.addListener).toHaveBeenCalledWith('dragend', handlerDummy)
+            expect(markerSpy.addListener).toHaveBeenCalledWith('dblclick', handlerDummy)
+            expect(mapSpy.addListener).toHaveBeenCalledWith('click', handlerDummy)
+            expect(googleMapsListenerServiceSpy.getLocationChangedHandler).toHaveBeenCalled()
+            expect(googleMapsListenerServiceSpy.getLocationDeletedMarkerHandler).toHaveBeenCalledWith(markerSpy)
+            expect(googleMapsListenerServiceSpy.getBindMarkerToMapHandler).toHaveBeenCalledWith(markerSpy, mapSpy)
         }))
 
-        it('Creates a map without a marked location', fakeAsync(() => {
+        it('creates a map without a marked location', fakeAsync(() => {
             component.ngOnInit()
 
             component.setUpMap(location, [])
@@ -121,7 +154,7 @@ describe('AngularGoogleMaps Component: ', () => {
             }))
         }))
 
-        it('Creates a map with multiple map types', fakeAsync(() => {
+        it('creates a map with multiple map type buttons', fakeAsync(() => {
             component.ngOnInit()
 
             component.setUpMap(location, [])
@@ -136,7 +169,7 @@ describe('AngularGoogleMaps Component: ', () => {
                 }))
         }))
 
-        it('Reverse geocodes location', fakeAsync(() => {
+        it('reverses geocode a location', fakeAsync(() => {
             component.ngOnInit()
 
             component.setUpMap(location, [new Location(0.0, 1.0)])
@@ -145,7 +178,7 @@ describe('AngularGoogleMaps Component: ', () => {
             expect(googleMapsServiceSpy.reverseGeocode).toHaveBeenCalled()
         }))
 
-        it('Does not reverse geocode when there is no location', fakeAsync(() => {
+        it('does not reverse geocode when there is no location', fakeAsync(() => {
             component.ngOnInit()
 
             component.setUpMap(location, [])
@@ -154,7 +187,7 @@ describe('AngularGoogleMaps Component: ', () => {
             expect(googleMapsServiceSpy.reverseGeocode).not.toHaveBeenCalled()
         }))
 
-        it('Adds resize control', fakeAsync(() => {
+        it('adds resize control', fakeAsync(() => {
             component.ngOnInit()
 
             component.setUpMap(location, [])
@@ -165,7 +198,7 @@ describe('AngularGoogleMaps Component: ', () => {
 
     })
 
-    it('Sets address from broadcast event', () => {
+    it('sets address from broadcast event', () => {
         const address = 'Some address'
         component.ngOnInit()
 
@@ -174,9 +207,9 @@ describe('AngularGoogleMaps Component: ', () => {
         expect(component.address).toEqual(address)
     })
 
-    describe('Custom resizing Google Maps: ', () => {
+    describe('Custom resizing of Google Maps', () => {
 
-        it('Publishes event on map resize', () => {
+        it('publishes an event', () => {
             component.ngOnInit()
 
             component.onMapResize()
@@ -184,7 +217,7 @@ describe('AngularGoogleMaps Component: ', () => {
             expect(eventPublisherSpy.notify).toHaveBeenCalled()
         })
 
-        it('Sets resize state to expanded', () => {
+        it('sets resize state to expanded', () => {
             component.ngOnInit()
 
             component.onMapResize()
@@ -192,7 +225,7 @@ describe('AngularGoogleMaps Component: ', () => {
             expect(component.isMapExpanded).toBeTruthy()
         })
 
-        it('Sets resize state to collapsed', () => {
+        it('sets resize state to collapsed', () => {
             component.ngOnInit()
 
             component.onMapResize()

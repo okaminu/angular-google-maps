@@ -3,10 +3,12 @@ import { MatIconRegistry } from '@angular/material'
 import { DomSanitizer } from '@angular/platform-browser'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from './location'
+import { AngularGoogleMapsListenerService } from './service/angular-google-maps-listener.service'
 import { AngularGoogleMapsService } from './service/angular-google-maps.service'
 import { GoogleMapsSingleton } from './service/google-maps-singleton.service'
 import Map = google.maps.Map
 import MapOptions = google.maps.MapOptions
+import Marker = google.maps.Marker
 import MarkerOptions = google.maps.MarkerOptions
 
 @Component({
@@ -50,6 +52,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
 
     constructor(private googleMaps: GoogleMapsSingleton,
                 private googleMapsService: AngularGoogleMapsService,
+                private googleMapsListeners: AngularGoogleMapsListenerService,
                 private eventPublisher: EventPublisher,
                 private iconRegistry: MatIconRegistry,
                 private sanitizer: DomSanitizer) {
@@ -68,6 +71,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
 
     setUpMap(focusLocation: Location, markerLocations: Array<Location>) {
         let map: Map
+        let marker: Marker
         const areMarkerLocationsProvided = markerLocations.length > 0
 
         if (areMarkerLocationsProvided)
@@ -79,9 +83,16 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
                 return this.googleMapsService.addMarker(this.markerOptions)
             })
             .then(markerPromise => {
-                this.googleMapsService.bindMarkerToMapClick(markerPromise, map)
-                this.googleMapsService.addSearchBox(map, markerPromise)
+                marker = markerPromise
+                marker.addListener('dragend', this.googleMapsListeners.getLocationChangedHandler())
+                marker.addListener('dblclick', this.googleMapsListeners.getLocationDeletedMarkerHandler(marker))
+                map.addListener('click', this.googleMapsListeners.getBindMarkerToMapHandler(marker, map))
                 this.googleMapsService.addResizeControl(map)
+                return this.googleMapsService.addSearchBox(map)
+            })
+            .then(searchBoxPromise => {
+                searchBoxPromise.addListener('places_changed',
+                    this.googleMapsListeners.getLocationChangedSearchBoxMapMarkerHandler(searchBoxPromise, map, marker))
             })
     }
 
