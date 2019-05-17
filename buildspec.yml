@@ -9,7 +9,7 @@ phases:
       - apt-get --yes --force-yes install chromium-browser
   pre_build:
     commands:
-      - npm install -g @angular/cli@7.2.13
+      - npm install -g @angular/cli@7.2.7
       - npm install -g npm-cli-login
       - npm run install --unsafe-perm
   build:
