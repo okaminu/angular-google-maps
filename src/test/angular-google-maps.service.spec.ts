@@ -180,8 +180,6 @@ describe('AngularGoogleMapsService', () => {
                 })
                 elementSpy = createSpyObj('HTMLElement', [''])
                 controlSpy = createSpyObj('google.maps.Map.controls', ['push'])
-                mapSpy = createSpyObj('google.maps.Map', [''])
-
                 mapSpy.controls = {
                     'somePosition': controlSpy
                 }
@@ -195,7 +193,7 @@ describe('AngularGoogleMapsService', () => {
             it('adds resize control to map', () => {
                 service
                     .createMap(mapOptionsSpy, focusLocation)
-                    .addResizeControl(mapSpy)
+                    .addResizeControl()
                     .build()
 
                 expect(controlSpy.push).toHaveBeenCalledWith(elementSpy)

@@ -45,9 +45,9 @@ export class AngularGoogleMapsService {
         return this
     }
 
-    addResizeControl(map: google.maps.Map) {
+    addResizeControl() {
         const resizeControl = document.getElementById('resize-control')
-        map.controls[this.googleMaps.getGoogleMaps().ControlPosition.TOP_RIGHT].push(resizeControl)
+        this.map.controls[this.googleMaps.getGoogleMaps().ControlPosition.TOP_RIGHT].push(resizeControl)
         return this
     }
 

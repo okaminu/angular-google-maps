@@ -8,8 +8,6 @@ import { Location } from '../location'
 import { AngularGoogleMapsListenerService } from '../service/angular-google-maps-listener.service'
 import { AngularGoogleMapsService } from '../service/angular-google-maps.service'
 import { GoogleMapsService } from '../service/google-maps.service'
-import Marker = google.maps.Marker
-import SearchBox = google.maps.places.SearchBox
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
 
@@ -38,7 +36,7 @@ describe('AngularGoogleMapsComponent', () => {
                 {
                     provide: AngularGoogleMapsService,
                     useValue: createSpyObj('AngularGoogleMapsService',
-                        ['createSearchBox', 'reverseGeocode', 'addResizeControl'])
+                        ['createMap', 'addMarker', 'addSearchBox', 'addResizeControl', 'build'])
                 },
                 {
                     provide: AngularGoogleMapsListenerService,
@@ -93,86 +91,44 @@ describe('AngularGoogleMapsComponent', () => {
         expect(eventPublisherSpy.unsubscribe).toHaveBeenCalledWith('addressReverseGeocoded')
     })
 
-    describe('Loaded Google Maps', () => {
-
-        let mapSpy: SpyObj<google.maps.Map>
-        let markerSpy: SpyObj<Marker>
-        let searchBoxSpy: SpyObj<SearchBox>
-        let handlerDummy: SpyObj<() => void>
+    describe('Loading Google Maps', () => {
 
         beforeEach(() => {
-            mapSpy = createSpyObj('google.maps.Map', ['getCenter', 'addListener'])
-            markerSpy = createSpyObj('google.maps.Marker', ['addListener'])
-            searchBoxSpy = createSpyObj('google.maps.places.SearchBox', ['addListener'])
-            handlerDummy = createSpyObj('ListenerHandler', [''])
-
-            googleMapsServiceSpy.createMap.and.returnValue(mapSpy)
-            googleMapsServiceSpy.createMarker.and.returnValue(markerSpy)
-            angularGoogleMapsServiceSpy.createSearchBox.and.returnValue(searchBoxSpy)
+            angularGoogleMapsServiceSpy.createMap.and.returnValue(angularGoogleMapsServiceSpy)
+            angularGoogleMapsServiceSpy.addMarker.and.returnValue(angularGoogleMapsServiceSpy)
+            angularGoogleMapsServiceSpy.addSearchBox.and.returnValue(angularGoogleMapsServiceSpy)
+            angularGoogleMapsServiceSpy.addResizeControl.and.returnValue(angularGoogleMapsServiceSpy)
+            angularGoogleMapsServiceSpy.build.and.returnValue(createSpyObj('google.maps.Map', ['']))
         })
 
-        it('creates a map', () => {
+        it('builds a map with marker, search box and custom expand control', () => {
             component.ngOnInit()
 
-            component.setUpMap(location, [])
+            component.setUpMap(location, [location])
 
-            expect(googleMapsServiceSpy.createMap).toHaveBeenCalled()
-        })
-
-        it('creates a map with a search box', () => {
-            googleMapsListenerServiceSpy.getLocationChangedSearchBoxMapMarkerHandler.and.returnValue(handlerDummy)
-            component.ngOnInit()
-
-            component.setUpMap(location, [])
-
-            expect(angularGoogleMapsServiceSpy.createSearchBox).toHaveBeenCalledWith(mapSpy)
-            expect(searchBoxSpy.addListener).toHaveBeenCalledWith('places_changed', handlerDummy)
-            expect(googleMapsListenerServiceSpy.getLocationChangedSearchBoxMapMarkerHandler)
-                .toHaveBeenCalledWith(searchBoxSpy, mapSpy, markerSpy)
-        })
-
-        it('creates a map with a configured marked', () => {
-            googleMapsListenerServiceSpy.getLocationChangedHandler.and.returnValue(handlerDummy)
-            googleMapsListenerServiceSpy.getBindMarkerToMapHandler.and.returnValue(handlerDummy)
-            googleMapsListenerServiceSpy.getLocationDeletedMarkerHandler.and.returnValue(handlerDummy)
-            component.ngOnInit()
-
-            component.setUpMap(location, [new Location(0.0, 1.0)])
-
-            expect(googleMapsServiceSpy.createMarker).toHaveBeenCalledWith(jasmine.objectContaining({
-                map: jasmine.anything()
-            }))
-            expect(markerSpy.addListener).toHaveBeenCalledWith('dragend', handlerDummy)
-            expect(markerSpy.addListener).toHaveBeenCalledWith('dblclick', handlerDummy)
-            expect(mapSpy.addListener).toHaveBeenCalledWith('click', handlerDummy)
-            expect(googleMapsListenerServiceSpy.getLocationChangedHandler).toHaveBeenCalled()
-            expect(googleMapsListenerServiceSpy.getLocationDeletedMarkerHandler).toHaveBeenCalledWith(markerSpy)
-            expect(googleMapsListenerServiceSpy.getBindMarkerToMapHandler).toHaveBeenCalledWith(markerSpy, mapSpy)
-        })
-
-        it('creates a map without a marked location', () => {
-            component.ngOnInit()
-
-            component.setUpMap(location, [])
-
-            expect(googleMapsServiceSpy.createMarker).toHaveBeenCalled()
-            expect(googleMapsServiceSpy.createMarker).not.toHaveBeenCalledWith(jasmine.objectContaining({
-                map: jasmine.anything()
-            }))
-        })
-
-        it('creates a map with multiple map type buttons', () => {
-            component.ngOnInit()
-
-            component.setUpMap(location, [])
-
-            expect(googleMapsServiceSpy.createMap).toHaveBeenCalledWith(
+            expect(angularGoogleMapsServiceSpy.createMap).toHaveBeenCalledWith(
                 jasmine.objectContaining({
                     mapTypeControlOptions: {
                         mapTypeIds: ['roadmap', 'satellite'],
                         position: 'position'
                     }
-                }))
+                }), location)
+            expect(angularGoogleMapsServiceSpy.addMarker).toHaveBeenCalledWith(jasmine.objectContaining({
+                position: jasmine.anything()
+            }), true)
+            expect(angularGoogleMapsServiceSpy.addSearchBox).toHaveBeenCalled()
+            expect(angularGoogleMapsServiceSpy.addResizeControl).toHaveBeenCalled()
+            expect(angularGoogleMapsServiceSpy.build).toHaveBeenCalled()
+        })
+
+        it('builds a map without a marked location', () => {
+            component.ngOnInit()
+
+            component.setUpMap(location, [])
+
+            expect(angularGoogleMapsServiceSpy.addMarker).toHaveBeenCalledWith(jasmine.objectContaining({
+                position: jasmine.anything()
+            }), false)
         })
 
         it('reverses geocode a location', () => {
@@ -189,14 +145,6 @@ describe('AngularGoogleMapsComponent', () => {
             component.setUpMap(location, [])
 
             expect(geocoderSpy.reverseGeocode).not.toHaveBeenCalled()
-        })
-
-        it('adds resize control', () => {
-            component.ngOnInit()
-
-            component.setUpMap(location, [])
-
-            expect(angularGoogleMapsServiceSpy.addResizeControl).toHaveBeenCalled()
         })
 
     })
