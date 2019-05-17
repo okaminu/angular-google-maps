@@ -2,7 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "module": "commonjs",
-    "types": ["jasmine"]
+    "types": ["jasmine", "googlemaps"]
   },
   "files": [
     "src/test.ts",

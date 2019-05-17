@@ -1,6 +1,6 @@
 {
   "name": "@boldadmin/angular-google-maps",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Google Maps adapter for Angular Framework",
   "keywords": [
     "google",
@@ -60,6 +60,9 @@
   },
   "scripts": {
     "build": "ng build",
-    "postbuild": "copyfiles style/google-maps.scss dist/"
+    "postbuild": "copyfiles style/google-maps.scss dist/",
+    "test": "ng test --code-coverage --watch=false",
+    "test-watch": "ng test --watch=true",
+    "lint": "ng lint"
   }
 }

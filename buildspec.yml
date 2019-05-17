@@ -1,0 +1,22 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 10
+    commands:
+      - apt-get update
+      - apt-get --yes --force-yes install chromium-browser
+  pre_build:
+    commands:
+      - npm install -g @angular/cli@7.3.9
+      - npm install -g npm-cli-login
+      - npm install --unsafe-perm
+  build:
+    commands:
+      - npm run test
+      - npm run lint
+      - npm run build
+      - cd dist
+      - npm-cli-login -u $NPM_USERNAME -p $NPM_PASSWORD -e $NPM_EMAIL
+      - npm publish --access public
