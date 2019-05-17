@@ -3,8 +3,8 @@ import { MatIconRegistry } from '@angular/material'
 import { DomSanitizer } from '@angular/platform-browser'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from './location'
-import { AngularGoogleMapsBuilder } from './service/angular-google-maps-builder'
-import { AngularGoogleMapsGeocoder } from './service/angular-google-maps-geocoder'
+import { AngularGoogleMapsBuilder } from './service/angular-google-maps-builder.service'
+import { AngularGoogleMapsGeocoder } from './service/angular-google-maps-geocoder.service'
 import { GoogleMapsService } from './service/google-maps.service'
 import MapOptions = google.maps.MapOptions
 import MarkerOptions = google.maps.MarkerOptions

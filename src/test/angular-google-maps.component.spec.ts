@@ -2,10 +2,10 @@ import { TestBed } from '@angular/core/testing'
 import { MatIconRegistry } from '@angular/material'
 import { DomSanitizer } from '@angular/platform-browser'
 import { EventPublisher } from '@boldadmin/event-publisher'
-import { AngularGoogleMapsGeocoder } from 'src/service/angular-google-maps-geocoder'
+import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocoder.service'
 import { AngularGoogleMapsComponent } from '../angular-google-maps.component'
 import { Location } from '../location'
-import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder'
+import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder.service'
 import { GoogleMapsService } from '../service/google-maps.service'
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj

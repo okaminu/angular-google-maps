@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from '../location'
-import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocoder'
+import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocoder.service'
 import { GoogleMapsService } from '../service/google-maps.service'
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
