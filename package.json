@@ -29,6 +29,7 @@
     "@angular/core": "^7.2.13",
     "@angular/platform-browser": "^7.2.13",
     "@angular/platform-browser-dynamic": "^7.2.13",
+    "@boldadmin/event-publisher": "^2.1.0",
     "@types/googlemaps": "^3.30.19",
     "@types/jasmine": "^3.3.12",
     "ng-packagr": "^4.2.0",
