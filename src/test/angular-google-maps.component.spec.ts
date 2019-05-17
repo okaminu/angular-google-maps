@@ -5,7 +5,7 @@ import { EventPublisher } from '@boldadmin/event-publisher'
 import { AngularGoogleMapsGeocoderService } from 'src/service/angular-google-maps-geocoder.service'
 import { AngularGoogleMapsComponent } from '../angular-google-maps.component'
 import { Location } from '../location'
-import { AngularGoogleMapsService } from '../service/angular-google-maps.service'
+import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder.service'
 import { GoogleMapsService } from '../service/google-maps.service'
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
@@ -17,9 +17,9 @@ describe('AngularGoogleMapsComponent', () => {
     let eventPublisherSpy: SpyObj<EventPublisher>
     let matIconRegistrySpy: SpyObj<MatIconRegistry>
     let domSanitizerSpy: SpyObj<DomSanitizer>
-    let angularGoogleMapsServiceSpy: SpyObj<AngularGoogleMapsService>
+    let googleMapsBuilderSpy: SpyObj<AngularGoogleMapsBuilder>
     let geocoderSpy: SpyObj<AngularGoogleMapsGeocoderService>
-    let googleMapsServiceSpy: SpyObj<GoogleMapsService>
+    let googleMapsSpy: SpyObj<GoogleMapsService>
 
     const subscribers = new Map<string, Function>()
     const location = new Location(10, 20)
@@ -32,8 +32,8 @@ describe('AngularGoogleMapsComponent', () => {
         TestBed.configureTestingModule({
             providers: [AngularGoogleMapsComponent,
                 {
-                    provide: AngularGoogleMapsService,
-                    useValue: createSpyObj('AngularGoogleMapsService',
+                    provide: AngularGoogleMapsBuilder,
+                    useValue: createSpyObj('AngularGoogleMapsBuilder',
                         ['createMap', 'addMarker', 'addSearchBox', 'addResizeControl', 'build'])
                 },
                 {
@@ -56,10 +56,10 @@ describe('AngularGoogleMapsComponent', () => {
         eventPublisherSpy.subscribe.and.callFake((e, fun) => subscribers.set(e, fun))
         matIconRegistrySpy = TestBed.get(MatIconRegistry)
         domSanitizerSpy = TestBed.get(DomSanitizer)
-        angularGoogleMapsServiceSpy = TestBed.get(AngularGoogleMapsService)
+        googleMapsBuilderSpy = TestBed.get(AngularGoogleMapsBuilder)
         geocoderSpy = TestBed.get(AngularGoogleMapsGeocoderService)
-        googleMapsServiceSpy = TestBed.get(GoogleMapsService)
-        googleMapsServiceSpy.getGoogleMaps.and.returnValue(googleMapsStub)
+        googleMapsSpy = TestBed.get(GoogleMapsService)
+        googleMapsSpy.getGoogleMaps.and.returnValue(googleMapsStub)
 
         component = TestBed.get(AngularGoogleMapsComponent)
     })
@@ -85,11 +85,11 @@ describe('AngularGoogleMapsComponent', () => {
     describe('Loading Google Maps', () => {
 
         beforeEach(() => {
-            angularGoogleMapsServiceSpy.createMap.and.returnValue(angularGoogleMapsServiceSpy)
-            angularGoogleMapsServiceSpy.addMarker.and.returnValue(angularGoogleMapsServiceSpy)
-            angularGoogleMapsServiceSpy.addSearchBox.and.returnValue(angularGoogleMapsServiceSpy)
-            angularGoogleMapsServiceSpy.addResizeControl.and.returnValue(angularGoogleMapsServiceSpy)
-            angularGoogleMapsServiceSpy.build.and.returnValue(createSpyObj('google.maps.Map', ['']))
+            googleMapsBuilderSpy.createMap.and.returnValue(googleMapsBuilderSpy)
+            googleMapsBuilderSpy.addMarker.and.returnValue(googleMapsBuilderSpy)
+            googleMapsBuilderSpy.addSearchBox.and.returnValue(googleMapsBuilderSpy)
+            googleMapsBuilderSpy.addResizeControl.and.returnValue(googleMapsBuilderSpy)
+            googleMapsBuilderSpy.build.and.returnValue(createSpyObj('google.maps.Map', ['']))
         })
 
         it('builds a map with marker, search box and custom expand control', () => {
@@ -97,19 +97,19 @@ describe('AngularGoogleMapsComponent', () => {
 
             component.setUpMap(location, [location])
 
-            expect(angularGoogleMapsServiceSpy.createMap).toHaveBeenCalledWith(
+            expect(googleMapsBuilderSpy.createMap).toHaveBeenCalledWith(
                 jasmine.objectContaining({
                     mapTypeControlOptions: {
                         mapTypeIds: ['roadmap', 'satellite'],
                         position: 'position'
                     }
                 }), location)
-            expect(angularGoogleMapsServiceSpy.addMarker).toHaveBeenCalledWith(jasmine.objectContaining({
+            expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalledWith(jasmine.objectContaining({
                 position: jasmine.anything()
             }), true)
-            expect(angularGoogleMapsServiceSpy.addSearchBox).toHaveBeenCalled()
-            expect(angularGoogleMapsServiceSpy.addResizeControl).toHaveBeenCalled()
-            expect(angularGoogleMapsServiceSpy.build).toHaveBeenCalled()
+            expect(googleMapsBuilderSpy.addSearchBox).toHaveBeenCalled()
+            expect(googleMapsBuilderSpy.addResizeControl).toHaveBeenCalled()
+            expect(googleMapsBuilderSpy.build).toHaveBeenCalled()
         })
 
         it('builds a map without a marked location', () => {
@@ -117,7 +117,7 @@ describe('AngularGoogleMapsComponent', () => {
 
             component.setUpMap(location, [])
 
-            expect(angularGoogleMapsServiceSpy.addMarker).toHaveBeenCalledWith(jasmine.objectContaining({
+            expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalledWith(jasmine.objectContaining({
                 position: jasmine.anything()
             }), false)
         })

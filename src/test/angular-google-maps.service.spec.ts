@@ -1,17 +1,17 @@
 import { fakeAsync, TestBed } from '@angular/core/testing'
 import { Location } from '../location'
+import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder.service'
 import { AngularGoogleMapsListenerService } from '../service/angular-google-maps-listener.service'
-import { AngularGoogleMapsService } from '../service/angular-google-maps.service'
 import { GoogleMapsService } from '../service/google-maps.service'
 import Marker = google.maps.Marker
 import createSpy = jasmine.createSpy
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
 
-describe('AngularGoogleMapsService', () => {
+describe('AngularGoogleMapsBuilder', () => {
 
     let googleMaps: SpyObj<GoogleMapsService>
-    let service: AngularGoogleMapsService
+    let builder: AngularGoogleMapsBuilder
     let listenerServiceSpy: SpyObj<AngularGoogleMapsListenerService>
 
     const position = {lat: 10, lng: 15}
@@ -20,7 +20,7 @@ describe('AngularGoogleMapsService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             providers: [
-                AngularGoogleMapsService,
+                AngularGoogleMapsBuilder,
                 {
                     provide: GoogleMapsService,
                     useValue: createSpyObj('GoogleMapsService',
@@ -37,7 +37,7 @@ describe('AngularGoogleMapsService', () => {
         googleMaps = TestBed.get(GoogleMapsService)
         listenerServiceSpy = TestBed.get(AngularGoogleMapsListenerService)
 
-        service = TestBed.get(AngularGoogleMapsService)
+        builder = TestBed.get(AngularGoogleMapsBuilder)
     })
 
     afterEach(() =>
@@ -64,14 +64,14 @@ describe('AngularGoogleMapsService', () => {
         describe('On map building', () => {
 
             it('builds a map', () => {
-                expect(service
+                expect(builder
                     .createMap(mapOptionsSpy, mapOptionsSpy)
                     .build()
                 ).toBe(mapSpy)
             })
 
             it('map is centered by provided location', () => {
-                service
+                builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .build()
 
@@ -93,7 +93,7 @@ describe('AngularGoogleMapsService', () => {
             })
 
             it('adds a marker', () => {
-                service
+                builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
                     .build()
@@ -104,7 +104,7 @@ describe('AngularGoogleMapsService', () => {
             it('adds a marker aligned with map position', () => {
                 mapSpy.getCenter.and.returnValue(position)
 
-                service
+                builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
                     .build()
@@ -113,7 +113,7 @@ describe('AngularGoogleMapsService', () => {
             })
 
             it('marker is bound to map if marker location are provided', () => {
-                service
+                builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
                     .build()
@@ -122,7 +122,7 @@ describe('AngularGoogleMapsService', () => {
             })
 
             it('marker is not bound to map if location is not provided', () => {
-                service
+                builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, false)
                     .build()
@@ -133,7 +133,7 @@ describe('AngularGoogleMapsService', () => {
             it('adds location changed marker listener', () => {
                 listenerServiceSpy.getLocationChangedHandler.and.returnValue(handlerDummy)
 
-                service
+                builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
                     .build()
@@ -145,7 +145,7 @@ describe('AngularGoogleMapsService', () => {
             it('adds location deleted marker listener', () => {
                 listenerServiceSpy.getLocationDeletedMarkerHandler.and.returnValue(handlerDummy)
 
-                service
+                builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
                     .build()
@@ -157,7 +157,7 @@ describe('AngularGoogleMapsService', () => {
             it('binds map click to marker position update', () => {
                 listenerServiceSpy.getBindMarkerToMapHandler.and.returnValue(handlerDummy)
 
-                service
+                builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
                     .build()
@@ -191,7 +191,7 @@ describe('AngularGoogleMapsService', () => {
             })
 
             it('adds resize control to map', () => {
-                service
+                builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addResizeControl()
                     .build()
@@ -237,7 +237,7 @@ describe('AngularGoogleMapsService', () => {
             })
 
             it('adds search box', fakeAsync(() => {
-                service
+                builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
                     .addSearchBox()
@@ -247,7 +247,7 @@ describe('AngularGoogleMapsService', () => {
             }))
 
             it('adds search box with configured location', fakeAsync(() => {
-                service
+                builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
                     .addSearchBox()
@@ -260,7 +260,7 @@ describe('AngularGoogleMapsService', () => {
                 const handlerDummy: SpyObj<() => void> = createSpyObj('ListenerHandler', [''])
                 listenerServiceSpy.getLocationChangedSearchBoxMapMarkerHandler.and.returnValue(handlerDummy)
 
-                service
+                builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
                     .addSearchBox()

@@ -8,7 +8,7 @@ import Marker = google.maps.Marker
 import MarkerOptions = google.maps.MarkerOptions
 
 @Injectable()
-export class AngularGoogleMapsService {
+export class AngularGoogleMapsBuilder {
 
     private map: Map
     private marker: Marker
