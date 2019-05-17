@@ -14,7 +14,7 @@ phases:
       - npm install --unsafe-perm
   build:
     commands:
-      - ls node_modules/
+      - ls node_modules/@types
 #      - npm run test
 #      - npm run lint
 #      - npm run build
