@@ -7,7 +7,7 @@ import Marker = google.maps.Marker
 import SearchBox = google.maps.places.SearchBox
 
 @Injectable()
-export class AngularGoogleMapsListenerService {
+export class AngularGoogleMapsListener {
 
     constructor(
         private geocoder: AngularGoogleMapsGeocoder,

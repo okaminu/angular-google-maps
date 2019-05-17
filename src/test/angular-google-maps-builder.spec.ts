@@ -1,7 +1,7 @@
 import { fakeAsync, TestBed } from '@angular/core/testing'
 import { Location } from '../location'
 import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder'
-import { AngularGoogleMapsListenerService } from '../service/angular-google-maps-listener.service'
+import { AngularGoogleMapsListener } from '../service/angular-google-maps-listener.service'
 import { GoogleMapsService } from '../service/google-maps.service'
 import Marker = google.maps.Marker
 import createSpy = jasmine.createSpy
@@ -12,7 +12,7 @@ describe('AngularGoogleMapsBuilder', () => {
 
     let googleMaps: SpyObj<GoogleMapsService>
     let builder: AngularGoogleMapsBuilder
-    let listenerServiceSpy: SpyObj<AngularGoogleMapsListenerService>
+    let listenerServiceSpy: SpyObj<AngularGoogleMapsListener>
 
     const position = {lat: 10, lng: 15}
     const focusLocation = new Location(10, 15)
@@ -27,15 +27,15 @@ describe('AngularGoogleMapsBuilder', () => {
                         ['getGoogleMaps', 'createMap', 'createMarker', 'createSearchBox'])
                 },
                 {
-                    provide: AngularGoogleMapsListenerService,
-                    useValue: createSpyObj('AngularGoogleMapsListenerService',
+                    provide: AngularGoogleMapsListener,
+                    useValue: createSpyObj('AngularGoogleMapsListener',
                         ['getLocationChangedHandler', 'getBindMarkerToMapHandler',
                             'getLocationChangedSearchBoxMapMarkerHandler', 'getLocationDeletedMarkerHandler'])
                 }
             ]
         })
         googleMaps = TestBed.get(GoogleMapsService)
-        listenerServiceSpy = TestBed.get(AngularGoogleMapsListenerService)
+        listenerServiceSpy = TestBed.get(AngularGoogleMapsListener)
 
         builder = TestBed.get(AngularGoogleMapsBuilder)
     })

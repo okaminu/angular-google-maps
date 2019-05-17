@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from '../location'
 import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocoder'
-import { AngularGoogleMapsListenerService } from '../service/angular-google-maps-listener.service'
+import { AngularGoogleMapsListener } from '../service/angular-google-maps-listener.service'
 import Map = google.maps.Map
 import Marker = google.maps.Marker
 import SearchBox = google.maps.places.SearchBox
@@ -11,9 +11,9 @@ import createSpy = jasmine.createSpy
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
 
-describe('AngularGoogleMapsListenerService', () => {
+describe('AngularGoogleMapsListener', () => {
 
-    let service: AngularGoogleMapsListenerService
+    let service: AngularGoogleMapsListener
     let geocoder: AngularGoogleMapsGeocoder
     let eventPublisherSpy: SpyObj<EventPublisher>
 
@@ -28,7 +28,7 @@ describe('AngularGoogleMapsListenerService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             providers: [
-                AngularGoogleMapsListenerService,
+                AngularGoogleMapsListener,
                 {
                     provide: AngularGoogleMapsGeocoder,
                     useValue: createSpyObj('AngularGoogleMapsGeocoder', ['reverseGeocode'])
@@ -38,7 +38,7 @@ describe('AngularGoogleMapsListenerService', () => {
         })
         eventPublisherSpy = TestBed.get(EventPublisher)
         geocoder = TestBed.get(AngularGoogleMapsGeocoder)
-        service = TestBed.get(AngularGoogleMapsListenerService)
+        service = TestBed.get(AngularGoogleMapsListener)
     })
 
     it('should handle location change', () => {
