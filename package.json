@@ -39,6 +39,7 @@
     "karma-jasmine": "^2.0.1",
     "karma-coverage-istanbul-reporter": "^2.0.5",
     "karma-istanbul-threshold": "^1.2.2",
+    "copyfiles": "^2.1.0",
     "tsickle": ">=0.34.0",
     "tslib": "^1.9.0",
     "tslint": "~5.16.0",
@@ -56,5 +57,9 @@
     "@boldadmin/event-publisher": "^2.1.0",
     "@angular/material": "^7.3.7",
     "@angular/forms": "^7.2.13"
+  },
+  "scripts": {
+    "build": "ng build",
+    "postbuild": "copyfiles style/google-maps.scss dist/"
   }
 }
