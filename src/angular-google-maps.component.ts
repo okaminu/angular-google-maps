@@ -52,7 +52,6 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
     constructor(private googleMaps: GoogleMapsService,
                 private googleMapsService: AngularGoogleMapsService,
                 private googleMapsGeocoderService: AngularGoogleMapsGeocoderService,
-                private googleMapsListeners: AngularGoogleMapsListenerService,
                 private eventPublisher: EventPublisher,
                 private iconRegistry: MatIconRegistry,
                 private sanitizer: DomSanitizer) {

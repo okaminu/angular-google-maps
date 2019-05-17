@@ -5,7 +5,6 @@ import { EventPublisher } from '@boldadmin/event-publisher'
 import { AngularGoogleMapsGeocoderService } from 'src/service/angular-google-maps-geocoder.service'
 import { AngularGoogleMapsComponent } from '../angular-google-maps.component'
 import { Location } from '../location'
-import { AngularGoogleMapsListenerService } from '../service/angular-google-maps-listener.service'
 import { AngularGoogleMapsService } from '../service/angular-google-maps.service'
 import { GoogleMapsService } from '../service/google-maps.service'
 import createSpyObj = jasmine.createSpyObj
@@ -21,7 +20,6 @@ describe('AngularGoogleMapsComponent', () => {
     let angularGoogleMapsServiceSpy: SpyObj<AngularGoogleMapsService>
     let geocoderSpy: SpyObj<AngularGoogleMapsGeocoderService>
     let googleMapsServiceSpy: SpyObj<GoogleMapsService>
-    let googleMapsListenerServiceSpy: SpyObj<AngularGoogleMapsListenerService>
 
     const subscribers = new Map<string, Function>()
     const location = new Location(10, 20)
@@ -39,18 +37,12 @@ describe('AngularGoogleMapsComponent', () => {
                         ['createMap', 'addMarker', 'addSearchBox', 'addResizeControl', 'build'])
                 },
                 {
-                    provide: AngularGoogleMapsListenerService,
-                    useValue: createSpyObj('AngularGoogleMapsListenerService',
-                        ['getLocationChangedHandler', 'getBindMarkerToMapHandler',
-                            'getLocationChangedSearchBoxMapMarkerHandler', 'getLocationDeletedMarkerHandler'])
-                },
-                {
                     provide: AngularGoogleMapsGeocoderService,
                     useValue: createSpyObj('AngularGoogleMapsGeocoderService', ['reverseGeocode'])
                 },
                 {
                     provide: GoogleMapsService,
-                    useValue: createSpyObj('GoogleMapsService', ['getGoogleMaps', 'createMap', 'createMarker'])
+                    useValue: createSpyObj('GoogleMapsService', ['getGoogleMaps'])
                 },
                 {
                     provide: EventPublisher,
@@ -68,7 +60,6 @@ describe('AngularGoogleMapsComponent', () => {
         geocoderSpy = TestBed.get(AngularGoogleMapsGeocoderService)
         googleMapsServiceSpy = TestBed.get(GoogleMapsService)
         googleMapsServiceSpy.getGoogleMaps.and.returnValue(googleMapsStub)
-        googleMapsListenerServiceSpy = TestBed.get(AngularGoogleMapsListenerService)
 
         component = TestBed.get(AngularGoogleMapsComponent)
     })
