@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from '../location'
 import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocoder'
-import { AngularGoogleMapsListener } from '../service/angular-google-maps-listener.service'
+import { AngularGoogleMapsListener } from '../service/angular-google-maps-listener'
 import Map = google.maps.Map
 import Marker = google.maps.Marker
 import SearchBox = google.maps.places.SearchBox

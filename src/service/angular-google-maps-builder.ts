@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Location } from '../location'
-import { AngularGoogleMapsListener } from './angular-google-maps-listener.service'
+import { AngularGoogleMapsListener } from './angular-google-maps-listener'
 import { GoogleMapsService } from './google-maps.service'
 import Map = google.maps.Map
 import MapOptions = google.maps.MapOptions

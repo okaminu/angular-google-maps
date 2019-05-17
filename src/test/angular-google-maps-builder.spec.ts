@@ -1,7 +1,7 @@
 import { fakeAsync, TestBed } from '@angular/core/testing'
 import { Location } from '../location'
 import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder'
-import { AngularGoogleMapsListener } from '../service/angular-google-maps-listener.service'
+import { AngularGoogleMapsListener } from '../service/angular-google-maps-listener'
 import { GoogleMapsService } from '../service/google-maps.service'
 import Marker = google.maps.Marker
 import createSpy = jasmine.createSpy
