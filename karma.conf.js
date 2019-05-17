@@ -36,10 +36,10 @@ module.exports = function (config) {
             reporters: ['text'],
             thresholds: {
                 global: {
-                    statements: 50,
-                    branches: 50,
-                    functions: 50,
-                    lines: 50
+                    statements: 100,
+                    branches: 100,
+                    functions: 100,
+                    lines: 100
                 }
             }
         },
