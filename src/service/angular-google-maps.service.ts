@@ -45,6 +45,12 @@ export class AngularGoogleMapsService {
         return this
     }
 
+    addResizeControl(map: google.maps.Map) {
+        const resizeControl = document.getElementById('resize-control')
+        map.controls[this.googleMaps.getGoogleMaps().ControlPosition.TOP_RIGHT].push(resizeControl)
+        return this
+    }
+
     build() {
         return this.map
     }
@@ -56,12 +62,6 @@ export class AngularGoogleMapsService {
         map.controls[this.googleMaps.getGoogleMaps().ControlPosition.TOP_LEFT].push(searchBoxInput)
 
         return searchBox
-    }
-
-    addResizeControl(map: google.maps.Map) {
-        const resizeControl = document.getElementById('resize-control')
-        map.controls[this.googleMaps.getGoogleMaps().ControlPosition.TOP_RIGHT].push(resizeControl)
-        return Promise.resolve(resizeControl)
     }
 
     private addMarkerListeners() {

@@ -44,42 +44,6 @@ describe('AngularGoogleMapsService', () => {
         document.getElementById = createSpy('document').and.callThrough()
     )
 
-    describe('Custom expand control', () => {
-        let elementSpy: SpyObj<HTMLElement>
-        let controlSpy: SpyObj<google.maps.MVCArray<Node>[]>
-        let mapSpy: SpyObj<any>
-
-        beforeEach(() => {
-            document.getElementById = createSpy('HTMLElement').and.callFake(id => {
-                if (id === 'resize-control')
-                    return elementSpy
-                else throw Error()
-            })
-            elementSpy = createSpyObj('HTMLElement', [''])
-            controlSpy = createSpyObj('google.maps.Map.controls', ['push'])
-            mapSpy = createSpyObj('google.maps.Map', [''])
-
-            mapSpy.controls = {
-                'somePosition': controlSpy
-            }
-            googleMaps.getGoogleMaps.and.returnValue({
-                ControlPosition: {
-                    TOP_RIGHT: 'somePosition'
-                }
-            })
-        })
-
-        it('adds resize control to map', fakeAsync(() => {
-            service
-                .addResizeControl(mapSpy)
-                .then(control => {
-                    expect(control).toBe(elementSpy)
-                    expect(controlSpy.push).toHaveBeenCalledWith(elementSpy)
-                })
-        }))
-
-    })
-
     describe('Building Google Maps', () => {
 
         let mapSpy: SpyObj<any>
@@ -200,6 +164,41 @@ describe('AngularGoogleMapsService', () => {
 
                 expect(mapSpy.addListener).toHaveBeenCalledWith('click', handlerDummy)
                 expect(listenerServiceSpy.getBindMarkerToMapHandler).toHaveBeenCalledWith(markerSpy, mapSpy)
+            })
+
+        })
+
+        describe('Custom expand control', () => {
+            let elementSpy: SpyObj<HTMLElement>
+            let controlSpy: SpyObj<google.maps.MVCArray<Node>[]>
+
+            beforeEach(() => {
+                document.getElementById = createSpy('HTMLElement').and.callFake(id => {
+                    if (id === 'resize-control')
+                        return elementSpy
+                    else throw Error()
+                })
+                elementSpy = createSpyObj('HTMLElement', [''])
+                controlSpy = createSpyObj('google.maps.Map.controls', ['push'])
+                mapSpy = createSpyObj('google.maps.Map', [''])
+
+                mapSpy.controls = {
+                    'somePosition': controlSpy
+                }
+                googleMaps.getGoogleMaps.and.returnValue({
+                    ControlPosition: {
+                        TOP_RIGHT: 'somePosition'
+                    }
+                })
+            })
+
+            it('adds resize control to map', () => {
+                service
+                    .createMap(mapOptionsSpy, focusLocation)
+                    .addResizeControl(mapSpy)
+                    .build()
+
+                expect(controlSpy.push).toHaveBeenCalledWith(elementSpy)
             })
 
         })
