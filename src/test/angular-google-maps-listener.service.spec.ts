@@ -14,7 +14,7 @@ import SpyObj = jasmine.SpyObj
 describe('AngularGoogleMapsListener', () => {
 
     let service: AngularGoogleMapsListener
-    let geocoder: AngularGoogleMapsGeocoder
+    let geocoderSpy: SpyObj<AngularGoogleMapsGeocoder>
     let eventPublisherSpy: SpyObj<EventPublisher>
 
     const location = {
@@ -37,7 +37,7 @@ describe('AngularGoogleMapsListener', () => {
             ]
         })
         eventPublisherSpy = TestBed.get(EventPublisher)
-        geocoder = TestBed.get(AngularGoogleMapsGeocoder)
+        geocoderSpy = TestBed.get(AngularGoogleMapsGeocoder)
         service = TestBed.get(AngularGoogleMapsListener)
     })
 
@@ -46,7 +46,7 @@ describe('AngularGoogleMapsListener', () => {
 
         expect(eventPublisherSpy.notify.calls.first().args[0]).toEqual('locationChanged')
         expect(eventPublisherSpy.notify.calls.first().args[1]).toEqual(new Location(location.lat(), location.lng()))
-        expect(geocoder.reverseGeocode).toHaveBeenCalledWith(new Location(location.lat(), location.lng()))
+        expect(geocoderSpy.reverseGeocode).toHaveBeenCalledWith(new Location(location.lat(), location.lng()))
     })
 
     it('should bind marker to map', () => {
@@ -59,7 +59,7 @@ describe('AngularGoogleMapsListener', () => {
         expect(markerSpy.setPosition).toHaveBeenCalledWith(mouseEvent.latLng)
         expect(eventPublisherSpy.notify.calls.first().args[0]).toEqual('locationChanged')
         expect(eventPublisherSpy.notify.calls.first().args[1]).toEqual(new Location(location.lat(), location.lng()))
-        expect(geocoder.reverseGeocode).toHaveBeenCalledWith(new Location(location.lat(), location.lng()))
+        expect(geocoderSpy.reverseGeocode).toHaveBeenCalledWith(new Location(location.lat(), location.lng()))
     })
 
     it('should handle location change for search box, map and marker', () => {

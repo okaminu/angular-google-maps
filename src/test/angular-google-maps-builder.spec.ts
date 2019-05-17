@@ -11,8 +11,8 @@ import SpyObj = jasmine.SpyObj
 describe('AngularGoogleMapsBuilder', () => {
 
     let googleMaps: SpyObj<GoogleMapsService>
-    let builder: AngularGoogleMapsBuilder
     let listenerServiceSpy: SpyObj<AngularGoogleMapsListener>
+    let builder: AngularGoogleMapsBuilder
 
     const position = {lat: 10, lng: 15}
     const focusLocation = new Location(10, 15)
