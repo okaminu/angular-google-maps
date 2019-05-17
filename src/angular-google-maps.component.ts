@@ -7,11 +7,8 @@ import { AngularGoogleMapsGeocoderService } from './service/angular-google-maps-
 import { AngularGoogleMapsListenerService } from './service/angular-google-maps-listener.service'
 import { AngularGoogleMapsService } from './service/angular-google-maps.service'
 import { GoogleMapsService } from './service/google-maps.service'
-import Map = google.maps.Map
 import MapOptions = google.maps.MapOptions
-import Marker = google.maps.Marker
 import MarkerOptions = google.maps.MarkerOptions
-import SearchBox = google.maps.places.SearchBox
 
 @Component({
     selector: 'google-maps',
@@ -73,42 +70,22 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
     }
 
     setUpMap(focusLocation: Location, markerLocations: Array<Location>) {
-        let map: Map
-        let marker: Marker
-        let searchBox: SearchBox
         const areMarkerLocationsProvided = markerLocations.length > 0
 
         if (areMarkerLocationsProvided)
             this.googleMapsGeocoderService.reverseGeocode(focusLocation)
-        map = this.createMap(focusLocation)
-        this.bindMarkerToMapsIfLocationIsProvided(map, areMarkerLocationsProvided)
-        marker = this.googleMaps.createMarker(this.markerOptions)
-        marker.addListener('dragend', this.googleMapsListeners.getLocationChangedHandler())
-        marker.addListener('dblclick', this.googleMapsListeners.getLocationDeletedMarkerHandler(marker))
-        map.addListener('click', this.googleMapsListeners.getBindMarkerToMapHandler(marker, map))
-        this.googleMapsService.addResizeControl(map)
-        searchBox = this.googleMapsService.createSearchBox(map)
-        searchBox.addListener('places_changed',
-            this.googleMapsListeners.getLocationChangedSearchBoxMapMarkerHandler(searchBox, map, marker))
+
+        this.googleMapsService
+            .createMap(this.mapOptions, focusLocation)
+            .addMarker(this.markerOptions, areMarkerLocationsProvided)
+            .addSearchBox()
+            .addResizeControl()
+            .build()
     }
 
     onMapResize() {
         this.eventPublisher.notify('onGoogleMapResize')
         this.isMapExpanded = !this.isMapExpanded
-    }
-
-    private createMap(focusLocation: Location) {
-        this.mapOptions.center = {
-            lat: focusLocation.latitude,
-            lng: focusLocation.longitude
-        }
-        return this.googleMaps.createMap(this.mapOptions)
-    }
-
-    private bindMarkerToMapsIfLocationIsProvided(map: Map, isLocationProvided: boolean) {
-        this.markerOptions.position = map.getCenter()
-        if (isLocationProvided)
-            this.markerOptions.map = map
     }
 
 }
