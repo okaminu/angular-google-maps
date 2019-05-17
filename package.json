@@ -1,6 +1,6 @@
 {
   "name": "@boldadmin/angular-google-maps",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Google Maps adapter for Angular Framework",
   "keywords": [
     "google",
