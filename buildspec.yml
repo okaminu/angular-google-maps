@@ -14,9 +14,10 @@ phases:
       - npm install --unsafe-perm
   build:
     commands:
-      - npm run test
-      - npm run lint
-      - npm run build
-      - cd dist
-      - npm-cli-login -u $NPM_USERNAME -p $NPM_PASSWORD -e $NPM_EMAIL
-      - npm publish --access public
+      - ls node_modules/
+#      - npm run test
+#      - npm run lint
+#      - npm run build
+#      - cd dist
+#      - npm-cli-login -u $NPM_USERNAME -p $NPM_PASSWORD -e $NPM_EMAIL
+#      - npm publish --access public
