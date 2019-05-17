@@ -4,7 +4,7 @@ import { DomSanitizer } from '@angular/platform-browser'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from './location'
 import { AngularGoogleMapsBuilder } from './service/angular-google-maps-builder'
-import { AngularGoogleMapsGeocoderService } from './service/angular-google-maps-geocoder.service'
+import { AngularGoogleMapsGeocoder } from './service/angular-google-maps-geocoder'
 import { GoogleMapsService } from './service/google-maps.service'
 import MapOptions = google.maps.MapOptions
 import MarkerOptions = google.maps.MarkerOptions
@@ -50,7 +50,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
 
     constructor(private googleMaps: GoogleMapsService,
                 private googleMapsBuilder: AngularGoogleMapsBuilder,
-                private googleMapsGeocoder: AngularGoogleMapsGeocoderService,
+                private googleMapsGeocoder: AngularGoogleMapsGeocoder,
                 private eventPublisher: EventPublisher,
                 private iconRegistry: MatIconRegistry,
                 private sanitizer: DomSanitizer) {

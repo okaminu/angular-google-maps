@@ -1,22 +1,22 @@
 import { TestBed } from '@angular/core/testing'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from '../location'
-import { AngularGoogleMapsGeocoderService } from '../service/angular-google-maps-geocoder.service'
+import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocoder'
 import { GoogleMapsService } from '../service/google-maps.service'
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
 
-describe('AngularGoogleMapsGeocoderService', () => {
+describe('AngularGoogleMapsGeocoder', () => {
 
     let googleMapsService: SpyObj<GoogleMapsService>
-    let service: AngularGoogleMapsGeocoderService
+    let service: AngularGoogleMapsGeocoder
     let eventPublisherSpy: SpyObj<EventPublisher>
     let geocoderSpy: SpyObj<google.maps.Geocoder>
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             providers: [
-                AngularGoogleMapsGeocoderService,
+                AngularGoogleMapsGeocoder,
                 {
                     provide: GoogleMapsService,
                     useValue: createSpyObj('GoogleMapsService', ['createGeocoder', 'createLatLng'])
@@ -30,7 +30,7 @@ describe('AngularGoogleMapsGeocoderService', () => {
         googleMapsService.createGeocoder.and.returnValue(geocoderSpy)
         eventPublisherSpy = TestBed.get(EventPublisher)
 
-        service = TestBed.get(AngularGoogleMapsGeocoderService)
+        service = TestBed.get(AngularGoogleMapsGeocoder)
     })
 
     describe('Reverse geocoding', () => {

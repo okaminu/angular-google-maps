@@ -4,7 +4,7 @@ import { Location } from '../location'
 import { GoogleMapsService } from './google-maps.service'
 
 @Injectable()
-export class AngularGoogleMapsGeocoderService {
+export class AngularGoogleMapsGeocoder {
 
     constructor(private googleMaps: GoogleMapsService,
                 private eventPublisher: EventPublisher) {

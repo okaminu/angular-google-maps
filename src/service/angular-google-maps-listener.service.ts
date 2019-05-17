@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from '../location'
-import { AngularGoogleMapsGeocoderService } from './angular-google-maps-geocoder.service'
+import { AngularGoogleMapsGeocoder } from './angular-google-maps-geocoder'
 import Map = google.maps.Map
 import Marker = google.maps.Marker
 import SearchBox = google.maps.places.SearchBox
@@ -10,7 +10,7 @@ import SearchBox = google.maps.places.SearchBox
 export class AngularGoogleMapsListenerService {
 
     constructor(
-        private geocoder: AngularGoogleMapsGeocoderService,
+        private geocoder: AngularGoogleMapsGeocoder,
         private eventPublisher: EventPublisher) {
     }
 

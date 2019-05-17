@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing'
 import { MatIconRegistry } from '@angular/material'
 import { DomSanitizer } from '@angular/platform-browser'
 import { EventPublisher } from '@boldadmin/event-publisher'
-import { AngularGoogleMapsGeocoderService } from 'src/service/angular-google-maps-geocoder.service'
+import { AngularGoogleMapsGeocoder } from 'src/service/angular-google-maps-geocoder'
 import { AngularGoogleMapsComponent } from '../angular-google-maps.component'
 import { Location } from '../location'
 import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder'
@@ -18,7 +18,7 @@ describe('AngularGoogleMapsComponent', () => {
     let matIconRegistrySpy: SpyObj<MatIconRegistry>
     let domSanitizerSpy: SpyObj<DomSanitizer>
     let googleMapsBuilderSpy: SpyObj<AngularGoogleMapsBuilder>
-    let geocoderSpy: SpyObj<AngularGoogleMapsGeocoderService>
+    let geocoderSpy: SpyObj<AngularGoogleMapsGeocoder>
     let googleMapsSpy: SpyObj<GoogleMapsService>
 
     const subscribers = new Map<string, Function>()
@@ -37,8 +37,8 @@ describe('AngularGoogleMapsComponent', () => {
                         ['createMap', 'addMarker', 'addSearchBox', 'addResizeControl', 'build'])
                 },
                 {
-                    provide: AngularGoogleMapsGeocoderService,
-                    useValue: createSpyObj('AngularGoogleMapsGeocoderService', ['reverseGeocode'])
+                    provide: AngularGoogleMapsGeocoder,
+                    useValue: createSpyObj('AngularGoogleMapsGeocoder', ['reverseGeocode'])
                 },
                 {
                     provide: GoogleMapsService,
@@ -57,7 +57,7 @@ describe('AngularGoogleMapsComponent', () => {
         matIconRegistrySpy = TestBed.get(MatIconRegistry)
         domSanitizerSpy = TestBed.get(DomSanitizer)
         googleMapsBuilderSpy = TestBed.get(AngularGoogleMapsBuilder)
-        geocoderSpy = TestBed.get(AngularGoogleMapsGeocoderService)
+        geocoderSpy = TestBed.get(AngularGoogleMapsGeocoder)
         googleMapsSpy = TestBed.get(GoogleMapsService)
         googleMapsSpy.getGoogleMaps.and.returnValue(googleMapsStub)
 
