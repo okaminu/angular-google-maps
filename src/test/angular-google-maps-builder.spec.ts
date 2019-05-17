@@ -1,6 +1,6 @@
 import { fakeAsync, TestBed } from '@angular/core/testing'
 import { Location } from '../location'
-import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder.service'
+import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder'
 import { AngularGoogleMapsListenerService } from '../service/angular-google-maps-listener.service'
 import { GoogleMapsService } from '../service/google-maps.service'
 import Marker = google.maps.Marker

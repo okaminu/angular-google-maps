@@ -5,7 +5,7 @@ import { EventPublisher } from '@boldadmin/event-publisher'
 import { AngularGoogleMapsGeocoderService } from 'src/service/angular-google-maps-geocoder.service'
 import { AngularGoogleMapsComponent } from '../angular-google-maps.component'
 import { Location } from '../location'
-import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder.service'
+import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder'
 import { GoogleMapsService } from '../service/google-maps.service'
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
