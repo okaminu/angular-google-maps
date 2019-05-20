@@ -1,9 +1,11 @@
 import { fakeAsync, TestBed } from '@angular/core/testing'
+import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from '../location'
 import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder.service'
-import { AngularGoogleMapsListener } from '../service/angular-google-maps-listener.service'
+import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocoder.service'
 import { GoogleMapsService } from '../service/google-maps.service'
 import Marker = google.maps.Marker
+import any = jasmine.any
 import createSpy = jasmine.createSpy
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
@@ -11,11 +13,9 @@ import SpyObj = jasmine.SpyObj
 describe('AngularGoogleMapsBuilder', () => {
 
     let googleMaps: SpyObj<GoogleMapsService>
-    let listenerServiceSpy: SpyObj<AngularGoogleMapsListener>
+    let eventPublisherSpy: SpyObj<EventPublisher>
+    let geocoderSpy: SpyObj<AngularGoogleMapsGeocoder>
     let builder: AngularGoogleMapsBuilder
-
-    const position = {lat: 10, lng: 15}
-    const focusLocation = new Location(10, 15)
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -26,16 +26,16 @@ describe('AngularGoogleMapsBuilder', () => {
                     useValue: createSpyObj('GoogleMapsService',
                         ['getGoogleMaps', 'createMap', 'createMarker', 'createSearchBox'])
                 },
+                {provide: EventPublisher, useValue: createSpyObj('EventPublisher', ['notify'])},
                 {
-                    provide: AngularGoogleMapsListener,
-                    useValue: createSpyObj('AngularGoogleMapsListener',
-                        ['getLocationChangedHandler', 'getBindMarkerToMapHandler',
-                            'getLocationChangedSearchBoxMapMarkerHandler', 'getLocationDeletedMarkerHandler'])
+                    provide: AngularGoogleMapsGeocoder,
+                    useValue: createSpyObj('AngularGoogleMapsGeocoder', ['reverseGeocode'])
                 }
             ]
         })
         googleMaps = TestBed.get(GoogleMapsService)
-        listenerServiceSpy = TestBed.get(AngularGoogleMapsListener)
+        eventPublisherSpy = TestBed.get(EventPublisher)
+        geocoderSpy = TestBed.get(AngularGoogleMapsGeocoder)
 
         builder = TestBed.get(AngularGoogleMapsBuilder)
     })
@@ -51,9 +51,18 @@ describe('AngularGoogleMapsBuilder', () => {
         let mapOptionsSpy: SpyObj<any>
         let markerOptionsSpy: SpyObj<any>
 
+        const location = {
+            lat: () => 10,
+            lng: () => 15
+        }
+        const focusLocation = new Location(10, 15)
+        const mouseEvent = {
+            latLng: location
+        }
+
         beforeEach(() => {
-            mapSpy = createSpyObj('google.maps.Map', ['getCenter', 'addListener'])
-            markerSpy = createSpyObj('google.maps.Marker', ['addListener'])
+            mapSpy = createSpyObj('google.maps.Map', ['addListener', 'getCenter', 'panTo', 'setZoom'])
+            markerSpy = createSpyObj('google.maps.Marker', ['addListener', 'setMap', 'setPosition'])
             mapOptionsSpy = createSpyObj('google.maps.MapOptions', [''])
             markerOptionsSpy = createSpyObj('google.maps.MarkerOptions', [''])
 
@@ -101,18 +110,18 @@ describe('AngularGoogleMapsBuilder', () => {
                 expect(googleMaps.createMarker).toHaveBeenCalled()
             })
 
-            it('adds a marker aligned with map position', () => {
-                mapSpy.getCenter.and.returnValue(position)
+            it('added marker is aligned with map location', () => {
+                mapSpy.getCenter.and.returnValue(location)
 
                 builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
                     .build()
 
-                expect(markerOptionsSpy.position).toEqual(position)
+                expect(markerOptionsSpy.position).toEqual(location)
             })
 
-            it('marker is bound to map if marker location are provided', () => {
+            it('marker is bound to map if marker location is provided', () => {
                 builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
@@ -130,40 +139,117 @@ describe('AngularGoogleMapsBuilder', () => {
                 expect(markerOptionsSpy.map).toBeUndefined()
             })
 
-            it('adds location changed marker listener', () => {
-                listenerServiceSpy.getLocationChangedHandler.and.returnValue(handlerDummy)
-
+            it('adds marker dragend listener to notify location change, reverse geocode and delete marker', () => {
                 builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
                     .build()
 
-                expect(markerSpy.addListener).toHaveBeenCalledWith('dragend', handlerDummy)
-                expect(listenerServiceSpy.getLocationChangedHandler).toHaveBeenCalled()
+                expect(markerSpy.addListener).toHaveBeenCalledTimes(3)
+                expect(markerSpy.addListener).toHaveBeenCalledWith('dragend', any(Function))
+                expect(markerSpy.addListener).toHaveBeenCalledWith('dblclick', any(Function))
             })
 
-            it('adds location deleted marker listener', () => {
-                listenerServiceSpy.getLocationDeletedMarkerHandler.and.returnValue(handlerDummy)
+            describe('invoked marker dragend listener handler', () => {
 
-                builder
-                    .createMap(mapOptionsSpy, focusLocation)
-                    .addMarker(markerOptionsSpy, true)
-                    .build()
+                it('notifies location change', () => {
+                    builder
+                        .createMap(mapOptionsSpy, focusLocation)
+                        .addMarker(markerOptionsSpy, true)
+                        .build()
 
-                expect(markerSpy.addListener).toHaveBeenCalledWith('dblclick', handlerDummy)
-                expect(listenerServiceSpy.getLocationDeletedMarkerHandler).toHaveBeenCalledWith(markerSpy)
+                    getCallsByInvokedParameter(markerSpy.addListener.calls.all(), 'dragend')[0].args[1](mouseEvent)
+
+                    expect(eventPublisherSpy.notify.calls.all()[0].args[0])
+                        .toEqual('locationChanged')
+                    expect(eventPublisherSpy.notify.calls.all()[0].args[1])
+                        .toEqual(new Location(location.lat(), location.lng()))
+                })
+
+                it('reverse geocodes', () => {
+                    builder
+                        .createMap(mapOptionsSpy, focusLocation)
+                        .addMarker(markerOptionsSpy, true)
+                        .build()
+
+                    getCallsByInvokedParameter(markerSpy.addListener.calls.all(), 'dragend')[1].args[1](mouseEvent)
+
+                    expect(geocoderSpy.reverseGeocode)
+                        .toHaveBeenCalledWith(new Location(location.lat(), location.lng()))
+                })
+
+                it('deletes marker', () => {
+                    const elementStub: SpyObj<HTMLInputElement> = createSpyObj('HTMLInputElement', [''])
+                    document.getElementById = createSpy('document').and.callFake(id => {
+                        if (id === 'search-input')
+                            return elementStub
+                        else throw Error()
+                    })
+
+                    builder
+                        .createMap(mapOptionsSpy, focusLocation)
+                        .addMarker(markerOptionsSpy, true)
+                        .build()
+
+                    getCallsByInvokedParameter(markerSpy.addListener.calls.all(), 'dblclick')[0].args[1](mouseEvent)
+
+                    expect(markerSpy.setMap).toHaveBeenCalledWith(null)
+                    expect(eventPublisherSpy.notify).toHaveBeenCalledWith('locationDeleted')
+                    expect(elementStub.value).toEqual('')
+                })
+
             })
 
-            it('binds map click to marker position update', () => {
-                listenerServiceSpy.getBindMarkerToMapHandler.and.returnValue(handlerDummy)
-
+            it('adds map click listener to update marker position, notify location change and reverse geocode', () => {
                 builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
                     .build()
 
-                expect(mapSpy.addListener).toHaveBeenCalledWith('click', handlerDummy)
-                expect(listenerServiceSpy.getBindMarkerToMapHandler).toHaveBeenCalledWith(markerSpy, mapSpy)
+                expect(mapSpy.addListener).toHaveBeenCalledTimes(3)
+                expect(mapSpy.addListener).toHaveBeenCalledWith('click', any(Function))
+            })
+
+            describe('invoked map click listener handler', () => {
+
+                it('binds marker to map and new location', () => {
+                    builder
+                        .createMap(mapOptionsSpy, focusLocation)
+                        .addMarker(markerOptionsSpy, true)
+                        .build()
+
+                    getCallsByInvokedParameter(mapSpy.addListener.calls.all(), 'click')[0].args[1](mouseEvent)
+
+                    expect(markerSpy.setMap).toHaveBeenCalledWith(mapSpy)
+                    expect(markerSpy.setPosition).toHaveBeenCalledWith(location)
+                })
+
+                it('notifies location change', () => {
+                    builder
+                        .createMap(mapOptionsSpy, focusLocation)
+                        .addMarker(markerOptionsSpy, true)
+                        .build()
+
+                    getCallsByInvokedParameter(mapSpy.addListener.calls.all(), 'click')[1].args[1](mouseEvent)
+
+                    expect(eventPublisherSpy.notify.calls.all()[0].args[0])
+                        .toEqual('locationChanged')
+                    expect(eventPublisherSpy.notify.calls.all()[0].args[1])
+                        .toEqual(new Location(location.lat(), location.lng()))
+                })
+
+                it('reverse geocodes', () => {
+                    builder
+                        .createMap(mapOptionsSpy, focusLocation)
+                        .addMarker(markerOptionsSpy, true)
+                        .build()
+
+                    getCallsByInvokedParameter(mapSpy.addListener.calls.all(), 'click')[2].args[1](mouseEvent)
+
+                    expect(geocoderSpy.reverseGeocode)
+                        .toHaveBeenCalledWith(new Location(location.lat(), location.lng()))
+                })
+
             })
 
         })
@@ -177,10 +263,7 @@ describe('AngularGoogleMapsBuilder', () => {
 
                 searchBoxSpy.getPlaces.and.returnValue([{
                     geometry: {
-                        location: {
-                            lat: () => position.lat,
-                            lng: () => position.lng
-                        }
+                        location: location
                     }
                 }] as any[])
                 googleMaps.createSearchBox.and.returnValue(searchBoxSpy)
@@ -201,23 +284,72 @@ describe('AngularGoogleMapsBuilder', () => {
                 expect(googleMaps.createSearchBox).toHaveBeenCalledWith()
             }))
 
-            it('adds listener for a search box', () => {
-                const handlerDummy: SpyObj<() => void> = createSpyObj('ListenerHandler', [''])
-                listenerServiceSpy.getLocationChangedSearchBoxMapMarkerHandler.and.returnValue(handlerDummy)
-
+            it('add search box listener', () => {
                 builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
                     .addSearchBox()
                     .build()
 
-                expect(searchBoxSpy.addListener).toHaveBeenCalledWith('places_changed', handlerDummy)
-                expect(listenerServiceSpy.getLocationChangedSearchBoxMapMarkerHandler)
-                    .toHaveBeenCalledWith(searchBoxSpy, mapSpy, markerSpy)
+                expect(searchBoxSpy.addListener).toHaveBeenCalledTimes(3)
+                expect(searchBoxSpy.addListener).toHaveBeenCalledWith('places_changed', any(Function))
+            })
+
+            describe('invoked search box listener handler', () => {
+
+                it('focuses map to new location', () => {
+                    builder
+                        .createMap(mapOptionsSpy, focusLocation)
+                        .addMarker(markerOptionsSpy, true)
+                        .addSearchBox()
+                        .build()
+
+                    getCallsByInvokedParameter(searchBoxSpy.addListener.calls.all(), 'places_changed')[0].args[1]()
+
+                    expect(mapSpy.panTo).toHaveBeenCalledWith(location)
+                    expect(mapSpy.setZoom).toHaveBeenCalledWith(any(Number))
+                })
+
+                it('binds marker to map and new location', () => {
+                    builder
+                        .createMap(mapOptionsSpy, focusLocation)
+                        .addMarker(markerOptionsSpy, true)
+                        .addSearchBox()
+                        .build()
+
+                    getCallsByInvokedParameter(searchBoxSpy.addListener.calls.all(), 'places_changed')[1].args[1]()
+
+                    expect(markerSpy.setMap).toHaveBeenCalledWith(mapSpy)
+                    expect(markerSpy.setPosition).toHaveBeenCalledWith(location)
+                })
+
+                it('notifies location change', () => {
+                    builder
+                        .createMap(mapOptionsSpy, focusLocation)
+                        .addMarker(markerOptionsSpy, true)
+                        .addSearchBox()
+                        .build()
+
+                    getCallsByInvokedParameter(searchBoxSpy.addListener.calls.all(), 'places_changed')[2].args[1]()
+
+                    expect(eventPublisherSpy.notify.calls.first().args[0])
+                        .toEqual('locationChanged')
+                    expect(eventPublisherSpy.notify.calls.first().args[1])
+                        .toEqual(new Location(location.lat(), location.lng()))
+                })
+
             })
 
         })
 
     })
+
+    function getCallsByInvokedParameter(allCalls, firstParameterValue: string) {
+        const matchedCalls = []
+        for (const call of allCalls)
+            if (call.args[0] === firstParameterValue)
+                matchedCalls.push(call)
+        return matchedCalls
+    }
 
 })

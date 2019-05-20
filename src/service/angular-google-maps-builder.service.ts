@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core'
+import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from '../location'
-import { AngularGoogleMapsListener } from './angular-google-maps-listener.service'
+import { AngularGoogleMapsGeocoder } from './angular-google-maps-geocoder.service'
 import { GoogleMapsService } from './google-maps.service'
+import LatLng = google.maps.LatLng
 import Map = google.maps.Map
 import MapOptions = google.maps.MapOptions
 import Marker = google.maps.Marker
 import MarkerOptions = google.maps.MarkerOptions
+import MouseEvent = google.maps.MouseEvent
 
 @Injectable()
 export class AngularGoogleMapsBuilder {
@@ -14,7 +17,8 @@ export class AngularGoogleMapsBuilder {
     private marker: Marker
 
     constructor(private googleMaps: GoogleMapsService,
-                private googleMapsListeners: AngularGoogleMapsListener) {
+                private geocoder: AngularGoogleMapsGeocoder,
+                private eventPublisher: EventPublisher) {
     }
 
     createMap(mapOptions: MapOptions, focusLocation: Location) {
@@ -34,10 +38,14 @@ export class AngularGoogleMapsBuilder {
     }
 
     addSearchBox() {
-        const searchBox = this.googleMaps.createSearchBox()
+        const box = this.googleMaps.createSearchBox()
 
-        searchBox.addListener('places_changed',
-            this.googleMapsListeners.getLocationChangedSearchBoxMapMarkerHandler(searchBox, this.map, this.marker))
+        box.addListener('places_changed', () => this.changeMapLocation(box.getPlaces()[0].geometry.location))
+        box.addListener('places_changed', () => this.changeMarkerLocation(box.getPlaces()[0].geometry.location))
+        box.addListener('places_changed', () => {
+            const loc = box.getPlaces()[0].geometry.location
+            this.eventPublisher.notify('locationChanged', new Location(loc.lat(), loc.lng()))
+        })
 
         return this
     }
@@ -46,15 +54,44 @@ export class AngularGoogleMapsBuilder {
         return this.map
     }
 
+    private changeMapLocation(location: LatLng) {
+        this.map.panTo(location)
+        this.map.setZoom(15)
+    }
+
+    private changeMarkerLocation(location: LatLng) {
+        this.marker.setMap(this.map)
+        this.marker.setPosition(location)
+    }
+
     private addMarkerListeners() {
-        this.marker.addListener('dragend', this.googleMapsListeners.getLocationChangedHandler())
-        this.marker.addListener('dblclick', this.googleMapsListeners.getLocationDeletedMarkerHandler(this.marker))
-        this.map.addListener('click', this.googleMapsListeners.getBindMarkerToMapHandler(this.marker, this.map))
+        this.marker.addListener('dragend', mouseEvent => this.notifyLocationChange(mouseEvent))
+        this.marker.addListener('dragend', mouseEvent => this.reverseGeocode(mouseEvent))
+        this.marker.addListener('dblclick', () => {
+            this.marker.setMap(null)
+            this.eventPublisher.notify('locationDeleted')
+            AngularGoogleMapsBuilder.clearSearchBoxInput()
+        })
+        this.map.addListener('click', mouseEvent => this.changeMarkerLocation(mouseEvent.latLng))
+        this.map.addListener('click', mouseEvent => this.notifyLocationChange(mouseEvent))
+        this.map.addListener('click', mouseEvent => this.reverseGeocode(mouseEvent))
+    }
+
+    private notifyLocationChange(e: MouseEvent) {
+        this.eventPublisher.notify('locationChanged', new Location(e.latLng.lat(), e.latLng.lng()))
+    }
+
+    private reverseGeocode(e: MouseEvent) {
+        this.geocoder.reverseGeocode(new Location(e.latLng.lat(), e.latLng.lng()))
     }
 
     private bindMarkerToMapsIfLocationIsProvided(markerOptions: MarkerOptions, isLocationProvided: boolean) {
         markerOptions.position = this.map.getCenter()
         if (isLocationProvided)
             markerOptions.map = this.map
+    }
+
+    private static clearSearchBoxInput() {
+        (<HTMLInputElement>document.getElementById('search-input')).value = ''
     }
 }
