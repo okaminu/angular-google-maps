@@ -34,10 +34,7 @@ export class AngularGoogleMapsBuilder {
     }
 
     addSearchBox() {
-        const searchBoxInput = <HTMLInputElement>document.getElementById('search-input')
-        const searchBox = this.googleMaps.createSearchBox(searchBoxInput)
-
-        this.map.controls[this.googleMaps.getGoogleMaps().ControlPosition.TOP_LEFT].push(searchBoxInput)
+        const searchBox = this.googleMaps.createSearchBox()
 
         searchBox.addListener('places_changed',
             this.googleMapsListeners.getLocationChangedSearchBoxMapMarkerHandler(searchBox, this.map, this.marker))
@@ -45,23 +42,8 @@ export class AngularGoogleMapsBuilder {
         return this
     }
 
-    addResizeControl() {
-        const resizeControl = document.getElementById('resize-control')
-        this.map.controls[this.googleMaps.getGoogleMaps().ControlPosition.TOP_RIGHT].push(resizeControl)
-        return this
-    }
-
     build() {
         return this.map
-    }
-
-    createSearchBox(map: Map) {
-        const searchBoxInput = <HTMLInputElement>document.getElementById('search-input')
-        const searchBox = this.googleMaps.createSearchBox(searchBoxInput)
-
-        map.controls[this.googleMaps.getGoogleMaps().ControlPosition.TOP_LEFT].push(searchBoxInput)
-
-        return searchBox
     }
 
     private addMarkerListeners() {

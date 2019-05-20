@@ -88,11 +88,10 @@ describe('AngularGoogleMapsComponent', () => {
             googleMapsBuilderSpy.createMap.and.returnValue(googleMapsBuilderSpy)
             googleMapsBuilderSpy.addMarker.and.returnValue(googleMapsBuilderSpy)
             googleMapsBuilderSpy.addSearchBox.and.returnValue(googleMapsBuilderSpy)
-            googleMapsBuilderSpy.addResizeControl.and.returnValue(googleMapsBuilderSpy)
             googleMapsBuilderSpy.build.and.returnValue(createSpyObj('google.maps.Map', ['']))
         })
 
-        it('builds a map with marker, search box and custom expand control', () => {
+        it('builds a map with marker and search box', () => {
             component.ngOnInit()
 
             component.setUpMap(location, [location])
@@ -108,7 +107,6 @@ describe('AngularGoogleMapsComponent', () => {
                 position: jasmine.anything()
             }), true)
             expect(googleMapsBuilderSpy.addSearchBox).toHaveBeenCalled()
-            expect(googleMapsBuilderSpy.addResizeControl).toHaveBeenCalled()
             expect(googleMapsBuilderSpy.build).toHaveBeenCalled()
         })
 

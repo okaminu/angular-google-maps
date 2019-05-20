@@ -168,58 +168,13 @@ describe('AngularGoogleMapsBuilder', () => {
 
         })
 
-        describe('Custom expand control', () => {
-            let elementSpy: SpyObj<HTMLElement>
-            let controlSpy: SpyObj<google.maps.MVCArray<Node>[]>
-
-            beforeEach(() => {
-                document.getElementById = createSpy('HTMLElement').and.callFake(id => {
-                    if (id === 'resize-control')
-                        return elementSpy
-                    else throw Error()
-                })
-                elementSpy = createSpyObj('HTMLElement', [''])
-                controlSpy = createSpyObj('google.maps.Map.controls', ['push'])
-                mapSpy.controls = {
-                    'somePosition': controlSpy
-                }
-                googleMaps.getGoogleMaps.and.returnValue({
-                    ControlPosition: {
-                        TOP_RIGHT: 'somePosition'
-                    }
-                })
-            })
-
-            it('adds resize control to map', () => {
-                builder
-                    .createMap(mapOptionsSpy, focusLocation)
-                    .addResizeControl()
-                    .build()
-
-                expect(controlSpy.push).toHaveBeenCalledWith(elementSpy)
-            })
-
-        })
-
         describe('On search box creation', () => {
 
-            let elementSpy: SpyObj<HTMLElement>
-            let controlSpy: SpyObj<google.maps.MVCArray<Node>[]>
             let searchBoxSpy: SpyObj<google.maps.places.SearchBox>
 
             beforeEach(() => {
-                document.getElementById = createSpy('document').and.callFake(id => {
-                    if (id === 'search-input')
-                        return elementSpy
-                    else throw Error()
-                })
-                elementSpy = createSpyObj('HTMLElement', [''])
-                controlSpy = createSpyObj('google.maps.Map.controls', ['push'])
                 searchBoxSpy = createSpyObj('google.maps.places.SearchBox', ['addListener', 'getPlaces'])
 
-                mapSpy.controls = {
-                    'somePosition': controlSpy
-                }
                 searchBoxSpy.getPlaces.and.returnValue([{
                     geometry: {
                         location: {
@@ -243,17 +198,7 @@ describe('AngularGoogleMapsBuilder', () => {
                     .addSearchBox()
                     .build()
 
-                expect(googleMaps.createSearchBox).toHaveBeenCalledWith(elementSpy)
-            }))
-
-            it('adds search box with configured location', fakeAsync(() => {
-                builder
-                    .createMap(mapOptionsSpy, focusLocation)
-                    .addMarker(markerOptionsSpy, true)
-                    .addSearchBox()
-                    .build()
-
-                expect(controlSpy.push).toHaveBeenCalledWith(elementSpy)
+                expect(googleMaps.createSearchBox).toHaveBeenCalledWith()
             }))
 
             it('adds listener for a search box', () => {

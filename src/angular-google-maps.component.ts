@@ -77,7 +77,6 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
             .createMap(this.mapOptions, focusLocation)
             .addMarker(this.markerOptions, areMarkerLocationsProvided)
             .addSearchBox()
-            .addResizeControl()
             .build()
     }
 
