@@ -3,9 +3,8 @@ import { MatIconRegistry } from '@angular/material'
 import { DomSanitizer } from '@angular/platform-browser'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from './location'
-import { AngularGoogleMapsGeocoderService } from './service/angular-google-maps-geocoder.service'
-import { AngularGoogleMapsListenerService } from './service/angular-google-maps-listener.service'
-import { AngularGoogleMapsService } from './service/angular-google-maps.service'
+import { AngularGoogleMapsBuilder } from './service/angular-google-maps-builder.service'
+import { AngularGoogleMapsGeocoder } from './service/angular-google-maps-geocoder.service'
 import { GoogleMapsService } from './service/google-maps.service'
 import MapOptions = google.maps.MapOptions
 import MarkerOptions = google.maps.MarkerOptions
@@ -50,9 +49,8 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
     }
 
     constructor(private googleMaps: GoogleMapsService,
-                private googleMapsService: AngularGoogleMapsService,
-                private googleMapsGeocoderService: AngularGoogleMapsGeocoderService,
-                private googleMapsListeners: AngularGoogleMapsListenerService,
+                private googleMapsBuilder: AngularGoogleMapsBuilder,
+                private googleMapsGeocoder: AngularGoogleMapsGeocoder,
                 private eventPublisher: EventPublisher,
                 private iconRegistry: MatIconRegistry,
                 private sanitizer: DomSanitizer) {
@@ -73,9 +71,9 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         const areMarkerLocationsProvided = markerLocations.length > 0
 
         if (areMarkerLocationsProvided)
-            this.googleMapsGeocoderService.reverseGeocode(focusLocation)
+            this.googleMapsGeocoder.reverseGeocode(focusLocation)
 
-        this.googleMapsService
+        this.googleMapsBuilder
             .createMap(this.mapOptions, focusLocation)
             .addMarker(this.markerOptions, areMarkerLocationsProvided)
             .addSearchBox()

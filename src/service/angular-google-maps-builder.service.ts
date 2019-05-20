@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Location } from '../location'
-import { AngularGoogleMapsListenerService } from './angular-google-maps-listener.service'
+import { AngularGoogleMapsListener } from './angular-google-maps-listener.service'
 import { GoogleMapsService } from './google-maps.service'
 import Map = google.maps.Map
 import MapOptions = google.maps.MapOptions
@@ -8,13 +8,13 @@ import Marker = google.maps.Marker
 import MarkerOptions = google.maps.MarkerOptions
 
 @Injectable()
-export class AngularGoogleMapsService {
+export class AngularGoogleMapsBuilder {
 
     private map: Map
     private marker: Marker
 
     constructor(private googleMaps: GoogleMapsService,
-                private googleMapsListeners: AngularGoogleMapsListenerService) {
+                private googleMapsListeners: AngularGoogleMapsListener) {
     }
 
     createMap(mapOptions: MapOptions, focusLocation: Location) {
