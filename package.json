@@ -1,6 +1,6 @@
 {
   "name": "@boldadmin/angular-google-maps",
-  "version": "2.1.0+timestamp",
+  "version": "2.1.0",
   "description": "Google Maps adapter for Angular Framework",
   "keywords": [
     "google",
@@ -64,6 +64,5 @@
     "test": "ng test --code-coverage --watch=false",
     "test-watch": "ng test --watch=true",
     "lint": "ng lint",
-    "lol": "echo 'hello' | sed -i \"s/timestamp/$1/' package.json\""
   }
 }
