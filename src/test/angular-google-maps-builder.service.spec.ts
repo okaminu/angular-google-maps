@@ -24,7 +24,7 @@ describe('AngularGoogleMapsBuilder', () => {
                 {
                     provide: GoogleMapsService,
                     useValue: createSpyObj('GoogleMapsService',
-                        ['getGoogleMaps', 'createMap', 'createMarker', 'createSearchBox'])
+                        ['getGoogleMaps', 'createMap', 'createMarker', 'createSearchBox', 'getSearchBoxInput'])
                 },
                 {provide: EventPublisher, useValue: createSpyObj('EventPublisher', ['notify'])},
                 {
@@ -177,11 +177,7 @@ describe('AngularGoogleMapsBuilder', () => {
 
                 it('deletes marker', () => {
                     const elementStub: SpyObj<HTMLInputElement> = createSpyObj('HTMLInputElement', [''])
-                    document.getElementById = createSpy('document').and.callFake(id => {
-                        if (id === 'search-input')
-                            return elementStub
-                        else throw Error()
-                    })
+                    googleMaps.getSearchBoxInput.and.returnValue(elementStub)
                     getCallsByInvokedParameter(markerSpy.addListener.calls.all(), 'dblclick')[0].args[1](mouseEvent)
 
                     expect(markerSpy.setMap).toHaveBeenCalledWith(null)

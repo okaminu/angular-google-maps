@@ -30,4 +30,8 @@ export class GoogleMapsService {
         return new google.maps.Geocoder()
     }
 
+    getSearchBoxInput() {
+        return <HTMLInputElement>document.getElementById('search-input')
+    }
+
 }

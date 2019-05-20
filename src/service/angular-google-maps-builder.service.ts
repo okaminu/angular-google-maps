@@ -62,7 +62,7 @@ export class AngularGoogleMapsBuilder {
         this.marker.addListener('dblclick', () => {
             this.marker.setMap(null)
             this.eventPublisher.notify('locationDeleted')
-            AngularGoogleMapsBuilder.clearSearchBoxInput()
+            this.clearSearchBoxInput()
         })
         this.map.addListener('click', mouseEvent => this.changeMarkerLocation(mouseEvent.latLng))
         this.map.addListener('click', mouseEvent => this.notifyLocationChange(mouseEvent))
@@ -87,7 +87,8 @@ export class AngularGoogleMapsBuilder {
         this.geocoder.reverseGeocode(new Location(e.latLng.lat(), e.latLng.lng()))
     }
 
-    private static clearSearchBoxInput() {
-        (<HTMLInputElement>document.getElementById('search-input')).value = ''
+    private clearSearchBoxInput() {
+        this.googleMaps.getSearchBoxInput().value = ''
     }
+
 }
