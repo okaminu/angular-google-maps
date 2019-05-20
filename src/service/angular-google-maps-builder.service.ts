@@ -31,7 +31,9 @@ export class AngularGoogleMapsBuilder {
     }
 
     addMarker(markerOptions: MarkerOptions, areMarkerLocationsProvided: boolean) {
-        this.bindMarkerToMapsIfLocationIsProvided(markerOptions, areMarkerLocationsProvided)
+        markerOptions.position = this.map.getCenter()
+        if (areMarkerLocationsProvided)
+            markerOptions.map = this.map
         this.marker = this.googleMaps.createMarker(markerOptions)
         this.addMarkerListeners()
         return this
@@ -54,16 +56,6 @@ export class AngularGoogleMapsBuilder {
         return this.map
     }
 
-    private changeMapLocation(location: LatLng) {
-        this.map.panTo(location)
-        this.map.setZoom(15)
-    }
-
-    private changeMarkerLocation(location: LatLng) {
-        this.marker.setMap(this.map)
-        this.marker.setPosition(location)
-    }
-
     private addMarkerListeners() {
         this.marker.addListener('dragend', mouseEvent => this.notifyLocationChange(mouseEvent))
         this.marker.addListener('dragend', mouseEvent => this.reverseGeocode(mouseEvent))
@@ -77,18 +69,22 @@ export class AngularGoogleMapsBuilder {
         this.map.addListener('click', mouseEvent => this.reverseGeocode(mouseEvent))
     }
 
+    private changeMapLocation(location: LatLng) {
+        this.map.panTo(location)
+        this.map.setZoom(15)
+    }
+
+    private changeMarkerLocation(location: LatLng) {
+        this.marker.setMap(this.map)
+        this.marker.setPosition(location)
+    }
+
     private notifyLocationChange(e: MouseEvent) {
         this.eventPublisher.notify('locationChanged', new Location(e.latLng.lat(), e.latLng.lng()))
     }
 
     private reverseGeocode(e: MouseEvent) {
         this.geocoder.reverseGeocode(new Location(e.latLng.lat(), e.latLng.lng()))
-    }
-
-    private bindMarkerToMapsIfLocationIsProvided(markerOptions: MarkerOptions, isLocationProvided: boolean) {
-        markerOptions.position = this.map.getCenter()
-        if (isLocationProvided)
-            markerOptions.map = this.map
     }
 
     private static clearSearchBoxInput() {
