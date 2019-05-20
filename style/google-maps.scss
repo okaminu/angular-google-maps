@@ -10,6 +10,13 @@ google-maps {
   }
 
   #resize-control {
+    position: absolute;
+
+    top: 0;
+    right: 0;
+
+    z-index: 1;
+
     margin: 0.3em;
     padding: 0;
     background-color: white;
