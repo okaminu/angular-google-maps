@@ -1,4 +1,4 @@
-import { fakeAsync, TestBed } from '@angular/core/testing'
+import { TestBed } from '@angular/core/testing'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from '../location'
 import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder.service'
@@ -6,7 +6,6 @@ import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocod
 import { GoogleMapsService } from '../service/google-maps.service'
 import Marker = google.maps.Marker
 import any = jasmine.any
-import createSpy = jasmine.createSpy
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
 
@@ -39,10 +38,6 @@ describe('AngularGoogleMapsBuilder', () => {
 
         builder = TestBed.get(AngularGoogleMapsBuilder)
     })
-
-    afterEach(() =>
-        document.getElementById = createSpy('document').and.callThrough()
-    )
 
     describe('Building Google Maps', () => {
 
@@ -233,7 +228,7 @@ describe('AngularGoogleMapsBuilder', () => {
 
         })
 
-        describe('On search box creation', () => {
+        describe('On search box building', () => {
 
             let searchBoxSpy: SpyObj<google.maps.places.SearchBox>
 
@@ -246,11 +241,6 @@ describe('AngularGoogleMapsBuilder', () => {
                     }
                 }] as any[])
                 googleMaps.createSearchBox.and.returnValue(searchBoxSpy)
-                googleMaps.getGoogleMaps.and.returnValue({
-                    ControlPosition: {
-                        TOP_LEFT: 'somePosition'
-                    }
-                })
 
                 builder
                     .createMap(mapOptionsSpy, focusLocation)
@@ -259,9 +249,9 @@ describe('AngularGoogleMapsBuilder', () => {
                     .build()
             })
 
-            it('adds search box', fakeAsync(() => {
+            it('adds search box', () => {
                 expect(googleMaps.createSearchBox).toHaveBeenCalledWith()
-            }))
+            })
 
             it('add search box listener', () => {
                 expect(searchBoxSpy.addListener).toHaveBeenCalledTimes(3)
