@@ -9,7 +9,8 @@ $ npm install @boldadmin/angular-google-maps
 ```
 
 ## Usage
-Configure providers like the following in @NgModule annotation of app.module.ts file and replace YOUR_GOOGLE_MAPS_API_KEY with google maps api key:
+Add new provider just like in the sample to @NgModule annotation of app.module.ts file 
+and replace YOUR_GOOGLE_MAPS_API_KEY with google maps api key:
 ```
 @NgModule({
         providers: [
@@ -23,7 +24,7 @@ Configure providers like the following in @NgModule annotation of app.module.ts 
 })
 ```
 
-Configure imports like the following in @NgModule annotation of module where you will be using angular-google-maps:
+Add new import just like in the sample to @NgModule annotation of module where you will be using angular-google-maps:
 ```
 @NgModule({
     imports: [
@@ -33,9 +34,9 @@ Configure imports like the following in @NgModule annotation of module where you
 
 ```
 
-Add the following element `<google-maps></google-maps>` to your html template where map should be displayed
+Add the following element `<google-maps></google-maps>` to your html template where map will be displayed.
 
-Add AngularGoogleMapsComponent reference inside your module's component:
+Add AngularGoogleMapsComponent reference inside your component:
 ```
 @ViewChild(AngularGoogleMapsComponent) mapsComponent: AngularGoogleMapsComponent
 ```
@@ -45,7 +46,6 @@ and markerLocation which will place marker at the given coordinates:
 ```
 this.mapsComponent.setUpMap(focusLocation, markerLocation)
 ```
-
 
 Create map by providing only focusLocation and no markerLocation in order not to display marker:
 ```
