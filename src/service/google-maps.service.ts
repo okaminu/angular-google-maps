@@ -18,8 +18,8 @@ export class GoogleMapsService {
         return new google.maps.Marker(options)
     }
 
-    createSearchBox(searchBoxInput: HTMLInputElement) {
-        return new google.maps.places.SearchBox(searchBoxInput)
+    createSearchBox() {
+        return new google.maps.places.SearchBox(<HTMLInputElement>document.getElementById('search-input'))
     }
 
     createLatLng(location: Location) {
@@ -28,6 +28,10 @@ export class GoogleMapsService {
 
     createGeocoder() {
         return new google.maps.Geocoder()
+    }
+
+    getSearchBoxInput() {
+        return <HTMLInputElement>document.getElementById('search-input')
     }
 
 }

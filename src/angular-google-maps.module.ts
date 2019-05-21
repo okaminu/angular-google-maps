@@ -4,7 +4,6 @@ import { MatIconModule } from '@angular/material'
 import { AngularGoogleMapsComponent } from './angular-google-maps.component'
 import { AngularGoogleMapsBuilder } from './service/angular-google-maps-builder.service'
 import { AngularGoogleMapsGeocoder } from './service/angular-google-maps-geocoder.service'
-import { AngularGoogleMapsListener } from './service/angular-google-maps-listener.service'
 import { GoogleMapsLoader } from './service/google-maps-loader.service'
 import { GoogleMapsService } from './service/google-maps.service'
 
@@ -22,7 +21,6 @@ import { GoogleMapsService } from './service/google-maps.service'
     providers: [
         AngularGoogleMapsBuilder,
         AngularGoogleMapsGeocoder,
-        AngularGoogleMapsListener,
         GoogleMapsLoader,
         GoogleMapsService
     ]

@@ -33,6 +33,36 @@ describe('AngularGoogleMapsGeocoder', () => {
         geocoderService = TestBed.get(AngularGoogleMapsGeocoder)
     })
 
+    describe('Geocoding', () => {
+
+        it('converts address to location', () => {
+            geocoderSpy.geocode.and.callFake(
+                (request, callback: any) => callback([{geometry: {location: {lat: () => 1.0, lng: () => 2.0}}}], null)
+            )
+
+            geocoderService.geocode('address')
+
+            expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), new Location(1.0, 2.0))
+        })
+
+        it('returns default location on no results', () => {
+            geocoderSpy.geocode.and.callFake((request, callback) => callback(null, null))
+
+            geocoderService.geocode('address')
+
+            expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(Location))
+        })
+
+        it('returns default location on empty results', () => {
+            geocoderSpy.geocode.and.callFake((request, callback) => callback([], null))
+
+            geocoderService.geocode('address')
+
+            expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(Location))
+        })
+
+    })
+
     describe('Reverse geocoding', () => {
 
         it('converts location to address', () => {
@@ -65,36 +95,6 @@ describe('AngularGoogleMapsGeocoder', () => {
             geocoderService.reverseGeocode(new Location(1, 1))
 
             expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), 'location')
-        })
-
-    })
-
-    describe('Geocoding', () => {
-
-        it('converts address to location', () => {
-            geocoderSpy.geocode.and.callFake(
-                (request, callback: any) => callback([{geometry: {location: {lat: () => 1.0, lng: () => 2.0}}}], null)
-            )
-
-            geocoderService.geocode('address')
-
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), new Location(1.0, 2.0))
-        })
-
-        it('returns default location on no results', () => {
-            geocoderSpy.geocode.and.callFake((request, callback) => callback(null, null))
-
-            geocoderService.geocode('address')
-
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(Location))
-        })
-
-        it('returns default location on empty results', () => {
-            geocoderSpy.geocode.and.callFake((request, callback) => callback([], null))
-
-            geocoderService.geocode('address')
-
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(Location))
         })
 
     })
