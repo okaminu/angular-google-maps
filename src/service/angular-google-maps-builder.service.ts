@@ -42,11 +42,14 @@ export class AngularGoogleMapsBuilder {
     addSearchBox() {
         const box = this.googleMaps.createSearchBox()
 
-        box.addListener('places_changed', () => this.changeMapLocation(box.getPlaces()[0].geometry.location))
-        box.addListener('places_changed', () => this.changeMarkerLocation(box.getPlaces()[0].geometry.location))
         box.addListener('places_changed', () => {
-            const loc = box.getPlaces()[0].geometry.location
-            this.eventPublisher.notify('locationChanged', new Location(loc.lat(), loc.lng()))
+            const places = box.getPlaces()
+            if (places[0]) {
+                this.changeMapLocation(places[0].geometry.location)
+                this.changeMarkerLocation(places[0].geometry.location)
+                const loc = places[0].geometry.location
+                this.eventPublisher.notify('locationChanged', new Location(loc.lat(), loc.lng()))
+            }
         })
 
         return this

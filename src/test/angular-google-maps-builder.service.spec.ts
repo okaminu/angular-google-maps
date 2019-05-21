@@ -254,33 +254,43 @@ describe('AngularGoogleMapsBuilder', () => {
             })
 
             it('add search box listener', () => {
-                expect(searchBoxSpy.addListener).toHaveBeenCalledTimes(3)
                 expect(searchBoxSpy.addListener).toHaveBeenCalledWith('places_changed', any(Function))
             })
 
             describe('Invoked search box listener handler', () => {
 
                 it('focuses map to new location', () => {
-                    getCallsByInvokedParameter(searchBoxSpy.addListener.calls.all(), 'places_changed')[0].args[1]()
+                    searchBoxSpy.addListener.calls.first().args[1]()
 
                     expect(mapSpy.panTo).toHaveBeenCalledWith(location)
                     expect(mapSpy.setZoom).toHaveBeenCalledWith(any(Number))
                 })
 
                 it('binds marker to map and new location', () => {
-                    getCallsByInvokedParameter(searchBoxSpy.addListener.calls.all(), 'places_changed')[1].args[1]()
+                    searchBoxSpy.addListener.calls.first().args[1]()
 
                     expect(markerSpy.setMap).toHaveBeenCalledWith(mapSpy)
                     expect(markerSpy.setPosition).toHaveBeenCalledWith(location)
                 })
 
                 it('notifies location change', () => {
-                    getCallsByInvokedParameter(searchBoxSpy.addListener.calls.all(), 'places_changed')[2].args[1]()
+                    searchBoxSpy.addListener.calls.first().args[1]()
 
                     expect(eventPublisherSpy.notify.calls.first().args[0])
                         .toEqual('locationChanged')
                     expect(eventPublisherSpy.notify.calls.first().args[1])
                         .toEqual(new Location(location.lat(), location.lng()))
+                })
+
+                it('Does nothing if location cannot be retrieved', () => {
+                    searchBoxSpy.getPlaces.and.returnValue([])
+                    searchBoxSpy.addListener.calls.first().args[1]()
+
+                    expect(mapSpy.panTo).not.toHaveBeenCalled()
+                    expect(mapSpy.setZoom).not.toHaveBeenCalled()
+                    expect(markerSpy.setPosition).not.toHaveBeenCalled()
+                    expect(markerSpy.setMap).not.toHaveBeenCalled()
+                    expect(eventPublisherSpy.notify).not.toHaveBeenCalled()
                 })
 
             })
