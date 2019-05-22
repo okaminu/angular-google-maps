@@ -143,31 +143,25 @@ describe('AngularGoogleMapsComponent', () => {
         expect(component.address).toEqual(address)
     })
 
-    describe('Custom resizing of Google Maps', () => {
+    describe('Resizes Google Maps', () => {
 
-        it('publishes an event', () => {
+        it('Expands map', () => {
             component.ngOnInit()
 
-            component.onMapResize()
-
-            expect(eventPublisherSpy.notify).toHaveBeenCalled()
-        })
-
-        it('sets resize state to expanded', () => {
-            component.ngOnInit()
-
-            component.onMapResize()
+            component.resizeMap()
 
             expect(component.isMapExpanded).toBeTruthy()
+            expect(eventPublisherSpy.notify).toHaveBeenCalledWith('googleMapsExpanded')
         })
 
-        it('sets resize state to collapsed', () => {
+        it('Collapses map', () => {
             component.ngOnInit()
 
-            component.onMapResize()
-            component.onMapResize()
+            component.resizeMap()
+            component.resizeMap()
 
             expect(component.isMapExpanded).toBeFalsy()
+            expect(eventPublisherSpy.notify).toHaveBeenCalledWith('googleMapsCollapsed')
         })
     })
 

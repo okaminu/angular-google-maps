@@ -19,7 +19,7 @@ import MarkerOptions = google.maps.MarkerOptions
         <div id="map"></div>
         <mat-icon id="resize-control" matSuffix
                   svgIcon="{{!isMapExpanded ? 'expand' : 'collapse'}}"
-                  (click)="onMapResize()"></mat-icon>`
+                  (click)="resizeMap()"></mat-icon>`
 })
 export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
 
@@ -86,8 +86,11 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
                 .build())
     }
 
-    onMapResize() {
-        this.eventPublisher.notify('onGoogleMapResize')
+    resizeMap() {
         this.isMapExpanded = !this.isMapExpanded
+        if (this.isMapExpanded)
+            this.eventPublisher.notify('googleMapsExpanded')
+        else
+            this.eventPublisher.notify('googleMapsCollapsed')
     }
 }
