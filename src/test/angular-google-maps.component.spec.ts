@@ -118,7 +118,6 @@ describe('AngularGoogleMapsComponent', () => {
 
             component.setUpMapByAddress('address')
 
-            expect(geocoderSpy.reverseGeocode).toHaveBeenCalled()
             expect(googleMapsBuilderSpy.createMap).toHaveBeenCalledWith(
                 jasmine.objectContaining({
                     mapTypeControlOptions: {
