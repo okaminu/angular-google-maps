@@ -38,7 +38,7 @@ describe('AngularGoogleMapsComponent', () => {
                 },
                 {
                     provide: AngularGoogleMapsGeocoder,
-                    useValue: createSpyObj('AngularGoogleMapsGeocoder', ['reverseGeocode'])
+                    useValue: createSpyObj('AngularGoogleMapsGeocoder', ['reverseGeocode', 'geocode'])
                 },
                 {
                     provide: GoogleMapsService,
@@ -94,7 +94,7 @@ describe('AngularGoogleMapsComponent', () => {
         it('builds a map with marker and search box', () => {
             component.ngOnInit()
 
-            component.setUpMap(location, [location])
+            component.setUpMapByLocation(location)
 
             expect(googleMapsBuilderSpy.createMap).toHaveBeenCalledWith(
                 jasmine.objectContaining({
@@ -110,30 +110,27 @@ describe('AngularGoogleMapsComponent', () => {
             expect(googleMapsBuilderSpy.build).toHaveBeenCalled()
         })
 
-        it('builds a map without a marked location', () => {
+        it('builds a map by address', () => {
+            geocoderSpy.geocode.and.callFake(
+                (request, callback: any) => callback(location, null)
+            )
             component.ngOnInit()
 
-            component.setUpMap(location, [])
+            component.setUpMapByAddress('address')
 
+            expect(geocoderSpy.reverseGeocode).toHaveBeenCalled()
+            expect(googleMapsBuilderSpy.createMap).toHaveBeenCalledWith(
+                jasmine.objectContaining({
+                    mapTypeControlOptions: {
+                        mapTypeIds: ['roadmap', 'satellite'],
+                        position: 'position'
+                    }
+                }), location)
             expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalledWith(jasmine.objectContaining({
                 position: jasmine.anything()
             }), false)
-        })
-
-        it('reverses geocode a location', () => {
-            component.ngOnInit()
-
-            component.setUpMap(location, [new Location(0.0, 1.0)])
-
-            expect(geocoderSpy.reverseGeocode).toHaveBeenCalled()
-        })
-
-        it('does not reverse geocode when there is no location', () => {
-            component.ngOnInit()
-
-            component.setUpMap(location, [])
-
-            expect(geocoderSpy.reverseGeocode).not.toHaveBeenCalled()
+            expect(googleMapsBuilderSpy.addSearchBox)
+            expect(googleMapsBuilderSpy.build).toHaveBeenCalled()
         })
 
     })
