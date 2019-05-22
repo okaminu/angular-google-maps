@@ -64,7 +64,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.eventPublisher.unsubscribe('addressReverseGeocoded')
+        this.eventPublisher.unsubscribeAll('addressReverseGeocoded')
     }
 
     setUpMap(focusLocation: Location, markerLocations: Array<Location>) {

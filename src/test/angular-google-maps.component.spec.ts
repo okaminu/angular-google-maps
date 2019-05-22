@@ -2,10 +2,10 @@ import { TestBed } from '@angular/core/testing'
 import { MatIconRegistry } from '@angular/material'
 import { DomSanitizer } from '@angular/platform-browser'
 import { EventPublisher } from '@boldadmin/event-publisher'
-import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocoder.service'
 import { AngularGoogleMapsComponent } from '../angular-google-maps.component'
 import { Location } from '../location'
 import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder.service'
+import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocoder.service'
 import { GoogleMapsService } from '../service/google-maps.service'
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
@@ -46,7 +46,7 @@ describe('AngularGoogleMapsComponent', () => {
                 },
                 {
                     provide: EventPublisher,
-                    useValue: createSpyObj('EvenPublisher', ['subscribe', 'notify', 'unsubscribe'])
+                    useValue: createSpyObj('EvenPublisher', ['subscribe', 'notify', 'unsubscribeAll'])
                 },
                 {provide: MatIconRegistry, useValue: createSpyObj('MatIconRegistry', ['addSvgIcon'])},
                 {provide: DomSanitizer, useValue: createSpyObj('DomSanitizer', ['bypassSecurityTrustResourceUrl'])}
@@ -79,7 +79,7 @@ describe('AngularGoogleMapsComponent', () => {
     it('unsubscribes on destroy', () => {
         component.ngOnDestroy()
 
-        expect(eventPublisherSpy.unsubscribe).toHaveBeenCalledWith('addressReverseGeocoded')
+        expect(eventPublisherSpy.unsubscribeAll).toHaveBeenCalledWith('addressReverseGeocoded')
     })
 
     describe('Loading Google Maps', () => {
