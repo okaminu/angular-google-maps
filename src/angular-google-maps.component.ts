@@ -67,22 +67,27 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         this.eventPublisher.unsubscribeAll('addressReverseGeocoded')
     }
 
-    setUpMap(focusLocation: Location, markerLocations: Array<Location>) {
-        const areMarkerLocationsProvided = markerLocations.length > 0
-
-        if (areMarkerLocationsProvided)
-            this.googleMapsGeocoder.reverseGeocode(focusLocation)
+    setUpMapByLocation(focusLocation: Location) {
+        this.googleMapsGeocoder.reverseGeocode(focusLocation)
 
         this.googleMapsBuilder
             .createMap(this.mapOptions, focusLocation)
-            .addMarker(this.markerOptions, areMarkerLocationsProvided)
+            .addMarker(this.markerOptions, true)
             .addSearchBox()
             .build()
+    }
+
+    setUpMapByAddress(address: string) {
+        this.googleMapsGeocoder.geocode(address, (location: Location) =>
+            this.googleMapsBuilder
+                .createMap(this.mapOptions, location)
+                .addMarker(this.markerOptions, false)
+                .addSearchBox()
+                .build())
     }
 
     onMapResize() {
         this.eventPublisher.notify('onGoogleMapResize')
         this.isMapExpanded = !this.isMapExpanded
     }
-
 }

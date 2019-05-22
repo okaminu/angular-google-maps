@@ -5,6 +5,7 @@ import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocod
 import { GoogleMapsService } from '../service/google-maps.service'
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
+import createSpy = jasmine.createSpy
 
 describe('AngularGoogleMapsGeocoder', () => {
 
@@ -36,31 +37,33 @@ describe('AngularGoogleMapsGeocoder', () => {
     describe('Geocoding', () => {
 
         it('converts address to location', () => {
+            const callbackSpy = createSpy()
             geocoderSpy.geocode.and.callFake(
                 (request, callback: any) => callback([{geometry: {location: {lat: () => 1.0, lng: () => 2.0}}}], null)
             )
 
-            geocoderService.geocode('address')
+            geocoderService.geocode('address', callbackSpy)
 
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), new Location(1.0, 2.0))
+            expect(callbackSpy).toHaveBeenCalledWith(new Location(1.0, 2.0))
         })
 
         it('returns default location on no results', () => {
+            const callbackSpy = createSpy()
             geocoderSpy.geocode.and.callFake((request, callback) => callback(null, null))
 
-            geocoderService.geocode('address')
+            geocoderService.geocode('address', callbackSpy)
 
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(Location))
+            expect(callbackSpy).toHaveBeenCalledWith(jasmine.any(Location))
         })
 
         it('returns default location on empty results', () => {
+            const callbackSpy = createSpy()
             geocoderSpy.geocode.and.callFake((request, callback) => callback([], null))
 
-            geocoderService.geocode('address')
+            geocoderService.geocode('address', callbackSpy)
 
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(Location))
+            expect(callbackSpy).toHaveBeenCalledWith(jasmine.any(Location))
         })
-
     })
 
     describe('Reverse geocoding', () => {

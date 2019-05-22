@@ -10,13 +10,12 @@ export class AngularGoogleMapsGeocoder {
                 private eventPublisher: EventPublisher) {
     }
 
-    geocode(address: string) {
+    geocode(address: string, callback: (Location) => void) {
         return this.googleMaps.createGeocoder().geocode({'address': address}, results => {
             if (results !== null && results[0])
-                this.eventPublisher.notify('onGeocodeAddress', new Location(results[0].geometry.location.lat(),
-                    results[0].geometry.location.lng()))
+                callback(new Location(results[0].geometry.location.lat(), results[0].geometry.location.lng()))
             else
-                this.eventPublisher.notify('onGeocodeAddress', new Location(59.9139, 10.7522))
+                callback(new Location(59.9139, 10.7522))
         })
     }
 
