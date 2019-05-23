@@ -16,6 +16,7 @@
     "type": "git",
     "url": "git+https://github.com/boldadmin-com/angular-google-maps.git"
   },
+  "dependencies": {},
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.13.8",
     "@angular-devkit/build-ng-packagr": "~0.13.0",
@@ -65,6 +66,7 @@
     "test": "ng test --code-coverage --watch=false",
     "test-watch": "ng test --watch=true",
     "lint": "ng lint",
-    "link": "npm link @boldadmin/event-publisher && npm link @boldadmin/angular-google-maps"
+    "link-dependencies": "npm link @boldadmin/event-publisher",
+    "link": "cd dist && npm link @boldadmin/angular-google-maps"
   }
 }
