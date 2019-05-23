@@ -43,12 +43,17 @@ Add AngularGoogleMapsComponent reference inside your component:
 Create map by providing focusLocation which will display the location from given coordinates 
 and markerLocation which will place marker at the given coordinates:
 ```
-this.mapsComponent.setUpMap(focusLocation, markerLocation)
+this.mapsComponent.setUpMapByLocation(focusLocation, markerLocation)
 ```
 
 Create map by providing only focusLocation and no markerLocation in order not to display marker:
 ```
-this.mapsComponent.setUpMap(focusLocation, [])
+this.mapsComponent.setUpMapByLocation(focusLocation, [])
+```
+
+Create map by providing address which will display the location after geocoding the input:
+```
+this.mapsComponent.setUpMapByAddress(address)
 ```
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
