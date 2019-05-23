@@ -61,12 +61,10 @@
   "scripts": {
     "build": "ng build",
     "build-watch": "ng build --watch",
-    "prebuild": "npm install",
     "postbuild": "copyfiles style/google-maps.scss dist/",
     "test": "ng test --code-coverage --watch=false",
     "test-watch": "ng test --watch=true",
     "lint": "ng lint",
-    "link": "npm link @boldadmin/event-publisher && npm link @boldadmin/angular-google-maps",
-    "postinstall": "npm run link"
+    "link": "npm link @boldadmin/event-publisher && npm link @boldadmin/angular-google-maps"
   }
 }
