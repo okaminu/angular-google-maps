@@ -9,7 +9,7 @@ import createSpy = jasmine.createSpy
 
 describe('AngularGoogleMapsGeocoder', () => {
 
-    let googleMapsSpy: SpyObj<GoogleMapsService>
+    let googleMapsStub: SpyObj<GoogleMapsService>
     let eventPublisherSpy: SpyObj<EventPublisher>
     let geocoderSpy: SpyObj<google.maps.Geocoder>
     let geocoderService: AngularGoogleMapsGeocoder
@@ -27,8 +27,8 @@ describe('AngularGoogleMapsGeocoder', () => {
         })
         geocoderSpy = createSpyObj('google.maps.Geocoder', ['geocode'])
 
-        googleMapsSpy = TestBed.get(GoogleMapsService)
-        googleMapsSpy.createGeocoder.and.returnValue(geocoderSpy)
+        googleMapsStub = TestBed.get(GoogleMapsService)
+        googleMapsStub.createGeocoder.and.returnValue(geocoderSpy)
         eventPublisherSpy = TestBed.get(EventPublisher)
 
         geocoderService = TestBed.get(AngularGoogleMapsGeocoder)
@@ -80,7 +80,7 @@ describe('AngularGoogleMapsGeocoder', () => {
 
         it('returns location on no results', () => {
             const latLngSpy = createSpyObj('google.maps.LatLng', ['toString'])
-            googleMapsSpy.createLatLng.and.returnValue(latLngSpy)
+            googleMapsStub.createLatLng.and.returnValue(latLngSpy)
             geocoderSpy.geocode.and.callFake((request, callback) => callback(null, null))
             latLngSpy.toString.and.returnValue('location')
 
@@ -91,7 +91,7 @@ describe('AngularGoogleMapsGeocoder', () => {
 
         it('returns location on empty results', () => {
             const latLngSpy = createSpyObj('google.maps.LatLng', ['toString'])
-            googleMapsSpy.createLatLng.and.returnValue(latLngSpy)
+            googleMapsStub.createLatLng.and.returnValue(latLngSpy)
             geocoderSpy.geocode.and.callFake((request, callback) => callback([], null))
             latLngSpy.toString.and.returnValue('location')
 

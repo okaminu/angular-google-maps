@@ -19,7 +19,7 @@ describe('AngularGoogleMapsComponent', () => {
     let domSanitizerSpy: SpyObj<DomSanitizer>
     let googleMapsBuilderSpy: SpyObj<AngularGoogleMapsBuilder>
     let geocoderSpy: SpyObj<AngularGoogleMapsGeocoder>
-    let googleMapsSpy: SpyObj<GoogleMapsService>
+    let googleMapsServiceStub: SpyObj<GoogleMapsService>
 
     const subscribers = new Map<string, Function>()
     const location = new Location(10, 20)
@@ -58,8 +58,8 @@ describe('AngularGoogleMapsComponent', () => {
         domSanitizerSpy = TestBed.get(DomSanitizer)
         googleMapsBuilderSpy = TestBed.get(AngularGoogleMapsBuilder)
         geocoderSpy = TestBed.get(AngularGoogleMapsGeocoder)
-        googleMapsSpy = TestBed.get(GoogleMapsService)
-        googleMapsSpy.getGoogleMaps.and.returnValue(googleMapsStub)
+        googleMapsServiceStub = TestBed.get(GoogleMapsService)
+        googleMapsServiceStub.getGoogleMaps.and.returnValue(googleMapsStub)
 
         component = TestBed.get(AngularGoogleMapsComponent)
     })
