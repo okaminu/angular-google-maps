@@ -2,7 +2,6 @@
 This library integrates Google Maps functionality to Angular framework. 
 
 ## Installation
-
 Install using node package manager:
 ```
 $ npm install @boldadmin/angular-google-maps
