@@ -21,7 +21,8 @@ import MarkerOptions = google.maps.MarkerOptions
                   svgIcon="{{!isMapExpanded ? 'expand' : 'collapse'}}"
                   (click)="resizeMap()"></mat-icon>
         
-        <div id="map"></div>`
+        <div id="map"></div>`,
+    providers: [AngularGoogleMapsBuilder]
 })
 export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
 

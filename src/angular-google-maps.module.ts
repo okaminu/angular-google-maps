@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { MatIconModule } from '@angular/material'
 import { AngularGoogleMapsComponent } from './angular-google-maps.component'
-import { AngularGoogleMapsBuilder } from './service/angular-google-maps-builder.service'
 import { AngularGoogleMapsGeocoder } from './service/angular-google-maps-geocoder.service'
 import { GoogleMapsLoader } from './service/google-maps-loader.service'
 import { GoogleMapsFactory } from './service/google-maps-factory.service'
@@ -19,7 +18,6 @@ import { GoogleMapsFactory } from './service/google-maps-factory.service'
         AngularGoogleMapsComponent
     ],
     providers: [
-        AngularGoogleMapsBuilder,
         AngularGoogleMapsGeocoder,
         GoogleMapsLoader,
         GoogleMapsFactory
