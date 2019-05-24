@@ -16,10 +16,11 @@ import MarkerOptions = google.maps.MarkerOptions
                placeholder="Search Box"
                [ngModelOptions]="{standalone: true}"
                [(ngModel)]="address"/>
-        <div id="map"></div>
         <mat-icon id="resize-control" matSuffix
                   svgIcon="{{!isMapExpanded ? 'expand' : 'collapse'}}"
-                  (click)="resizeMap()"></mat-icon>`
+                  (click)="resizeMap()"></mat-icon>
+        
+        <div id="map"></div>`
 })
 export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
 

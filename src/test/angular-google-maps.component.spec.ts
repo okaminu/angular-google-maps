@@ -70,10 +70,10 @@ describe('AngularGoogleMapsComponent', () => {
 
         component.ngOnInit()
 
-        expect(matIconRegistrySpy.addSvgIcon).toHaveBeenCalledWith(jasmine.any(String), safeResource)
-        expect(domSanitizerSpy.bypassSecurityTrustResourceUrl).toHaveBeenCalled()
         expect(matIconRegistrySpy.addSvgIcon).toHaveBeenCalledTimes(2)
         expect(domSanitizerSpy.bypassSecurityTrustResourceUrl).toHaveBeenCalledTimes(2)
+        expect(matIconRegistrySpy.addSvgIcon).toHaveBeenCalledWith(jasmine.any(String), safeResource)
+        expect(domSanitizerSpy.bypassSecurityTrustResourceUrl).toHaveBeenCalled()
     })
 
     it('unsubscribes on destroy', () => {
@@ -145,7 +145,7 @@ describe('AngularGoogleMapsComponent', () => {
 
     describe('Resizes Google Maps', () => {
 
-        it('Expands map', () => {
+        it('expands map', () => {
             component.ngOnInit()
 
             component.resizeMap()
@@ -154,7 +154,7 @@ describe('AngularGoogleMapsComponent', () => {
             expect(eventPublisherSpy.notify).toHaveBeenCalledWith('googleMapsExpanded')
         })
 
-        it('Collapses map', () => {
+        it('collapses map', () => {
             component.ngOnInit()
 
             component.resizeMap()

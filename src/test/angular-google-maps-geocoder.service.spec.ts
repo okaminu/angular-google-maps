@@ -39,7 +39,7 @@ describe('AngularGoogleMapsGeocoder', () => {
         it('converts address to location', () => {
             const callbackSpy = createSpy()
             geocoderSpy.geocode.and.callFake(
-                (request, callback: any) => callback([{geometry: {location: {lat: () => 1.0, lng: () => 2.0}}}], null)
+                (request, callback: any) => callback([{geometry: {location: {lat: () => 1.0, lng: () => 2.0}}}])
             )
 
             geocoderService.geocode('address', callbackSpy)
@@ -49,7 +49,7 @@ describe('AngularGoogleMapsGeocoder', () => {
 
         it('returns default location on no results', () => {
             const callbackSpy = createSpy()
-            geocoderSpy.geocode.and.callFake((request, callback) => callback(null, null))
+            geocoderSpy.geocode.and.callFake((request, callback: any) => callback(null))
 
             geocoderService.geocode('address', callbackSpy)
 
@@ -58,7 +58,7 @@ describe('AngularGoogleMapsGeocoder', () => {
 
         it('returns default location on empty results', () => {
             const callbackSpy = createSpy()
-            geocoderSpy.geocode.and.callFake((request, callback) => callback([], null))
+            geocoderSpy.geocode.and.callFake((request, callback: any) => callback([]))
 
             geocoderService.geocode('address', callbackSpy)
 
@@ -70,7 +70,7 @@ describe('AngularGoogleMapsGeocoder', () => {
 
         it('converts location to address', () => {
             geocoderSpy.geocode.and.callFake(
-                (request, callback: any) => callback([{formatted_address: 'address'}], null)
+                (request, callback: any) => callback([{formatted_address: 'address'}])
             )
 
             geocoderService.reverseGeocode(new Location(1, 1))
@@ -81,7 +81,7 @@ describe('AngularGoogleMapsGeocoder', () => {
         it('returns location on no results', () => {
             const latLngSpy = createSpyObj('google.maps.LatLng', ['toString'])
             googleMapsStub.createLatLng.and.returnValue(latLngSpy)
-            geocoderSpy.geocode.and.callFake((request, callback) => callback(null, null))
+            geocoderSpy.geocode.and.callFake((request, callback: any) => callback(null))
             latLngSpy.toString.and.returnValue('location')
 
             geocoderService.reverseGeocode(new Location(1, 1))
@@ -92,7 +92,7 @@ describe('AngularGoogleMapsGeocoder', () => {
         it('returns location on empty results', () => {
             const latLngSpy = createSpyObj('google.maps.LatLng', ['toString'])
             googleMapsStub.createLatLng.and.returnValue(latLngSpy)
-            geocoderSpy.geocode.and.callFake((request, callback) => callback([], null))
+            geocoderSpy.geocode.and.callFake((request, callback: any) => callback([]))
             latLngSpy.toString.and.returnValue('location')
 
             geocoderService.reverseGeocode(new Location(1, 1))
