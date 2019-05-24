@@ -77,6 +77,12 @@ describe('AngularGoogleMapsComponent', () => {
         expect(domSanitizerSpy.bypassSecurityTrustResourceUrl).toHaveBeenCalled()
     })
 
+    it('subscribes setup functions', () => {
+        component.ngOnInit()
+
+        expect(eventPublisherSpy.subscribe).toHaveBeenCalledWith('addressReverseGeocoded', any(Function))
+    })
+
     it('unsubscribes on destroy', () => {
         component.ngOnDestroy()
 
