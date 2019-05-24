@@ -76,7 +76,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         this.changeMapCenter(focusLocation)
         this.googleMapsBuilder
             .createMap(this.mapOptions)
-            .addMarker(this.markerOptions, true)
+            .addMarker(this.markerOptions)
             .addSearchBox()
     }
 
@@ -85,7 +85,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
                 this.changeMapCenter(location)
                 this.googleMapsBuilder
                     .createMap(this.mapOptions)
-                    .addMarker(this.markerOptions, false)
+                    .addHiddenMarker(this.markerOptions)
                     .addSearchBox()
             }
         )

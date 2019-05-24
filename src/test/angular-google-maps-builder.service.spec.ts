@@ -85,7 +85,7 @@ describe('AngularGoogleMapsBuilder', () => {
             it('adds a marker', () => {
                 builder
                     .createMap(mapOptionsSpy)
-                    .addMarker(markerOptionsSpy, true)
+                    .addMarker(markerOptionsSpy)
 
                 expect(mapsFactorySpy.createMarker).toHaveBeenCalled()
             })
@@ -95,23 +95,23 @@ describe('AngularGoogleMapsBuilder', () => {
 
                 builder
                     .createMap(mapOptionsSpy)
-                    .addMarker(markerOptionsSpy, true)
+                    .addMarker(markerOptionsSpy)
 
                 expect(markerOptionsSpy.position).toEqual(location)
             })
 
-            it('marker is bound to map if marker location is provided', () => {
+            it('marker is bound to map', () => {
                 builder
                     .createMap(mapOptionsSpy)
-                    .addMarker(markerOptionsSpy, true)
+                    .addMarker(markerOptionsSpy)
 
                 expect(markerOptionsSpy.map).toEqual(mapSpy)
             })
 
-            it('marker is not bound to map if location is not provided', () => {
+            it('hidden marker is added to map', () => {
                 builder
                     .createMap(mapOptionsSpy)
-                    .addMarker(markerOptionsSpy, false)
+                    .addHiddenMarker(markerOptionsSpy)
 
                 expect(markerOptionsSpy.map).toBeUndefined()
             })
@@ -121,7 +121,7 @@ describe('AngularGoogleMapsBuilder', () => {
                 beforeEach(() => {
                     builder
                         .createMap(mapOptionsSpy)
-                        .addMarker(markerOptionsSpy, true)
+                        .addMarker(markerOptionsSpy)
                 })
 
                 it('notifies location change', () => {
@@ -172,7 +172,7 @@ describe('AngularGoogleMapsBuilder', () => {
                 beforeEach(() => {
                     builder
                         .createMap(mapOptionsSpy)
-                        .addMarker(markerOptionsSpy, true)
+                        .addMarker(markerOptionsSpy)
                 })
 
                 it('binds marker to map and new location', () => {
@@ -222,7 +222,7 @@ describe('AngularGoogleMapsBuilder', () => {
 
                 builder
                     .createMap(mapOptionsSpy)
-                    .addMarker(markerOptionsSpy, true)
+                    .addMarker(markerOptionsSpy)
                     .addSearchBox()
             })
 

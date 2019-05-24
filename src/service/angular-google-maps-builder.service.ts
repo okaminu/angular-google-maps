@@ -26,12 +26,14 @@ export class AngularGoogleMapsBuilder {
         return this
     }
 
-    addMarker(markerOptions: MarkerOptions, areMarkerLocationsProvided: boolean) {
-        markerOptions.position = this.map.getCenter()
-        if (areMarkerLocationsProvided)
-            markerOptions.map = this.map
-        this.marker = this.googleMaps.createMarker(markerOptions)
-        this.addMarkerListeners()
+    addMarker(markerOptions: MarkerOptions) {
+        markerOptions.map = this.map
+        this.createMarker(markerOptions)
+        return this
+    }
+
+    addHiddenMarker(markerOptions: MarkerOptions) {
+        this.createMarker(markerOptions)
         return this
     }
 
@@ -49,6 +51,12 @@ export class AngularGoogleMapsBuilder {
         })
 
         return this
+    }
+
+    private createMarker(markerOptions: google.maps.MarkerOptions) {
+        markerOptions.position = this.map.getCenter()
+        this.marker = this.googleMaps.createMarker(markerOptions)
+        this.addMarkerListeners()
     }
 
     private addMarkerListeners() {

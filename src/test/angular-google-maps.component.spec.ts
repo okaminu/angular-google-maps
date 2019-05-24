@@ -35,7 +35,7 @@ describe('AngularGoogleMapsComponent', () => {
                 {
                     provide: AngularGoogleMapsBuilder,
                     useValue: createSpyObj('AngularGoogleMapsBuilder',
-                        ['createMap', 'addMarker', 'addSearchBox', 'build'])
+                        ['createMap', 'addMarker', 'addHiddenMarker', 'addSearchBox', 'build'])
                 },
                 {
                     provide: AngularGoogleMapsGeocoder,
@@ -94,6 +94,7 @@ describe('AngularGoogleMapsComponent', () => {
         beforeEach(() => {
             googleMapsBuilderSpy.createMap.and.returnValue(googleMapsBuilderSpy)
             googleMapsBuilderSpy.addMarker.and.returnValue(googleMapsBuilderSpy)
+            googleMapsBuilderSpy.addHiddenMarker.and.returnValue(googleMapsBuilderSpy)
             googleMapsBuilderSpy.addSearchBox.and.returnValue(googleMapsBuilderSpy)
         })
 
@@ -115,7 +116,7 @@ describe('AngularGoogleMapsComponent', () => {
                 }))
             expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalledWith(jasmine.objectContaining({
                 position: jasmine.anything()
-            }), true)
+            }))
             expect(googleMapsBuilderSpy.addSearchBox).toHaveBeenCalled()
         })
 
@@ -150,9 +151,9 @@ describe('AngularGoogleMapsComponent', () => {
                         position: 'position'
                     }
                 }))
-            expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalledWith(jasmine.objectContaining({
+            expect(googleMapsBuilderSpy.addHiddenMarker).toHaveBeenCalledWith(jasmine.objectContaining({
                 position: jasmine.anything()
-            }), false)
+            }))
             expect(googleMapsBuilderSpy.addSearchBox)
         })
 
