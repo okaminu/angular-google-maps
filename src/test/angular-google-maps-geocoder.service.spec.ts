@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing'
-import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from '../location'
 import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocoder.service'
 import { GoogleMapsFactory } from '../service/google-maps-factory.service'
@@ -9,10 +8,9 @@ import createSpy = jasmine.createSpy
 
 describe('AngularGoogleMapsGeocoder', () => {
 
-    let googleMapsFactory: SpyObj<GoogleMapsFactory>
-    let eventPublisherSpy: SpyObj<EventPublisher>
-    let geocoderSpy: SpyObj<google.maps.Geocoder>
-    let geocoderService: AngularGoogleMapsGeocoder
+    let googleMapsFactoryStub: SpyObj<GoogleMapsFactory>
+    let geocoderStub: SpyObj<google.maps.Geocoder>
+    let service: AngularGoogleMapsGeocoder
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -21,46 +19,44 @@ describe('AngularGoogleMapsGeocoder', () => {
                 {
                     provide: GoogleMapsFactory,
                     useValue: createSpyObj('GoogleMapsFactory', ['createGeocoder', 'createLatLng'])
-                },
-                {provide: EventPublisher, useValue: createSpyObj('EventPublisher', ['notify'])}
+                }
             ]
         })
-        geocoderSpy = createSpyObj('google.maps.Geocoder', ['geocode'])
+        geocoderStub = createSpyObj('google.maps.Geocoder', ['geocode'])
 
-        googleMapsFactory = TestBed.get(GoogleMapsFactory)
-        googleMapsFactory.createGeocoder.and.returnValue(geocoderSpy)
-        eventPublisherSpy = TestBed.get(EventPublisher)
+        googleMapsFactoryStub = TestBed.get(GoogleMapsFactory)
+        googleMapsFactoryStub.createGeocoder.and.returnValue(geocoderStub)
 
-        geocoderService = TestBed.get(AngularGoogleMapsGeocoder)
+        service = TestBed.get(AngularGoogleMapsGeocoder)
     })
 
     describe('Geocoding', () => {
 
         it('converts address to location', () => {
             const callbackSpy = createSpy()
-            geocoderSpy.geocode.and.callFake(
+            geocoderStub.geocode.and.callFake(
                 (request, callback: any) => callback([{geometry: {location: {lat: () => 1.0, lng: () => 2.0}}}])
             )
 
-            geocoderService.geocode('address', callbackSpy)
+            service.geocode('address', callbackSpy)
 
             expect(callbackSpy).toHaveBeenCalledWith(new Location(1.0, 2.0))
         })
 
         it('returns default location on no results', () => {
             const callbackSpy = createSpy()
-            geocoderSpy.geocode.and.callFake((request, callback: any) => callback(null))
+            geocoderStub.geocode.and.callFake((request, callback: any) => callback(null))
 
-            geocoderService.geocode('address', callbackSpy)
+            service.geocode('address', callbackSpy)
 
             expect(callbackSpy).toHaveBeenCalledWith(jasmine.any(Location))
         })
 
         it('returns default location on empty results', () => {
             const callbackSpy = createSpy()
-            geocoderSpy.geocode.and.callFake((request, callback: any) => callback([]))
+            geocoderStub.geocode.and.callFake((request, callback: any) => callback([]))
 
-            geocoderService.geocode('address', callbackSpy)
+            service.geocode('address', callbackSpy)
 
             expect(callbackSpy).toHaveBeenCalledWith(jasmine.any(Location))
         })
@@ -69,35 +65,38 @@ describe('AngularGoogleMapsGeocoder', () => {
     describe('Reverse geocoding', () => {
 
         it('converts location to address', () => {
-            geocoderSpy.geocode.and.callFake(
+            const callbackSpy = createSpy()
+            geocoderStub.geocode.and.callFake(
                 (request, callback: any) => callback([{formatted_address: 'address'}])
             )
 
-            geocoderService.reverseGeocode(new Location(1, 1))
+            service.reverseGeocode(new Location(1, 1), callbackSpy)
 
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), 'address')
+            expect(callbackSpy).toHaveBeenCalledWith('address')
         })
 
         it('returns location on no results', () => {
             const latLngSpy = createSpyObj('google.maps.LatLng', ['toString'])
-            googleMapsFactory.createLatLng.and.returnValue(latLngSpy)
-            geocoderSpy.geocode.and.callFake((request, callback: any) => callback(null))
+            const callbackSpy = createSpy()
+            googleMapsFactoryStub.createLatLng.and.returnValue(latLngSpy)
+            geocoderStub.geocode.and.callFake((request, callback: any) => callback(null))
             latLngSpy.toString.and.returnValue('location')
 
-            geocoderService.reverseGeocode(new Location(1, 1))
+            service.reverseGeocode(new Location(1, 1), callbackSpy)
 
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), 'location')
+            expect(callbackSpy).toHaveBeenCalledWith('location')
         })
 
         it('returns location on empty results', () => {
+            const callbackSpy = createSpy()
             const latLngSpy = createSpyObj('google.maps.LatLng', ['toString'])
-            googleMapsFactory.createLatLng.and.returnValue(latLngSpy)
-            geocoderSpy.geocode.and.callFake((request, callback: any) => callback([]))
+            googleMapsFactoryStub.createLatLng.and.returnValue(latLngSpy)
+            geocoderStub.geocode.and.callFake((request, callback: any) => callback([]))
             latLngSpy.toString.and.returnValue('location')
 
-            geocoderService.reverseGeocode(new Location(1, 1))
+            service.reverseGeocode(new Location(1, 1), callbackSpy)
 
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith(jasmine.any(String), 'location')
+            expect(callbackSpy).toHaveBeenCalledWith('location')
         })
 
     })

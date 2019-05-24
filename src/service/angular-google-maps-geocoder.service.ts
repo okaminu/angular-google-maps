@@ -1,13 +1,11 @@
 import { Injectable } from '@angular/core'
-import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from '../location'
 import { GoogleMapsFactory } from './google-maps-factory.service'
 
 @Injectable()
 export class AngularGoogleMapsGeocoder {
 
-    constructor(private googleMaps: GoogleMapsFactory,
-                private eventPublisher: EventPublisher) {
+    constructor(private googleMaps: GoogleMapsFactory) {
     }
 
     geocode(address: string, callback: (Location) => void) {
@@ -19,13 +17,13 @@ export class AngularGoogleMapsGeocoder {
         })
     }
 
-    reverseGeocode(location: Location) {
+    reverseGeocode(location: Location, callback: (string) => void) {
         const latLng = this.googleMaps.createLatLng(location)
         this.googleMaps.createGeocoder().geocode({'location': latLng}, results => {
             if (results !== null && results[0])
-                this.eventPublisher.notify('addressReverseGeocoded', results[0].formatted_address)
+                callback(results[0].formatted_address)
             else
-                this.eventPublisher.notify('addressReverseGeocoded', latLng.toString())
+                callback(latLng.toString())
         })
     }
 

@@ -87,7 +87,9 @@ export class AngularGoogleMapsBuilder {
     }
 
     private reverseGeocode(e: MouseEvent) {
-        this.geocoder.reverseGeocode(new Location(e.latLng.lat(), e.latLng.lng()))
+        this.geocoder.reverseGeocode(new Location(e.latLng.lat(), e.latLng.lng()), (address: string) =>
+            this.eventPublisher.notify('addressReverseGeocoded', address)
+        )
     }
 
     private clearSearchBoxInput() {

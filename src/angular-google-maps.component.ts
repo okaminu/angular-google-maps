@@ -71,7 +71,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
     }
 
     createMapByLocation(focusLocation: Location) {
-        this.googleMapsGeocoder.reverseGeocode(focusLocation)
+        this.googleMapsGeocoder.reverseGeocode(focusLocation, (address: string) => this.address = address)
 
         this.googleMapsBuilder
             .createMap(this.mapOptions, focusLocation)
