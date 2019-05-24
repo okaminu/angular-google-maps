@@ -50,7 +50,6 @@ describe('AngularGoogleMapsBuilder', () => {
             lat: () => 10,
             lng: () => 15
         }
-        const focusLocation = new Location(10, 15)
         const mouseEvent = {
             latLng: location
         }
@@ -67,13 +66,9 @@ describe('AngularGoogleMapsBuilder', () => {
 
         describe('On map building', () => {
 
-            it('created map is centered to provided location', () => {
-                builder.createMap(mapOptionsSpy, focusLocation)
+            it('creates a map', () => {
+                builder.createMap(mapOptionsSpy)
 
-                expect(mapOptionsSpy.center).toEqual({
-                    lat: focusLocation.latitude,
-                    lng: focusLocation.longitude
-                })
                 expect(mapsFactorySpy.createMap).toHaveBeenCalledWith(mapOptionsSpy)
             })
 
@@ -89,7 +84,7 @@ describe('AngularGoogleMapsBuilder', () => {
 
             it('adds a marker', () => {
                 builder
-                    .createMap(mapOptionsSpy, focusLocation)
+                    .createMap(mapOptionsSpy)
                     .addMarker(markerOptionsSpy, true)
 
                 expect(mapsFactorySpy.createMarker).toHaveBeenCalled()
@@ -99,7 +94,7 @@ describe('AngularGoogleMapsBuilder', () => {
                 mapSpy.getCenter.and.returnValue(location)
 
                 builder
-                    .createMap(mapOptionsSpy, focusLocation)
+                    .createMap(mapOptionsSpy)
                     .addMarker(markerOptionsSpy, true)
 
                 expect(markerOptionsSpy.position).toEqual(location)
@@ -107,7 +102,7 @@ describe('AngularGoogleMapsBuilder', () => {
 
             it('marker is bound to map if marker location is provided', () => {
                 builder
-                    .createMap(mapOptionsSpy, focusLocation)
+                    .createMap(mapOptionsSpy)
                     .addMarker(markerOptionsSpy, true)
 
                 expect(markerOptionsSpy.map).toEqual(mapSpy)
@@ -115,7 +110,7 @@ describe('AngularGoogleMapsBuilder', () => {
 
             it('marker is not bound to map if location is not provided', () => {
                 builder
-                    .createMap(mapOptionsSpy, focusLocation)
+                    .createMap(mapOptionsSpy)
                     .addMarker(markerOptionsSpy, false)
 
                 expect(markerOptionsSpy.map).toBeUndefined()
@@ -125,7 +120,7 @@ describe('AngularGoogleMapsBuilder', () => {
 
                 beforeEach(() => {
                     builder
-                        .createMap(mapOptionsSpy, focusLocation)
+                        .createMap(mapOptionsSpy)
                         .addMarker(markerOptionsSpy, true)
                 })
 
@@ -176,7 +171,7 @@ describe('AngularGoogleMapsBuilder', () => {
 
                 beforeEach(() => {
                     builder
-                        .createMap(mapOptionsSpy, focusLocation)
+                        .createMap(mapOptionsSpy)
                         .addMarker(markerOptionsSpy, true)
                 })
 
@@ -226,7 +221,7 @@ describe('AngularGoogleMapsBuilder', () => {
                 mapsFactorySpy.createSearchBox.and.returnValue(searchBoxSpy)
 
                 builder
-                    .createMap(mapOptionsSpy, focusLocation)
+                    .createMap(mapOptionsSpy)
                     .addMarker(markerOptionsSpy, true)
                     .addSearchBox()
             })

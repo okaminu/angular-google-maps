@@ -19,7 +19,7 @@ import MarkerOptions = google.maps.MarkerOptions
                [(ngModel)]="address"/>
         <mat-icon id="resize-control" svgIcon="{{!isMapExpanded ? 'expand' : 'collapse'}}"
                   (click)="resizeMap()"></mat-icon>
-        
+
         <div id="map"></div>`,
     providers: [AngularGoogleMapsBuilder]
 })
@@ -73,18 +73,22 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
     createMapByLocation(focusLocation: Location) {
         this.googleMapsGeocoder.reverseGeocode(focusLocation, (address: string) => this.address = address)
 
+        this.changeMapCenter(focusLocation)
         this.googleMapsBuilder
-            .createMap(this.mapOptions, focusLocation)
+            .createMap(this.mapOptions)
             .addMarker(this.markerOptions, true)
             .addSearchBox()
     }
 
     createMapByAddress(address: string) {
-        this.googleMapsGeocoder.geocode(address, (location: Location) =>
-            this.googleMapsBuilder
-                .createMap(this.mapOptions, location)
-                .addMarker(this.markerOptions, false)
-                .addSearchBox())
+        this.googleMapsGeocoder.geocode(address, (location: Location) => {
+                this.changeMapCenter(location)
+                this.googleMapsBuilder
+                    .createMap(this.mapOptions)
+                    .addMarker(this.markerOptions, false)
+                    .addSearchBox()
+            }
+        )
     }
 
     resizeMap() {
@@ -93,5 +97,12 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
             this.eventPublisher.notify('googleMapsExpanded')
         else
             this.eventPublisher.notify('googleMapsCollapsed')
+    }
+
+    private changeMapCenter(location: Location) {
+        this.mapOptions.center = {
+            lat: location.latitude,
+            lng: location.longitude
+        }
     }
 }

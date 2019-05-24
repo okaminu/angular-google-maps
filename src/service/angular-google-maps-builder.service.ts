@@ -21,11 +21,7 @@ export class AngularGoogleMapsBuilder {
                 private eventPublisher: EventPublisher) {
     }
 
-    createMap(mapOptions: MapOptions, focusLocation: Location) {
-        mapOptions.center = {
-            lat: focusLocation.latitude,
-            lng: focusLocation.longitude
-        }
+    createMap(mapOptions: MapOptions) {
         this.map = this.googleMaps.createMap(mapOptions)
         return this
     }

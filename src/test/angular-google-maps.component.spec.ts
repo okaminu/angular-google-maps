@@ -104,11 +104,15 @@ describe('AngularGoogleMapsComponent', () => {
 
             expect(googleMapsBuilderSpy.createMap).toHaveBeenCalledWith(
                 jasmine.objectContaining({
+                    center: {
+                        lat: location.latitude,
+                        lng: location.longitude
+                    },
                     mapTypeControlOptions: {
                         mapTypeIds: ['roadmap', 'satellite'],
                         position: 'position'
                     }
-                }), location)
+                }))
             expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalledWith(jasmine.objectContaining({
                 position: jasmine.anything()
             }), true)
@@ -137,11 +141,15 @@ describe('AngularGoogleMapsComponent', () => {
 
             expect(googleMapsBuilderSpy.createMap).toHaveBeenCalledWith(
                 jasmine.objectContaining({
+                    center: {
+                        lat: location.latitude,
+                        lng: location.longitude
+                    },
                     mapTypeControlOptions: {
                         mapTypeIds: ['roadmap', 'satellite'],
                         position: 'position'
                     }
-                }), location)
+                }))
             expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalledWith(jasmine.objectContaining({
                 position: jasmine.anything()
             }), false)
