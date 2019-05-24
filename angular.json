@@ -23,7 +23,7 @@
             "karmaConfig": "karma.conf.js",
             "polyfills": "src/polyfills.ts",
             "codeCoverageExclude": [
-              "/**/google-maps.service.ts"
+              "/**/google-maps-factory.service.ts"
             ]
           }
         },
