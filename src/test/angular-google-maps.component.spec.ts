@@ -35,7 +35,7 @@ describe('AngularGoogleMapsComponent', () => {
                 {
                     provide: AngularGoogleMapsBuilder,
                     useValue: createSpyObj('AngularGoogleMapsBuilder',
-                        ['createMap', 'addMarker', 'addSearchBox', 'addResizeControl', 'build'])
+                        ['createMap', 'addMarker', 'addSearchBox', 'build'])
                 },
                 {
                     provide: AngularGoogleMapsGeocoder,
