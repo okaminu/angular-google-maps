@@ -7,6 +7,7 @@ import { mapsText } from './angular-google-maps.constant'
 import { AngularGoogleMapsBuilder } from './service/angular-google-maps-builder.service'
 import { AngularGoogleMapsGeocoder } from './service/angular-google-maps-geocoder.service'
 import { GoogleMapsFactory } from './service/google-maps-factory.service'
+import { IconRegistry } from './service/icon-registry/icon-registry'
 import MapOptions = google.maps.MapOptions
 import MarkerOptions = google.maps.MarkerOptions
 
@@ -55,14 +56,13 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
                 private googleMapsBuilder: AngularGoogleMapsBuilder,
                 private googleMapsGeocoder: AngularGoogleMapsGeocoder,
                 private eventPublisher: EventPublisher,
-                private iconRegistry: MatIconRegistry,
-                private sanitizer: DomSanitizer) {
+                private iconRegistry: IconRegistry) {
     }
 
     ngOnInit() {
         this.eventPublisher.subscribe('addressReverseGeocoded', (address: string) => this.address = address)
-        this.iconRegistry.addSvgIcon('expand', this.sanitizer.bypassSecurityTrustResourceUrl('./assets/expand.svg'))
-        this.iconRegistry.addSvgIcon('collapse', this.sanitizer.bypassSecurityTrustResourceUrl('./assets/collapse.svg'))
+        this.iconRegistry.register('expand', './assets/expand.svg')
+        this.iconRegistry.register('collapse', './assets/collapse.svg')
 
     }
 

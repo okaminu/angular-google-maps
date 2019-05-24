@@ -1,23 +1,22 @@
 import { TestBed } from '@angular/core/testing'
 import { MatIconRegistry } from '@angular/material'
-import { DomSanitizer } from '@angular/platform-browser'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { AngularGoogleMapsComponent } from '../angular-google-maps.component'
 import { Location } from '../location'
 import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder.service'
 import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocoder.service'
 import { GoogleMapsFactory } from '../service/google-maps-factory.service'
+import { IconRegistry } from '../service/icon-registry/icon-registry'
+import any = jasmine.any
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
-import any = jasmine.any
 
 describe('AngularGoogleMapsComponent', () => {
 
     let component: AngularGoogleMapsComponent
 
     let eventPublisherSpy: SpyObj<EventPublisher>
-    let matIconRegistrySpy: SpyObj<MatIconRegistry>
-    let domSanitizerSpy: SpyObj<DomSanitizer>
+    let iconRegistrySpy: SpyObj<IconRegistry>
     let googleMapsBuilderSpy: SpyObj<AngularGoogleMapsBuilder>
     let geocoderSpy: SpyObj<AngularGoogleMapsGeocoder>
     let googleMapsFactory: SpyObj<GoogleMapsFactory>
@@ -49,14 +48,11 @@ describe('AngularGoogleMapsComponent', () => {
                     provide: EventPublisher,
                     useValue: createSpyObj('EvenPublisher', ['subscribe', 'notify', 'unsubscribeAll'])
                 },
-                {provide: MatIconRegistry, useValue: createSpyObj('MatIconRegistry', ['addSvgIcon'])},
-                {provide: DomSanitizer, useValue: createSpyObj('DomSanitizer', ['bypassSecurityTrustResourceUrl'])}
+                {provide: IconRegistry, useValue: createSpyObj('IconRegistry', ['register'])},
             ]
         })
         eventPublisherSpy = TestBed.get(EventPublisher)
         eventPublisherSpy.subscribe.and.callFake((e, fun) => subscribers.set(e, fun))
-        matIconRegistrySpy = TestBed.get(MatIconRegistry)
-        domSanitizerSpy = TestBed.get(DomSanitizer)
         googleMapsBuilderSpy = TestBed.get(AngularGoogleMapsBuilder)
         geocoderSpy = TestBed.get(AngularGoogleMapsGeocoder)
         googleMapsFactory = TestBed.get(GoogleMapsFactory)
@@ -66,15 +62,11 @@ describe('AngularGoogleMapsComponent', () => {
     })
 
     it('registers an icon', () => {
-        const safeResource = createSpyObj('SafeResourceUrl', [''])
-        domSanitizerSpy.bypassSecurityTrustResourceUrl.and.returnValue(safeResource)
+        iconRegistrySpy = TestBed.get(IconRegistry)
 
         component.ngOnInit()
 
-        expect(matIconRegistrySpy.addSvgIcon).toHaveBeenCalledTimes(2)
-        expect(domSanitizerSpy.bypassSecurityTrustResourceUrl).toHaveBeenCalledTimes(2)
-        expect(matIconRegistrySpy.addSvgIcon).toHaveBeenCalledWith(jasmine.any(String), safeResource)
-        expect(domSanitizerSpy.bypassSecurityTrustResourceUrl).toHaveBeenCalled()
+        expect(iconRegistrySpy.register).toHaveBeenCalledTimes(2)
     })
 
     it('subscribes setup functions', () => {
