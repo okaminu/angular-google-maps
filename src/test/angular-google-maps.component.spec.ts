@@ -88,7 +88,6 @@ describe('AngularGoogleMapsComponent', () => {
             googleMapsBuilderSpy.createMap.and.returnValue(googleMapsBuilderSpy)
             googleMapsBuilderSpy.addMarker.and.returnValue(googleMapsBuilderSpy)
             googleMapsBuilderSpy.addSearchBox.and.returnValue(googleMapsBuilderSpy)
-            googleMapsBuilderSpy.build.and.returnValue(createSpyObj('google.maps.Map', ['']))
         })
 
         it('builds a map with marker and search box', () => {
@@ -107,7 +106,6 @@ describe('AngularGoogleMapsComponent', () => {
                 position: jasmine.anything()
             }), true)
             expect(googleMapsBuilderSpy.addSearchBox).toHaveBeenCalled()
-            expect(googleMapsBuilderSpy.build).toHaveBeenCalled()
         })
 
         it('builds a map by address', () => {
@@ -129,7 +127,6 @@ describe('AngularGoogleMapsComponent', () => {
                 position: jasmine.anything()
             }), false)
             expect(googleMapsBuilderSpy.addSearchBox)
-            expect(googleMapsBuilderSpy.build).toHaveBeenCalled()
         })
 
     })

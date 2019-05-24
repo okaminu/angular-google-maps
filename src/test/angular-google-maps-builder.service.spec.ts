@@ -67,17 +67,8 @@ describe('AngularGoogleMapsBuilder', () => {
 
         describe('On map building', () => {
 
-            it('builds a map', () => {
-                expect(builder
-                    .createMap(mapOptionsSpy, mapOptionsSpy)
-                    .build()
-                ).toBe(mapSpy)
-            })
-
-            it('map is centered to provided location', () => {
-                builder
-                    .createMap(mapOptionsSpy, focusLocation)
-                    .build()
+            it('created map is centered to provided location', () => {
+                builder.createMap(mapOptionsSpy, focusLocation)
 
                 expect(mapOptionsSpy.center).toEqual({
                     lat: focusLocation.latitude,
@@ -100,7 +91,6 @@ describe('AngularGoogleMapsBuilder', () => {
                 builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
-                    .build()
 
                 expect(googleMaps.createMarker).toHaveBeenCalled()
             })
@@ -111,7 +101,6 @@ describe('AngularGoogleMapsBuilder', () => {
                 builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
-                    .build()
 
                 expect(markerOptionsSpy.position).toEqual(location)
             })
@@ -120,7 +109,6 @@ describe('AngularGoogleMapsBuilder', () => {
                 builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
-                    .build()
 
                 expect(markerOptionsSpy.map).toEqual(mapSpy)
             })
@@ -129,7 +117,6 @@ describe('AngularGoogleMapsBuilder', () => {
                 builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, false)
-                    .build()
 
                 expect(markerOptionsSpy.map).toBeUndefined()
             })
@@ -138,7 +125,6 @@ describe('AngularGoogleMapsBuilder', () => {
                 builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
-                    .build()
 
                 expect(markerSpy.addListener).toHaveBeenCalledTimes(3)
                 expect(markerSpy.addListener).toHaveBeenCalledWith('dragend', any(Function))
@@ -151,7 +137,6 @@ describe('AngularGoogleMapsBuilder', () => {
                     builder
                         .createMap(mapOptionsSpy, focusLocation)
                         .addMarker(markerOptionsSpy, true)
-                        .build()
                 })
 
                 it('notifies location change', () => {
@@ -186,7 +171,6 @@ describe('AngularGoogleMapsBuilder', () => {
                 builder
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
-                    .build()
 
                 expect(mapSpy.addListener).toHaveBeenCalledTimes(3)
                 expect(mapSpy.addListener).toHaveBeenCalledWith('click', any(Function))
@@ -198,7 +182,6 @@ describe('AngularGoogleMapsBuilder', () => {
                     builder
                         .createMap(mapOptionsSpy, focusLocation)
                         .addMarker(markerOptionsSpy, true)
-                        .build()
                 })
 
                 it('binds marker to map and new location', () => {
@@ -246,7 +229,6 @@ describe('AngularGoogleMapsBuilder', () => {
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
                     .addSearchBox()
-                    .build()
             })
 
             it('adds search box', () => {

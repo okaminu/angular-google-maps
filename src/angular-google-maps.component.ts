@@ -78,7 +78,6 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
             .createMap(this.mapOptions, focusLocation)
             .addMarker(this.markerOptions, true)
             .addSearchBox()
-            .build()
     }
 
     createMapByAddress(address: string) {
@@ -86,8 +85,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
             this.googleMapsBuilder
                 .createMap(this.mapOptions, location)
                 .addMarker(this.markerOptions, false)
-                .addSearchBox()
-                .build())
+                .addSearchBox())
     }
 
     resizeMap() {

@@ -55,10 +55,6 @@ export class AngularGoogleMapsBuilder {
         return this
     }
 
-    build() {
-        return this.map
-    }
-
     private addMarkerListeners() {
         this.marker.addListener('dragend', mouseEvent => this.notifyLocationChange(mouseEvent))
         this.marker.addListener('dragend', mouseEvent => this.reverseGeocode(mouseEvent))
