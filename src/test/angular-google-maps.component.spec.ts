@@ -9,6 +9,7 @@ import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocod
 import { GoogleMapsFactory } from '../service/google-maps-factory.service'
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
+import any = jasmine.any
 
 describe('AngularGoogleMapsComponent', () => {
 
@@ -106,6 +107,18 @@ describe('AngularGoogleMapsComponent', () => {
                 position: jasmine.anything()
             }), true)
             expect(googleMapsBuilderSpy.addSearchBox).toHaveBeenCalled()
+        })
+
+        it('reverse geocodes location', () => {
+            geocoderSpy.reverseGeocode.and.callFake((request, callback: any) =>
+                callback('address')
+            )
+            component.ngOnInit()
+
+            component.createMapByLocation(location)
+
+            expect(geocoderSpy.reverseGeocode).toHaveBeenCalledWith(location, any(Function))
+            expect(component.address).toEqual('address')
         })
 
         it('builds a map by address', () => {

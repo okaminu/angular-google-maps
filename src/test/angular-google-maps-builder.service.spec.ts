@@ -23,7 +23,7 @@ describe('AngularGoogleMapsBuilder', () => {
                 {
                     provide: GoogleMapsFactory,
                     useValue: createSpyObj('GoogleMapsFactory',
-                        ['getGoogleMaps', 'createMap', 'createMarker', 'createSearchBox', 'getSearchBoxInput'])
+                        ['createMap', 'createMarker', 'createSearchBox', 'getSearchBoxInput'])
                 },
                 {provide: EventPublisher, useValue: createSpyObj('EventPublisher', ['notify'])},
                 {
@@ -149,10 +149,14 @@ describe('AngularGoogleMapsBuilder', () => {
                 })
 
                 it('reverse geocodes', () => {
+                    geocoderSpy.reverseGeocode.and.callFake((request, callback: any) =>
+                        callback('address')
+                    )
                     getCallsByInvokedParameter(markerSpy.addListener.calls.all(), 'dragend')[1].args[1](mouseEvent)
 
                     expect(geocoderSpy.reverseGeocode)
-                        .toHaveBeenCalledWith(new Location(location.lat(), location.lng()))
+                        .toHaveBeenCalledWith(new Location(location.lat(), location.lng()), any(Function))
+                    expect(eventPublisherSpy.notify).toHaveBeenCalledWith(any(String), 'address')
                 })
 
                 it('deletes marker', () => {
@@ -201,10 +205,14 @@ describe('AngularGoogleMapsBuilder', () => {
                 })
 
                 it('reverse geocodes', () => {
+                    geocoderSpy.reverseGeocode.and.callFake((request, callback: any) =>
+                        callback('address')
+                    )
                     getCallsByInvokedParameter(mapSpy.addListener.calls.all(), 'click')[2].args[1](mouseEvent)
 
                     expect(geocoderSpy.reverseGeocode)
-                        .toHaveBeenCalledWith(new Location(location.lat(), location.lng()))
+                        .toHaveBeenCalledWith(new Location(location.lat(), location.lng()), any(Function))
+                    expect(eventPublisherSpy.notify).toHaveBeenCalledWith(any(String), 'address')
                 })
 
             })
