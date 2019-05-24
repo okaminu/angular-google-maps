@@ -45,7 +45,7 @@ export class AngularGoogleMapsBuilder {
         box.addListener('places_changed', () => {
             const places = box.getPlaces()
             if (places[0]) {
-                this.changeMapLocation(places[0].geometry.location)
+                this.changeMapLocationAndZoom(places[0].geometry.location)
                 this.changeMarkerLocation(places[0].geometry.location)
                 const loc = places[0].geometry.location
                 this.eventPublisher.notify('locationChanged', new Location(loc.lat(), loc.lng()))
@@ -58,17 +58,15 @@ export class AngularGoogleMapsBuilder {
     private addMarkerListeners() {
         this.marker.addListener('dragend', mouseEvent => this.notifyLocationChange(mouseEvent))
         this.marker.addListener('dragend', mouseEvent => this.reverseGeocode(mouseEvent))
-        this.marker.addListener('dblclick', () => {
-            this.marker.setMap(null)
-            this.eventPublisher.notify('locationDeleted')
-            this.clearSearchBoxInput()
-        })
+        this.marker.addListener('dblclick', () => this.marker.setMap(null))
+        this.marker.addListener('dblclick', () => this.eventPublisher.notify('locationDeleted'))
+        this.marker.addListener('dblclick', () => this.googleMaps.getSearchBoxInput().value = '')
         this.map.addListener('click', mouseEvent => this.changeMarkerLocation(mouseEvent.latLng))
         this.map.addListener('click', mouseEvent => this.notifyLocationChange(mouseEvent))
         this.map.addListener('click', mouseEvent => this.reverseGeocode(mouseEvent))
     }
 
-    private changeMapLocation(location: LatLng) {
+    private changeMapLocationAndZoom(location: LatLng) {
         this.map.panTo(location)
         this.map.setZoom(15)
     }
@@ -87,9 +85,4 @@ export class AngularGoogleMapsBuilder {
             this.eventPublisher.notify('addressReverseGeocoded', address)
         )
     }
-
-    private clearSearchBoxInput() {
-        this.googleMaps.getSearchBoxInput().value = ''
-    }
-
 }

@@ -121,16 +121,6 @@ describe('AngularGoogleMapsBuilder', () => {
                 expect(markerOptionsSpy.map).toBeUndefined()
             })
 
-            it('adds marker dragend listener to notify location change, reverse geocode and delete marker', () => {
-                builder
-                    .createMap(mapOptionsSpy, focusLocation)
-                    .addMarker(markerOptionsSpy, true)
-
-                expect(markerSpy.addListener).toHaveBeenCalledTimes(3)
-                expect(markerSpy.addListener).toHaveBeenCalledWith('dragend', any(Function))
-                expect(markerSpy.addListener).toHaveBeenCalledWith('dblclick', any(Function))
-            })
-
             describe('Invoked marker dragend listener handler', () => {
 
                 beforeEach(() => {
@@ -160,24 +150,26 @@ describe('AngularGoogleMapsBuilder', () => {
                 })
 
                 it('deletes marker', () => {
-                    const elementStub: SpyObj<HTMLInputElement> = createSpyObj('HTMLInputElement', [''])
-                    googleMaps.getSearchBoxInput.and.returnValue(elementStub)
-                    getCallsByInvokedParameter(markerSpy.addListener.calls.all(), 'dblclick')[0].args[1](mouseEvent)
+                    getCallsByInvokedParameter(markerSpy.addListener.calls.all(), 'dblclick')[0].args[1]()
 
                     expect(markerSpy.setMap).toHaveBeenCalledWith(null)
-                    expect(eventPublisherSpy.notify).toHaveBeenCalledWith('locationDeleted')
-                    expect(elementStub.value).toEqual('')
                 })
 
-            })
+                it('deleted marker fires location deleted event', () => {
+                    getCallsByInvokedParameter(markerSpy.addListener.calls.all(), 'dblclick')[1].args[1]()
 
-            it('adds map click listener to update marker position, notify location change and reverse geocode', () => {
-                builder
-                    .createMap(mapOptionsSpy, focusLocation)
-                    .addMarker(markerOptionsSpy, true)
+                    expect(eventPublisherSpy.notify).toHaveBeenCalledWith('locationDeleted')
+                })
 
-                expect(mapSpy.addListener).toHaveBeenCalledTimes(3)
-                expect(mapSpy.addListener).toHaveBeenCalledWith('click', any(Function))
+                it('deleted marker clears search box input', () => {
+                    const elementSpy: SpyObj<HTMLInputElement> = createSpyObj('HTMLInputElement', [''])
+                    googleMaps.getSearchBoxInput.and.returnValue(elementSpy)
+
+                    getCallsByInvokedParameter(markerSpy.addListener.calls.all(), 'dblclick')[2].args[1]()
+
+                    expect(elementSpy.value).toEqual('')
+                })
+
             })
 
             describe('Invoked map click listener handler', () => {
@@ -241,10 +233,6 @@ describe('AngularGoogleMapsBuilder', () => {
 
             it('adds search box', () => {
                 expect(googleMaps.createSearchBox).toHaveBeenCalledWith()
-            })
-
-            it('add search box listener', () => {
-                expect(searchBoxSpy.addListener).toHaveBeenCalledWith('places_changed', any(Function))
             })
 
             describe('Invoked search box listener handler', () => {

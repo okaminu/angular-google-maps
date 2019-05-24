@@ -17,8 +17,7 @@ import MarkerOptions = google.maps.MarkerOptions
                placeholder="{{mapsText.searchBox}}"
                [ngModelOptions]="{standalone: true}"
                [(ngModel)]="address"/>
-        <mat-icon id="resize-control" matSuffix
-                  svgIcon="{{!isMapExpanded ? 'expand' : 'collapse'}}"
+        <mat-icon id="resize-control" svgIcon="{{!isMapExpanded ? 'expand' : 'collapse'}}"
                   (click)="resizeMap()"></mat-icon>
         
         <div id="map"></div>`,
