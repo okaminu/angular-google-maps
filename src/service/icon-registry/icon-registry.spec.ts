@@ -5,7 +5,7 @@ import { IconRegistry } from './icon-registry'
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
 
-describe('Icon registry: ', () => {
+describe('Icon registry', () => {
     let iconRegistry: IconRegistry
     let matIconRegistrySpy: SpyObj<MatIconRegistry>
     let domSanitizerSpy: SpyObj<DomSanitizer>
@@ -23,7 +23,7 @@ describe('Icon registry: ', () => {
         iconRegistry = TestBed.get(IconRegistry)
     })
 
-    it('Registers icon', () => {
+    it('registers icon', () => {
         const safeResource = createSpyObj('SafeResourceUrl', [''])
         domSanitizerSpy.bypassSecurityTrustResourceUrl.and.returnValue(safeResource)
 
