@@ -3,6 +3,7 @@ import { MatIconRegistry } from '@angular/material'
 import { DomSanitizer } from '@angular/platform-browser'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from './location'
+import { mapsText } from './angular-google-maps.constant'
 import { AngularGoogleMapsBuilder } from './service/angular-google-maps-builder.service'
 import { AngularGoogleMapsGeocoder } from './service/angular-google-maps-geocoder.service'
 import { GoogleMapsService } from './service/google-maps.service'
@@ -13,7 +14,7 @@ import MarkerOptions = google.maps.MarkerOptions
     selector: 'google-maps',
     template: `
         <input id="search-input" name="searchBox" class="controls" type="text"
-               placeholder="Search Box"
+               placeholder="{{mapsText.searchBox}}"
                [ngModelOptions]="{standalone: true}"
                [(ngModel)]="address"/>
         <mat-icon id="resize-control" matSuffix
@@ -24,6 +25,7 @@ import MarkerOptions = google.maps.MarkerOptions
 })
 export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
 
+    mapsText = mapsText
     address = ''
     isMapExpanded = false
 

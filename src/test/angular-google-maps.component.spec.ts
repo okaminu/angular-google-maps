@@ -112,7 +112,7 @@ describe('AngularGoogleMapsComponent', () => {
 
         it('builds a map by address', () => {
             geocoderSpy.geocode.and.callFake(
-                (request, callback: any) => callback(location, null)
+                (request, callback: any) => callback(location)
             )
             component.ngOnInit()
 
