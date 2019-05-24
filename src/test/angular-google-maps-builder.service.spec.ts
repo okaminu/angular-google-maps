@@ -11,7 +11,7 @@ import SpyObj = jasmine.SpyObj
 
 describe('AngularGoogleMapsBuilder', () => {
 
-    let googleMaps: SpyObj<GoogleMapsFactory>
+    let mapsFactorySpy: SpyObj<GoogleMapsFactory>
     let eventPublisherSpy: SpyObj<EventPublisher>
     let geocoderSpy: SpyObj<AngularGoogleMapsGeocoder>
     let builder: AngularGoogleMapsBuilder
@@ -32,7 +32,7 @@ describe('AngularGoogleMapsBuilder', () => {
                 }
             ]
         })
-        googleMaps = TestBed.get(GoogleMapsFactory)
+        mapsFactorySpy = TestBed.get(GoogleMapsFactory)
         eventPublisherSpy = TestBed.get(EventPublisher)
         geocoderSpy = TestBed.get(AngularGoogleMapsGeocoder)
 
@@ -61,8 +61,8 @@ describe('AngularGoogleMapsBuilder', () => {
             mapOptionsSpy = createSpyObj('google.maps.MapOptions', [''])
             markerOptionsSpy = createSpyObj('google.maps.MarkerOptions', [''])
 
-            googleMaps.createMap.and.returnValue(mapSpy)
-            googleMaps.createMarker.and.returnValue(markerSpy)
+            mapsFactorySpy.createMap.and.returnValue(mapSpy)
+            mapsFactorySpy.createMarker.and.returnValue(markerSpy)
         })
 
         describe('On map building', () => {
@@ -74,7 +74,7 @@ describe('AngularGoogleMapsBuilder', () => {
                     lat: focusLocation.latitude,
                     lng: focusLocation.longitude
                 })
-                expect(googleMaps.createMap).toHaveBeenCalledWith(mapOptionsSpy)
+                expect(mapsFactorySpy.createMap).toHaveBeenCalledWith(mapOptionsSpy)
             })
 
         })
@@ -92,7 +92,7 @@ describe('AngularGoogleMapsBuilder', () => {
                     .createMap(mapOptionsSpy, focusLocation)
                     .addMarker(markerOptionsSpy, true)
 
-                expect(googleMaps.createMarker).toHaveBeenCalled()
+                expect(mapsFactorySpy.createMarker).toHaveBeenCalled()
             })
 
             it('added marker is aligned with map location', () => {
@@ -163,7 +163,7 @@ describe('AngularGoogleMapsBuilder', () => {
 
                 it('deleted marker clears search box input', () => {
                     const elementSpy: SpyObj<HTMLInputElement> = createSpyObj('HTMLInputElement', [''])
-                    googleMaps.getSearchBoxInput.and.returnValue(elementSpy)
+                    mapsFactorySpy.getSearchBoxInput.and.returnValue(elementSpy)
 
                     getCallsByInvokedParameter(markerSpy.addListener.calls.all(), 'dblclick')[2].args[1]()
 
@@ -211,7 +211,7 @@ describe('AngularGoogleMapsBuilder', () => {
 
         })
 
-        describe('On search box building', () => {
+        describe('Search box building', () => {
 
             let searchBoxSpy: SpyObj<google.maps.places.SearchBox>
 
@@ -223,7 +223,7 @@ describe('AngularGoogleMapsBuilder', () => {
                         location: location
                     }
                 }] as any[])
-                googleMaps.createSearchBox.and.returnValue(searchBoxSpy)
+                mapsFactorySpy.createSearchBox.and.returnValue(searchBoxSpy)
 
                 builder
                     .createMap(mapOptionsSpy, focusLocation)
@@ -232,7 +232,7 @@ describe('AngularGoogleMapsBuilder', () => {
             })
 
             it('adds search box', () => {
-                expect(googleMaps.createSearchBox).toHaveBeenCalledWith()
+                expect(mapsFactorySpy.createSearchBox).toHaveBeenCalledWith()
             })
 
             describe('Invoked search box listener handler', () => {
@@ -260,7 +260,7 @@ describe('AngularGoogleMapsBuilder', () => {
                         .toEqual(new Location(location.lat(), location.lng()))
                 })
 
-                it('Does nothing if location cannot be retrieved', () => {
+                it('does nothing if location cannot be retrieved', () => {
                     searchBoxSpy.getPlaces.and.returnValue([])
                     searchBoxSpy.addListener.calls.first().args[1]()
 

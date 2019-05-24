@@ -35,7 +35,7 @@ describe('AngularGoogleMapsComponent', () => {
                 {
                     provide: AngularGoogleMapsBuilder,
                     useValue: createSpyObj('AngularGoogleMapsBuilder',
-                        ['createMap', 'addMarker', 'addSearchBox', 'addResizeControl', 'build'])
+                        ['createMap', 'addMarker', 'addSearchBox', 'build'])
                 },
                 {
                     provide: AngularGoogleMapsGeocoder,
@@ -75,6 +75,12 @@ describe('AngularGoogleMapsComponent', () => {
         expect(domSanitizerSpy.bypassSecurityTrustResourceUrl).toHaveBeenCalledTimes(2)
         expect(matIconRegistrySpy.addSvgIcon).toHaveBeenCalledWith(jasmine.any(String), safeResource)
         expect(domSanitizerSpy.bypassSecurityTrustResourceUrl).toHaveBeenCalled()
+    })
+
+    it('subscribes setup functions', () => {
+        component.ngOnInit()
+
+        expect(eventPublisherSpy.subscribe).toHaveBeenCalledWith('addressReverseGeocoded', any(Function))
     })
 
     it('unsubscribes on destroy', () => {
