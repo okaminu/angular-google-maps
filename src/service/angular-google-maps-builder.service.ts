@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from '../location'
 import { AngularGoogleMapsGeocoder } from './angular-google-maps-geocoder.service'
-import { GoogleMapsService } from './google-maps.service'
+import { GoogleMapsFactory } from './google-maps-factory.service'
 import LatLng = google.maps.LatLng
 import Map = google.maps.Map
 import MapOptions = google.maps.MapOptions
@@ -16,7 +16,7 @@ export class AngularGoogleMapsBuilder {
     private map: Map
     private marker: Marker
 
-    constructor(private googleMaps: GoogleMapsService,
+    constructor(private googleMaps: GoogleMapsFactory,
                 private geocoder: AngularGoogleMapsGeocoder,
                 private eventPublisher: EventPublisher) {
     }

@@ -5,7 +5,7 @@ import { AngularGoogleMapsComponent } from './angular-google-maps.component'
 import { AngularGoogleMapsBuilder } from './service/angular-google-maps-builder.service'
 import { AngularGoogleMapsGeocoder } from './service/angular-google-maps-geocoder.service'
 import { GoogleMapsLoader } from './service/google-maps-loader.service'
-import { GoogleMapsService } from './service/google-maps.service'
+import { GoogleMapsFactory } from './service/google-maps-factory.service'
 
 @NgModule({
     declarations: [
@@ -22,7 +22,7 @@ import { GoogleMapsService } from './service/google-maps.service'
         AngularGoogleMapsBuilder,
         AngularGoogleMapsGeocoder,
         GoogleMapsLoader,
-        GoogleMapsService
+        GoogleMapsFactory
     ]
 })
 export class AngularGoogleMapsModule {

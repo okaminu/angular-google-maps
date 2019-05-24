@@ -6,7 +6,7 @@ import { Location } from './location'
 import { mapsText } from './angular-google-maps.constant'
 import { AngularGoogleMapsBuilder } from './service/angular-google-maps-builder.service'
 import { AngularGoogleMapsGeocoder } from './service/angular-google-maps-geocoder.service'
-import { GoogleMapsService } from './service/google-maps.service'
+import { GoogleMapsFactory } from './service/google-maps-factory.service'
 import MapOptions = google.maps.MapOptions
 import MarkerOptions = google.maps.MarkerOptions
 
@@ -36,7 +36,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         },
         mapTypeControlOptions: {
             mapTypeIds: ['roadmap', 'satellite'],
-            position: this.googleMaps.getGoogleMaps().ControlPosition.LEFT_BOTTOM
+            position: this.googleMapsFactory.getGoogleMaps().ControlPosition.LEFT_BOTTOM
         },
         zoom: 10,
         controlSize: 22,
@@ -48,10 +48,10 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
             lng: 0
         },
         draggable: true,
-        animation: this.googleMaps.getGoogleMaps().Animation.DROP
+        animation: this.googleMapsFactory.getGoogleMaps().Animation.DROP
     }
 
-    constructor(private googleMaps: GoogleMapsService,
+    constructor(private googleMapsFactory: GoogleMapsFactory,
                 private googleMapsBuilder: AngularGoogleMapsBuilder,
                 private googleMapsGeocoder: AngularGoogleMapsGeocoder,
                 private eventPublisher: EventPublisher,
@@ -70,7 +70,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         this.eventPublisher.unsubscribeAll('addressReverseGeocoded')
     }
 
-    setUpMapByLocation(focusLocation: Location) {
+    createMapByLocation(focusLocation: Location) {
         this.googleMapsGeocoder.reverseGeocode(focusLocation)
 
         this.googleMapsBuilder
@@ -80,7 +80,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
             .build()
     }
 
-    setUpMapByAddress(address: string) {
+    createMapByAddress(address: string) {
         this.googleMapsGeocoder.geocode(address, (location: Location) =>
             this.googleMapsBuilder
                 .createMap(this.mapOptions, location)

@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from '../location'
-import { GoogleMapsService } from './google-maps.service'
+import { GoogleMapsFactory } from './google-maps-factory.service'
 
 @Injectable()
 export class AngularGoogleMapsGeocoder {
 
-    constructor(private googleMaps: GoogleMapsService,
+    constructor(private googleMaps: GoogleMapsFactory,
                 private eventPublisher: EventPublisher) {
     }
 

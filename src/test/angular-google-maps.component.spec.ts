@@ -6,7 +6,7 @@ import { AngularGoogleMapsComponent } from '../angular-google-maps.component'
 import { Location } from '../location'
 import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder.service'
 import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocoder.service'
-import { GoogleMapsService } from '../service/google-maps.service'
+import { GoogleMapsFactory } from '../service/google-maps-factory.service'
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
 
@@ -19,7 +19,7 @@ describe('AngularGoogleMapsComponent', () => {
     let domSanitizerSpy: SpyObj<DomSanitizer>
     let googleMapsBuilderSpy: SpyObj<AngularGoogleMapsBuilder>
     let geocoderSpy: SpyObj<AngularGoogleMapsGeocoder>
-    let googleMapsServiceStub: SpyObj<GoogleMapsService>
+    let googleMapsFactory: SpyObj<GoogleMapsFactory>
 
     const subscribers = new Map<string, Function>()
     const location = new Location(10, 20)
@@ -41,8 +41,8 @@ describe('AngularGoogleMapsComponent', () => {
                     useValue: createSpyObj('AngularGoogleMapsGeocoder', ['reverseGeocode', 'geocode'])
                 },
                 {
-                    provide: GoogleMapsService,
-                    useValue: createSpyObj('GoogleMapsService', ['getGoogleMaps'])
+                    provide: GoogleMapsFactory,
+                    useValue: createSpyObj('GoogleMapsFactory', ['getGoogleMaps'])
                 },
                 {
                     provide: EventPublisher,
@@ -58,8 +58,8 @@ describe('AngularGoogleMapsComponent', () => {
         domSanitizerSpy = TestBed.get(DomSanitizer)
         googleMapsBuilderSpy = TestBed.get(AngularGoogleMapsBuilder)
         geocoderSpy = TestBed.get(AngularGoogleMapsGeocoder)
-        googleMapsServiceStub = TestBed.get(GoogleMapsService)
-        googleMapsServiceStub.getGoogleMaps.and.returnValue(googleMapsStub)
+        googleMapsFactory = TestBed.get(GoogleMapsFactory)
+        googleMapsFactory.getGoogleMaps.and.returnValue(googleMapsStub)
 
         component = TestBed.get(AngularGoogleMapsComponent)
     })
@@ -94,7 +94,7 @@ describe('AngularGoogleMapsComponent', () => {
         it('builds a map with marker and search box', () => {
             component.ngOnInit()
 
-            component.setUpMapByLocation(location)
+            component.createMapByLocation(location)
 
             expect(googleMapsBuilderSpy.createMap).toHaveBeenCalledWith(
                 jasmine.objectContaining({
@@ -116,7 +116,7 @@ describe('AngularGoogleMapsComponent', () => {
             )
             component.ngOnInit()
 
-            component.setUpMapByAddress('address')
+            component.createMapByAddress('address')
 
             expect(googleMapsBuilderSpy.createMap).toHaveBeenCalledWith(
                 jasmine.objectContaining({

@@ -4,7 +4,7 @@ import MapOptions = google.maps.MapOptions
 import MarkerOptions = google.maps.MarkerOptions
 
 @Injectable()
-export class GoogleMapsService {
+export class GoogleMapsFactory {
 
     getGoogleMaps(): any {
         return google.maps

@@ -3,7 +3,7 @@ import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from '../location'
 import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder.service'
 import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocoder.service'
-import { GoogleMapsService } from '../service/google-maps.service'
+import { GoogleMapsFactory } from '../service/google-maps-factory.service'
 import Marker = google.maps.Marker
 import any = jasmine.any
 import createSpyObj = jasmine.createSpyObj
@@ -11,7 +11,7 @@ import SpyObj = jasmine.SpyObj
 
 describe('AngularGoogleMapsBuilder', () => {
 
-    let googleMaps: SpyObj<GoogleMapsService>
+    let googleMaps: SpyObj<GoogleMapsFactory>
     let eventPublisherSpy: SpyObj<EventPublisher>
     let geocoderSpy: SpyObj<AngularGoogleMapsGeocoder>
     let builder: AngularGoogleMapsBuilder
@@ -21,8 +21,8 @@ describe('AngularGoogleMapsBuilder', () => {
             providers: [
                 AngularGoogleMapsBuilder,
                 {
-                    provide: GoogleMapsService,
-                    useValue: createSpyObj('GoogleMapsService',
+                    provide: GoogleMapsFactory,
+                    useValue: createSpyObj('GoogleMapsFactory',
                         ['getGoogleMaps', 'createMap', 'createMarker', 'createSearchBox', 'getSearchBoxInput'])
                 },
                 {provide: EventPublisher, useValue: createSpyObj('EventPublisher', ['notify'])},
@@ -32,7 +32,7 @@ describe('AngularGoogleMapsBuilder', () => {
                 }
             ]
         })
-        googleMaps = TestBed.get(GoogleMapsService)
+        googleMaps = TestBed.get(GoogleMapsFactory)
         eventPublisherSpy = TestBed.get(EventPublisher)
         geocoderSpy = TestBed.get(AngularGoogleMapsGeocoder)
 
