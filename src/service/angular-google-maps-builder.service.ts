@@ -3,6 +3,8 @@ import { EventPublisher } from '@boldadmin/event-publisher'
 import { Location } from '../location'
 import { AngularGoogleMapsGeocoder } from './angular-google-maps-geocoder.service'
 import { GoogleMapsFactory } from './google-maps-factory.service'
+import Circle = google.maps.Circle
+import CircleOptions = google.maps.CircleOptions
 import LatLng = google.maps.LatLng
 import Map = google.maps.Map
 import MapOptions = google.maps.MapOptions
@@ -15,6 +17,7 @@ export class AngularGoogleMapsBuilder {
 
     private map: Map
     private marker: Marker
+    private markerRadius: Circle
 
     constructor(private googleMaps: GoogleMapsFactory,
                 private geocoder: AngularGoogleMapsGeocoder,
@@ -26,14 +29,16 @@ export class AngularGoogleMapsBuilder {
         return this
     }
 
-    addMarker(markerOptions: MarkerOptions) {
-        markerOptions.map = this.map
+    addMarkerWithRadius(markerOptions: MarkerOptions, circleOptions: CircleOptions) {
         this.createMarker(markerOptions)
+        this.createMarkerRadius(circleOptions)
+        this.markerRadius.bindTo('center', this.marker, 'position')
         return this
     }
 
-    addHiddenMarker(markerOptions: MarkerOptions) {
-        this.createMarker(markerOptions)
+    hideMarker() {
+        this.marker.setMap(null)
+        this.markerRadius.setMap(null)
         return this
     }
 
@@ -53,16 +58,23 @@ export class AngularGoogleMapsBuilder {
         return this
     }
 
+    private createMarkerRadius(circleOptions: CircleOptions) {
+        this.markerRadius = this.googleMaps.createCircle(circleOptions)
+        this.markerRadius.setMap(this.map)
+        this.markerRadius.setCenter(this.map.getCenter())
+    }
+
     private createMarker(markerOptions: google.maps.MarkerOptions) {
-        markerOptions.position = this.map.getCenter()
         this.marker = this.googleMaps.createMarker(markerOptions)
+        this.marker.setPosition(this.map.getCenter())
+        this.marker.setMap(this.map)
         this.addMarkerListeners()
     }
 
     private addMarkerListeners() {
         this.marker.addListener('dragend', mouseEvent => this.notifyLocationChange(mouseEvent))
         this.marker.addListener('dragend', mouseEvent => this.reverseGeocode(mouseEvent))
-        this.marker.addListener('dblclick', () => this.marker.setMap(null))
+        this.marker.addListener('dblclick', () => this.hideMarker())
         this.marker.addListener('dblclick', () => this.eventPublisher.notify('locationDeleted'))
         this.marker.addListener('dblclick', () => this.googleMaps.getSearchBoxInput().value = '')
         this.map.addListener('click', mouseEvent => this.changeMarkerLocation(mouseEvent.latLng))
@@ -76,6 +88,7 @@ export class AngularGoogleMapsBuilder {
     }
 
     private changeMarkerLocation(location: LatLng) {
+        this.markerRadius.setMap(this.map)
         this.marker.setMap(this.map)
         this.marker.setPosition(location)
     }

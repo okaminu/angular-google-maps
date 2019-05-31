@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Location } from '../location'
+import CircleOptions = google.maps.CircleOptions
 import MapOptions = google.maps.MapOptions
 import MarkerOptions = google.maps.MarkerOptions
 
@@ -12,6 +13,10 @@ export class GoogleMapsFactory {
 
     createMap(options: MapOptions) {
         return new google.maps.Map(document.getElementById('map'), options)
+    }
+
+    createCircle(options: CircleOptions) {
+        return new google.maps.Circle(options)
     }
 
     createMarker(options: MarkerOptions) {

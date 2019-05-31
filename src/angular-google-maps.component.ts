@@ -1,13 +1,12 @@
 import { Component, OnDestroy, OnInit, Output } from '@angular/core'
-import { MatIconRegistry } from '@angular/material'
-import { DomSanitizer } from '@angular/platform-browser'
 import { EventPublisher } from '@boldadmin/event-publisher'
-import { Location } from './location'
 import { mapsText } from './angular-google-maps.constant'
+import { Location } from './location'
 import { AngularGoogleMapsBuilder } from './service/angular-google-maps-builder.service'
 import { AngularGoogleMapsGeocoder } from './service/angular-google-maps-geocoder.service'
 import { GoogleMapsFactory } from './service/google-maps-factory.service'
 import { IconRegistry } from './service/icon-registry/icon-registry'
+import CircleOptions = google.maps.CircleOptions
 import MapOptions = google.maps.MapOptions
 import MarkerOptions = google.maps.MarkerOptions
 
@@ -52,6 +51,15 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         animation: this.googleMapsFactory.getGoogleMaps().Animation.DROP
     }
 
+    @Output() markerRadiusOptions: CircleOptions = {
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35,
+        radius: 50
+    }
+
     constructor(private googleMapsFactory: GoogleMapsFactory,
                 private googleMapsBuilder: AngularGoogleMapsBuilder,
                 private googleMapsGeocoder: AngularGoogleMapsGeocoder,
@@ -76,7 +84,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         this.changeMapCenter(focusLocation)
         this.googleMapsBuilder
             .createMap(this.mapOptions)
-            .addMarker(this.markerOptions)
+            .addMarkerWithRadius(this.markerOptions, this.markerRadiusOptions)
             .addSearchBox()
     }
 
@@ -85,7 +93,8 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
                 this.changeMapCenter(location)
                 this.googleMapsBuilder
                     .createMap(this.mapOptions)
-                    .addHiddenMarker(this.markerOptions)
+                    .addMarkerWithRadius(this.markerOptions, this.markerRadiusOptions)
+                    .hideMarker()
                     .addSearchBox()
             }
         )

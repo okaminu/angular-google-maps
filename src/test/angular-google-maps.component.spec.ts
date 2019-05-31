@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing'
-import { MatIconRegistry } from '@angular/material'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { AngularGoogleMapsComponent } from '../angular-google-maps.component'
 import { Location } from '../location'
@@ -34,7 +33,7 @@ describe('AngularGoogleMapsComponent', () => {
                 {
                     provide: AngularGoogleMapsBuilder,
                     useValue: createSpyObj('AngularGoogleMapsBuilder',
-                        ['createMap', 'addMarker', 'addHiddenMarker', 'addSearchBox', 'build'])
+                        ['createMap', 'addMarkerWithRadius', 'hideMarker', 'addSearchBox', 'build'])
                 },
                 {
                     provide: AngularGoogleMapsGeocoder,
@@ -85,8 +84,8 @@ describe('AngularGoogleMapsComponent', () => {
 
         beforeEach(() => {
             googleMapsBuilderSpy.createMap.and.returnValue(googleMapsBuilderSpy)
-            googleMapsBuilderSpy.addMarker.and.returnValue(googleMapsBuilderSpy)
-            googleMapsBuilderSpy.addHiddenMarker.and.returnValue(googleMapsBuilderSpy)
+            googleMapsBuilderSpy.addMarkerWithRadius.and.returnValue(googleMapsBuilderSpy)
+            googleMapsBuilderSpy.hideMarker.and.returnValue(googleMapsBuilderSpy)
             googleMapsBuilderSpy.addSearchBox.and.returnValue(googleMapsBuilderSpy)
         })
 
@@ -106,9 +105,7 @@ describe('AngularGoogleMapsComponent', () => {
                         position: 'position'
                     }
                 }))
-            expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalledWith(jasmine.objectContaining({
-                position: jasmine.anything()
-            }))
+            expect(googleMapsBuilderSpy.addMarkerWithRadius).toHaveBeenCalled()
             expect(googleMapsBuilderSpy.addSearchBox).toHaveBeenCalled()
         })
 
@@ -143,9 +140,8 @@ describe('AngularGoogleMapsComponent', () => {
                         position: 'position'
                     }
                 }))
-            expect(googleMapsBuilderSpy.addHiddenMarker).toHaveBeenCalledWith(jasmine.objectContaining({
-                position: jasmine.anything()
-            }))
+            expect(googleMapsBuilderSpy.addMarkerWithRadius).toHaveBeenCalled()
+            expect(googleMapsBuilderSpy.hideMarker)
             expect(googleMapsBuilderSpy.addSearchBox)
         })
 
