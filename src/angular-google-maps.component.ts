@@ -51,7 +51,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         animation: this.googleMapsFactory.getGoogleMaps().Animation.DROP
     }
 
-    @Output() markerRadiusOptions: CircleOptions = {
+    @Output() markerCircleOptions: CircleOptions = {
         strokeColor: '#FF0000',
         strokeOpacity: 0.8,
         strokeWeight: 2,
@@ -84,7 +84,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         this.changeMapCenter(focusLocation)
         this.googleMapsBuilder
             .createMap(this.mapOptions)
-            .addMarkerWithRadius(this.markerOptions, this.markerRadiusOptions)
+            .addMarkerWithCircle(this.markerOptions, this.markerCircleOptions)
             .addSearchBox()
     }
 
@@ -93,8 +93,8 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
                 this.changeMapCenter(location)
                 this.googleMapsBuilder
                     .createMap(this.mapOptions)
-                    .addMarkerWithRadius(this.markerOptions, this.markerRadiusOptions)
-                    .hideMarker()
+                    .addMarkerWithCircle(this.markerOptions, this.markerCircleOptions)
+                    .hideMarkerWithCircle()
                     .addSearchBox()
             }
         )

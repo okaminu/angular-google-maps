@@ -44,10 +44,10 @@ describe('AngularGoogleMapsBuilder', () => {
 
         let mapSpy: SpyObj<any>
         let markerSpy: SpyObj<Marker>
-        let markerRadiusSpy: SpyObj<Circle>
+        let markerCircleSpy: SpyObj<Circle>
         let mapOptionsSpy: SpyObj<any>
         let markerOptionsSpy: SpyObj<any>
-        let markerRadiusOptionsSpy: SpyObj<any>
+        let markerCircleOptionsSpy: SpyObj<any>
 
         const location = {
             lat: () => 10,
@@ -60,14 +60,14 @@ describe('AngularGoogleMapsBuilder', () => {
         beforeEach(() => {
             mapSpy = createSpyObj('google.maps.Map', ['addListener', 'getCenter', 'panTo', 'setZoom'])
             markerSpy = createSpyObj('google.maps.Marker', ['addListener', 'setMap', 'setPosition'])
-            markerRadiusSpy = createSpyObj('google.maps.Circle', ['setMap', 'setPosition', 'setCenter', 'bindTo'])
+            markerCircleSpy = createSpyObj('google.maps.Circle', ['setMap', 'setPosition', 'bindTo'])
             mapOptionsSpy = createSpyObj('google.maps.MapOptions', [''])
             markerOptionsSpy = createSpyObj('google.maps.MarkerOptions', [''])
-            markerRadiusOptionsSpy = createSpyObj('google.maps.CircleOptions', [''])
+            markerCircleOptionsSpy = createSpyObj('google.maps.CircleOptions', [''])
 
             mapsFactorySpy.createMap.and.returnValue(mapSpy)
             mapsFactorySpy.createMarker.and.returnValue(markerSpy)
-            mapsFactorySpy.createCircle.withArgs(markerRadiusOptionsSpy).and.returnValue(markerRadiusSpy)
+            mapsFactorySpy.createCircle.withArgs(markerCircleOptionsSpy).and.returnValue(markerCircleSpy)
         })
 
         describe('On map building', () => {
@@ -91,7 +91,7 @@ describe('AngularGoogleMapsBuilder', () => {
             it('adds a marker', () => {
                 builder
                     .createMap(mapOptionsSpy)
-                    .addMarkerWithRadius(markerOptionsSpy, markerRadiusOptionsSpy)
+                    .addMarkerWithCircle(markerOptionsSpy, markerCircleOptionsSpy)
 
                 expect(mapsFactorySpy.createMarker).toHaveBeenCalled()
             })
@@ -101,7 +101,7 @@ describe('AngularGoogleMapsBuilder', () => {
 
                 builder
                     .createMap(mapOptionsSpy)
-                    .addMarkerWithRadius(markerOptionsSpy, markerRadiusOptionsSpy)
+                    .addMarkerWithCircle(markerOptionsSpy, markerCircleOptionsSpy)
 
                 expect(markerSpy.setPosition).toHaveBeenCalledWith(location)
             })
@@ -109,32 +109,31 @@ describe('AngularGoogleMapsBuilder', () => {
             it('marker is bound to map', () => {
                 builder
                     .createMap(mapOptionsSpy)
-                    .addMarkerWithRadius(markerOptionsSpy, markerRadiusOptionsSpy)
+                    .addMarkerWithCircle(markerOptionsSpy, markerCircleOptionsSpy)
 
                 expect(markerSpy.setMap).toHaveBeenCalledWith(mapSpy)
             })
 
 
-            it('marker is created along with radius', () => {
+            it('marker is created along with circle', () => {
                 mapSpy.getCenter.and.returnValue(location)
 
                 builder
                     .createMap(mapOptionsSpy)
-                    .addMarkerWithRadius(markerOptionsSpy, markerRadiusOptionsSpy)
+                    .addMarkerWithCircle(markerOptionsSpy, markerCircleOptionsSpy)
 
-                expect(markerRadiusSpy.setMap).toHaveBeenCalledWith(mapSpy)
-                expect(markerRadiusSpy.setCenter).toHaveBeenCalledWith(location)
-                expect(markerRadiusSpy.bindTo).toHaveBeenCalledWith('center', markerSpy, 'position')
+                expect(markerCircleSpy.setMap).toHaveBeenCalledWith(mapSpy)
+                expect(markerCircleSpy.bindTo).toHaveBeenCalledWith('center', markerSpy, 'position')
             })
 
-            it('marker is removed from map along with marker radius', () => {
+            it('marker is removed from map along with marker circle', () => {
                 builder
                     .createMap(mapOptionsSpy)
-                    .addMarkerWithRadius(markerOptionsSpy, markerRadiusOptionsSpy)
-                    .hideMarker()
+                    .addMarkerWithCircle(markerOptionsSpy, markerCircleOptionsSpy)
+                    .hideMarkerWithCircle()
 
                 expect(markerSpy.setMap).toHaveBeenCalledWith(null)
-                expect(markerRadiusSpy.setMap).toHaveBeenCalledWith(null)
+                expect(markerCircleSpy.setMap).toHaveBeenCalledWith(null)
             })
 
             describe('Invoked marker dragend listener handler', () => {
@@ -142,7 +141,7 @@ describe('AngularGoogleMapsBuilder', () => {
                 beforeEach(() => {
                     builder
                         .createMap(mapOptionsSpy)
-                        .addMarkerWithRadius(markerOptionsSpy, markerRadiusOptionsSpy)
+                        .addMarkerWithCircle(markerOptionsSpy, markerCircleOptionsSpy)
                 })
 
                 it('notifies location change', () => {
@@ -165,11 +164,11 @@ describe('AngularGoogleMapsBuilder', () => {
                     expect(eventPublisherSpy.notify).toHaveBeenCalledWith(any(String), 'address')
                 })
 
-                it('deletes marker with it`s radius', () => {
+                it('deletes marker with it`s circle', () => {
                     getCallsByInvokedParameter(markerSpy.addListener.calls.all(), 'dblclick')[0].args[1]()
 
                     expect(markerSpy.setMap).toHaveBeenCalledWith(null)
-                    expect(markerRadiusSpy.setMap).toHaveBeenCalledWith(null)
+                    expect(markerCircleSpy.setMap).toHaveBeenCalledWith(null)
                 })
 
                 it('deleted marker fires location deleted event', () => {
@@ -194,13 +193,13 @@ describe('AngularGoogleMapsBuilder', () => {
                 beforeEach(() => {
                     builder
                         .createMap(mapOptionsSpy)
-                        .addMarkerWithRadius(markerOptionsSpy, markerRadiusOptionsSpy)
+                        .addMarkerWithCircle(markerOptionsSpy, markerCircleOptionsSpy)
                 })
 
                 it('binds marker to map and new location', () => {
                     getCallsByInvokedParameter(mapSpy.addListener.calls.all(), 'click')[0].args[1](mouseEvent)
 
-                    expect(markerRadiusSpy.setMap).toHaveBeenCalledWith(mapSpy)
+                    expect(markerCircleSpy.setMap).toHaveBeenCalledWith(mapSpy)
                     expect(markerSpy.setMap).toHaveBeenCalledWith(mapSpy)
                     expect(markerSpy.setPosition).toHaveBeenCalledWith(location)
                 })
@@ -245,7 +244,7 @@ describe('AngularGoogleMapsBuilder', () => {
 
                 builder
                     .createMap(mapOptionsSpy)
-                    .addMarkerWithRadius(markerOptionsSpy, markerRadiusOptionsSpy)
+                    .addMarkerWithCircle(markerOptionsSpy, markerCircleOptionsSpy)
                     .addSearchBox()
             })
 
@@ -265,7 +264,7 @@ describe('AngularGoogleMapsBuilder', () => {
                 it('binds marker to map and new location', () => {
                     searchBoxSpy.addListener.calls.first().args[1]()
 
-                    expect(markerRadiusSpy.setMap).toHaveBeenCalledWith(mapSpy)
+                    expect(markerCircleSpy.setMap).toHaveBeenCalledWith(mapSpy)
                     expect(markerSpy.setMap).toHaveBeenCalledWith(mapSpy)
                     expect(markerSpy.setPosition).toHaveBeenCalledWith(location)
                 })

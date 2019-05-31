@@ -33,7 +33,7 @@ describe('AngularGoogleMapsComponent', () => {
                 {
                     provide: AngularGoogleMapsBuilder,
                     useValue: createSpyObj('AngularGoogleMapsBuilder',
-                        ['createMap', 'addMarkerWithRadius', 'hideMarker', 'addSearchBox', 'build'])
+                        ['createMap', 'addMarkerWithCircle', 'hideMarkerWithCircle', 'addSearchBox', 'build'])
                 },
                 {
                     provide: AngularGoogleMapsGeocoder,
@@ -84,8 +84,8 @@ describe('AngularGoogleMapsComponent', () => {
 
         beforeEach(() => {
             googleMapsBuilderSpy.createMap.and.returnValue(googleMapsBuilderSpy)
-            googleMapsBuilderSpy.addMarkerWithRadius.and.returnValue(googleMapsBuilderSpy)
-            googleMapsBuilderSpy.hideMarker.and.returnValue(googleMapsBuilderSpy)
+            googleMapsBuilderSpy.addMarkerWithCircle.and.returnValue(googleMapsBuilderSpy)
+            googleMapsBuilderSpy.hideMarkerWithCircle.and.returnValue(googleMapsBuilderSpy)
             googleMapsBuilderSpy.addSearchBox.and.returnValue(googleMapsBuilderSpy)
         })
 
@@ -105,7 +105,7 @@ describe('AngularGoogleMapsComponent', () => {
                         position: 'position'
                     }
                 }))
-            expect(googleMapsBuilderSpy.addMarkerWithRadius).toHaveBeenCalled()
+            expect(googleMapsBuilderSpy.addMarkerWithCircle).toHaveBeenCalled()
             expect(googleMapsBuilderSpy.addSearchBox).toHaveBeenCalled()
         })
 
@@ -140,8 +140,8 @@ describe('AngularGoogleMapsComponent', () => {
                         position: 'position'
                     }
                 }))
-            expect(googleMapsBuilderSpy.addMarkerWithRadius).toHaveBeenCalled()
-            expect(googleMapsBuilderSpy.hideMarker)
+            expect(googleMapsBuilderSpy.addMarkerWithCircle).toHaveBeenCalled()
+            expect(googleMapsBuilderSpy.hideMarkerWithCircle)
             expect(googleMapsBuilderSpy.addSearchBox)
         })
 

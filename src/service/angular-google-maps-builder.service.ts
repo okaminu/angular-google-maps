@@ -17,7 +17,7 @@ export class AngularGoogleMapsBuilder {
 
     private map: Map
     private marker: Marker
-    private markerRadius: Circle
+    private markerCircle: Circle
 
     constructor(private googleMaps: GoogleMapsFactory,
                 private geocoder: AngularGoogleMapsGeocoder,
@@ -29,16 +29,16 @@ export class AngularGoogleMapsBuilder {
         return this
     }
 
-    addMarkerWithRadius(markerOptions: MarkerOptions, circleOptions: CircleOptions) {
+    addMarkerWithCircle(markerOptions: MarkerOptions, circleOptions: CircleOptions) {
         this.createMarker(markerOptions)
-        this.createMarkerRadius(circleOptions)
-        this.markerRadius.bindTo('center', this.marker, 'position')
+        this.createCircle(circleOptions)
+        this.markerCircle.bindTo('center', this.marker, 'position')
         return this
     }
 
-    hideMarker() {
+    hideMarkerWithCircle() {
         this.marker.setMap(null)
-        this.markerRadius.setMap(null)
+        this.markerCircle.setMap(null)
         return this
     }
 
@@ -58,10 +58,9 @@ export class AngularGoogleMapsBuilder {
         return this
     }
 
-    private createMarkerRadius(circleOptions: CircleOptions) {
-        this.markerRadius = this.googleMaps.createCircle(circleOptions)
-        this.markerRadius.setMap(this.map)
-        this.markerRadius.setCenter(this.map.getCenter())
+    private createCircle(circleOptions: CircleOptions) {
+        this.markerCircle = this.googleMaps.createCircle(circleOptions)
+        this.markerCircle.setMap(this.map)
     }
 
     private createMarker(markerOptions: google.maps.MarkerOptions) {
@@ -74,7 +73,7 @@ export class AngularGoogleMapsBuilder {
     private addMarkerListeners() {
         this.marker.addListener('dragend', mouseEvent => this.notifyLocationChange(mouseEvent))
         this.marker.addListener('dragend', mouseEvent => this.reverseGeocode(mouseEvent))
-        this.marker.addListener('dblclick', () => this.hideMarker())
+        this.marker.addListener('dblclick', () => this.hideMarkerWithCircle())
         this.marker.addListener('dblclick', () => this.eventPublisher.notify('locationDeleted'))
         this.marker.addListener('dblclick', () => this.googleMaps.getSearchBoxInput().value = '')
         this.map.addListener('click', mouseEvent => this.changeMarkerLocation(mouseEvent.latLng))
@@ -88,7 +87,7 @@ export class AngularGoogleMapsBuilder {
     }
 
     private changeMarkerLocation(location: LatLng) {
-        this.markerRadius.setMap(this.map)
+        this.markerCircle.setMap(this.map)
         this.marker.setMap(this.map)
         this.marker.setPosition(location)
     }
