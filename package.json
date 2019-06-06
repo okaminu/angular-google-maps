@@ -67,6 +67,7 @@
     "test-watch": "ng test --watch=true",
     "lint": "ng lint",
     "link-dependencies": "npm link @boldadmin/event-publisher",
-    "link": "cd dist && npm link @boldadmin/angular-google-maps"
+    "link": "cd dist && npm link @boldadmin/angular-google-maps",
+    "first-time-link": "cd dist && npm link && rm -rf node_modules"
   }
 }
