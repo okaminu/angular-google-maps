@@ -68,6 +68,6 @@
     "lint": "ng lint",
     "link-dependencies": "npm link @boldadmin/event-publisher",
     "link": "cd dist && npm link @boldadmin/angular-google-maps",
-    "first-time-link": "cd dist && npm link && rm -rf node_modules"
+    "link-first-time": "cd dist && npm link && rm -rf node_modules"
   }
 }
