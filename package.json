@@ -55,7 +55,7 @@
     "@angular/animations": "^7.2.13",
     "@angular/core": "^7.2.13",
     "@angular/cdk": "^7.3.7",
-    "@boldadmin/event-publisher": "^2.2.4",
+    "@boldadmin/event-publisher": "^2.2.4-dev",
     "@angular/material": "^7.3.7",
     "@angular/forms": "^7.2.13"
   },
