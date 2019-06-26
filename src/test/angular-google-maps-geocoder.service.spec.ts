@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing'
-import { Location } from '../location'
+import { Coordinates } from '../coordinates'
 import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocoder.service'
 import { GoogleMapsFactory } from '../service/google-maps-factory.service'
+import createSpy = jasmine.createSpy
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
-import createSpy = jasmine.createSpy
 
 describe('AngularGoogleMapsGeocoder', () => {
 
@@ -40,7 +40,7 @@ describe('AngularGoogleMapsGeocoder', () => {
 
             service.geocode('address', callbackSpy)
 
-            expect(callbackSpy).toHaveBeenCalledWith(new Location(1.0, 2.0))
+            expect(callbackSpy).toHaveBeenCalledWith(new Coordinates(1.0, 2.0))
         })
 
         it('returns default location on no results', () => {
@@ -49,7 +49,7 @@ describe('AngularGoogleMapsGeocoder', () => {
 
             service.geocode('address', callbackSpy)
 
-            expect(callbackSpy).toHaveBeenCalledWith(jasmine.any(Location))
+            expect(callbackSpy).toHaveBeenCalledWith(jasmine.any(Coordinates))
         })
 
         it('returns default location on empty results', () => {
@@ -58,7 +58,7 @@ describe('AngularGoogleMapsGeocoder', () => {
 
             service.geocode('address', callbackSpy)
 
-            expect(callbackSpy).toHaveBeenCalledWith(jasmine.any(Location))
+            expect(callbackSpy).toHaveBeenCalledWith(jasmine.any(Coordinates))
         })
     })
 
@@ -70,7 +70,7 @@ describe('AngularGoogleMapsGeocoder', () => {
                 (request, callback: any) => callback([{formatted_address: 'address'}])
             )
 
-            service.reverseGeocode(new Location(1, 1), callbackSpy)
+            service.reverseGeocode(new Coordinates(1, 1), callbackSpy)
 
             expect(callbackSpy).toHaveBeenCalledWith('address')
         })
@@ -82,7 +82,7 @@ describe('AngularGoogleMapsGeocoder', () => {
             geocoderStub.geocode.and.callFake((request, callback: any) => callback(null))
             latLngSpy.toString.and.returnValue('location')
 
-            service.reverseGeocode(new Location(1, 1), callbackSpy)
+            service.reverseGeocode(new Coordinates(1, 1), callbackSpy)
 
             expect(callbackSpy).toHaveBeenCalledWith('location')
         })
@@ -94,7 +94,7 @@ describe('AngularGoogleMapsGeocoder', () => {
             geocoderStub.geocode.and.callFake((request, callback: any) => callback([]))
             latLngSpy.toString.and.returnValue('location')
 
-            service.reverseGeocode(new Location(1, 1), callbackSpy)
+            service.reverseGeocode(new Coordinates(1, 1), callbackSpy)
 
             expect(callbackSpy).toHaveBeenCalledWith('location')
         })
