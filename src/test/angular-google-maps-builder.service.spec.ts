@@ -59,8 +59,8 @@ describe('AngularGoogleMapsBuilder', () => {
             equals: () => false,
             toUrlValue: () => '',
             toJSON: (): any => ''
-
         }
+
         const mouseEvent = {
             latLng: location
         }

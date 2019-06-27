@@ -41,7 +41,7 @@ export class AngularGoogleMapsBuilder {
     addCircle(circleOptions: CircleOptions) {
         this.circle = this.googleMaps.createCircle(circleOptions)
         this.circle.setMap(this.map)
-        this.circle.addListener('radius_changed', () => { this.notifyLocationChange() })
+        this.circle.addListener('radius_changed', () => this.notifyLocationChange())
         return this
     }
 
@@ -77,13 +77,13 @@ export class AngularGoogleMapsBuilder {
     }
 
     private addMarkerListeners() {
-        this.marker.addListener('dragend', () => { this.notifyLocationChange() })
+        this.marker.addListener('dragend', () => this.notifyLocationChange())
         this.marker.addListener('dragend', mouseEvent => this.reverseGeocode(mouseEvent))
         this.marker.addListener('dblclick', () => { this.hideMarker(); this.hideCircle() })
         this.marker.addListener('dblclick', () => this.eventPublisher.notify('locationDeleted'))
         this.marker.addListener('dblclick', () => this.googleMaps.getSearchBoxInput().value = '')
         this.map.addListener('click', mouseEvent => this.changeMarkerLocation(mouseEvent.latLng))
-        this.map.addListener('click', () => { this.notifyLocationChange() })
+        this.map.addListener('click', () => this.notifyLocationChange())
         this.map.addListener('click', mouseEvent => this.reverseGeocode(mouseEvent))
     }
 
@@ -93,17 +93,17 @@ export class AngularGoogleMapsBuilder {
 
     private getRadius() {
         let radiusInMeters = 0
-        if (this.circle !== undefined) {
+        if (this.circle !== undefined)
             radiusInMeters = this.circle.getRadius()
-        }
+
         return radiusInMeters
     }
 
     private getCoordinates() {
         let coordinates = new Coordinates(0, 0)
-        if (this.marker !== undefined) {
+        if (this.marker !== undefined)
             coordinates = new Coordinates(this.marker.getPosition().lat(), this.marker.getPosition().lng())
-        }
+
         return coordinates
     }
 
