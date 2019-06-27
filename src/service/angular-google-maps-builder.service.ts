@@ -47,13 +47,6 @@ export class AngularGoogleMapsBuilder {
         return this
     }
 
-    private getExistingCoordinates() {
-        let coordinates = new Coordinates(0, 0)
-        if (this.marker !== undefined)
-            coordinates = new Coordinates(this.marker.getPosition().lat(), this.marker.getPosition().lng())
-        return coordinates
-    }
-
     bindCircleToMarker() {
         this.circle.bindTo('center', this.marker, 'position')
         return this
@@ -83,6 +76,13 @@ export class AngularGoogleMapsBuilder {
             }
         })
         return this
+    }
+
+    private getExistingCoordinates() {
+        let coordinates = new Coordinates(0, 0)
+        if (this.marker !== undefined)
+            coordinates = new Coordinates(this.marker.getPosition().lat(), this.marker.getPosition().lng())
+        return coordinates
     }
     private addMarkerListeners() {
         this.marker.addListener('dragend', e => {

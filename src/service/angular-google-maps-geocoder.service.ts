@@ -10,9 +10,9 @@ export class AngularGoogleMapsGeocoder {
 
     geocode(address: string, callback: (coordinates: Coordinates) => void) {
         return this.googleMaps.createGeocoder().geocode({'address': address}, results => {
-            if (results !== null && results[0]) {
+            if (results !== null && results[0])
                 callback(new Coordinates(results[0].geometry.location.lat(), results[0].geometry.location.lng()))
-            } else
+            else
                 callback(new Coordinates(59.9139, 10.7522))
         })
     }
