@@ -41,10 +41,7 @@ export class AngularGoogleMapsBuilder {
     addCircle(circleOptions: CircleOptions) {
         this.circle = this.googleMaps.createCircle(circleOptions)
         this.circle.setMap(this.map)
-        this.circle.addListener('radius_changed', () => {
-            const location = new Location(this.getExistingCoordinates(), this.circle.getRadius())
-            this.eventPublisher.notify('locationChanged', location)
-        })
+        this.circle.addListener('radius_changed', () => { this.notifyLocationChange() })
         return this
     }
 
@@ -79,25 +76,35 @@ export class AngularGoogleMapsBuilder {
         return this
     }
 
-    private getExistingCoordinates() {
-        let coordinates = new Coordinates(0, 0)
-        if (this.marker !== undefined)
-            coordinates = new Coordinates(this.marker.getPosition().lat(), this.marker.getPosition().lng())
-        return coordinates
-    }
     private addMarkerListeners() {
-        const notifyLocationChange = (e) => {
-            const location = new Location(new Coordinates(e.latLng.lat(), e.latLng.lng()), this.circle.getRadius())
-            this.eventPublisher.notify('locationChanged', location)
-        }
-        this.marker.addListener('dragend', notifyLocationChange)
+        this.marker.addListener('dragend', () => { this.notifyLocationChange() })
         this.marker.addListener('dragend', mouseEvent => this.reverseGeocode(mouseEvent))
         this.marker.addListener('dblclick', () => { this.hideMarker(); this.hideCircle() })
         this.marker.addListener('dblclick', () => this.eventPublisher.notify('locationDeleted'))
         this.marker.addListener('dblclick', () => this.googleMaps.getSearchBoxInput().value = '')
         this.map.addListener('click', mouseEvent => this.changeMarkerLocation(mouseEvent.latLng))
-        this.map.addListener('click', notifyLocationChange)
+        this.map.addListener('click', () => { this.notifyLocationChange() })
         this.map.addListener('click', mouseEvent => this.reverseGeocode(mouseEvent))
+    }
+
+    private notifyLocationChange() {
+        this.eventPublisher.notify('locationChanged', new Location(this.getCoordinates(), this.getRadius()))
+    }
+
+    private getRadius() {
+        let radiusInMeters = 0
+        if (this.circle !== undefined) {
+            radiusInMeters = this.circle.getRadius()
+        }
+        return radiusInMeters
+    }
+
+    private getCoordinates() {
+        let coordinates = new Coordinates(0, 0)
+        if (this.marker !== undefined) {
+            coordinates = new Coordinates(this.marker.getPosition().lat(), this.marker.getPosition().lng())
+        }
+        return coordinates
     }
 
     private changeMapLocationAndZoom(location: LatLng) {

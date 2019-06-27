@@ -205,6 +205,7 @@ describe('AngularGoogleMapsBuilder', () => {
 
                 beforeEach(() => {
                     circleSpy.getRadius.and.returnValue(radius)
+                    markerSpy.getPosition.and.returnValue(location)
 
                     builder
                         .createMap(mapOptionsSpy)
@@ -254,7 +255,20 @@ describe('AngularGoogleMapsBuilder', () => {
 
                     expect(elementSpy.value).toEqual('')
                 })
+            })
 
+            describe('Invoked marker dragend listener handler without circle', () => {
+
+                it('notifies location change with default radius when circle does not exist', () => {
+                    markerSpy.getPosition.and.returnValue(location)
+                    builder.createMap(mapOptionsSpy).addMarker(markerOptionsSpy)
+
+                    getCallsByInvokedParameter(markerSpy.addListener.calls.all(), 'dragend')[0].args[1]()
+
+                    expect(eventPublisherSpy.notify.calls.all()[0].args[0]).toEqual('locationChanged')
+                    expect(eventPublisherSpy.notify.calls.all()[0].args[1])
+                        .toEqual(new Location(new Coordinates(location.lat(), location.lng()), 0))
+                })
             })
 
             describe('Invoked map click listener handler', () => {
@@ -262,6 +276,7 @@ describe('AngularGoogleMapsBuilder', () => {
 
                 beforeEach(() => {
                     circleSpy.getRadius.and.returnValue(radius)
+                    markerSpy.getPosition.and.returnValue(location)
 
                     builder
                         .createMap(mapOptionsSpy)
