@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { AngularGoogleMapsComponent } from '../angular-google-maps.component'
+import { Coordinates } from '../coordinates'
 import { Location } from '../location'
 import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder.service'
 import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocoder.service'
@@ -21,7 +22,7 @@ describe('AngularGoogleMapsComponent', () => {
     let googleMapsFactory: SpyObj<GoogleMapsFactory>
 
     const subscribers = new Map<string, Function>()
-    const location = new Location(10, 20)
+    const location = new Location(new Coordinates(10, 20), 70)
     const googleMapsStub = {
         Animation: {DROP: ''},
         ControlPosition: {LEFT_BOTTOM: 'position'}
@@ -33,7 +34,17 @@ describe('AngularGoogleMapsComponent', () => {
                 {
                     provide: AngularGoogleMapsBuilder,
                     useValue: createSpyObj('AngularGoogleMapsBuilder',
-                        ['createMap', 'addMarkerWithCircle', 'hideMarkerWithCircle', 'addSearchBox', 'build'])
+                        [
+                            'createMap',
+                            'addMarker',
+                            'addCircle',
+                            'hideMarker',
+                            'hideCircle',
+                            'bindCircleToMarker',
+                            'addSearchBox',
+                            'build'
+                        ]
+                    )
                 },
                 {
                     provide: AngularGoogleMapsGeocoder,
@@ -84,8 +95,11 @@ describe('AngularGoogleMapsComponent', () => {
 
         beforeEach(() => {
             googleMapsBuilderSpy.createMap.and.returnValue(googleMapsBuilderSpy)
-            googleMapsBuilderSpy.addMarkerWithCircle.and.returnValue(googleMapsBuilderSpy)
-            googleMapsBuilderSpy.hideMarkerWithCircle.and.returnValue(googleMapsBuilderSpy)
+            googleMapsBuilderSpy.addMarker.and.returnValue(googleMapsBuilderSpy)
+            googleMapsBuilderSpy.addCircle.and.returnValue(googleMapsBuilderSpy)
+            googleMapsBuilderSpy.bindCircleToMarker.and.returnValue(googleMapsBuilderSpy)
+            googleMapsBuilderSpy.hideCircle.and.returnValue(googleMapsBuilderSpy)
+            googleMapsBuilderSpy.hideMarker.and.returnValue(googleMapsBuilderSpy)
             googleMapsBuilderSpy.addSearchBox.and.returnValue(googleMapsBuilderSpy)
         })
 
@@ -97,19 +111,21 @@ describe('AngularGoogleMapsComponent', () => {
             expect(googleMapsBuilderSpy.createMap).toHaveBeenCalledWith(
                 jasmine.objectContaining({
                     center: {
-                        lat: location.latitude,
-                        lng: location.longitude
+                        lat: location.coordinates.latitude,
+                        lng: location.coordinates.longitude
                     },
                     mapTypeControlOptions: {
                         mapTypeIds: ['roadmap', 'satellite'],
                         position: 'position'
                     }
                 }))
-            expect(googleMapsBuilderSpy.addMarkerWithCircle).toHaveBeenCalled()
+            expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalled()
+            expect(googleMapsBuilderSpy.addCircle).toHaveBeenCalled()
+            expect(googleMapsBuilderSpy.bindCircleToMarker).toHaveBeenCalled()
             expect(googleMapsBuilderSpy.addSearchBox).toHaveBeenCalled()
         })
 
-        it('reverse geocodes location', () => {
+        it('reverse geocodes coordinates', () => {
             geocoderSpy.reverseGeocode.and.callFake((request, callback: any) =>
                 callback('address')
             )
@@ -117,13 +133,13 @@ describe('AngularGoogleMapsComponent', () => {
 
             component.createMapByLocation(location)
 
-            expect(geocoderSpy.reverseGeocode).toHaveBeenCalledWith(location, any(Function))
+            expect(geocoderSpy.reverseGeocode).toHaveBeenCalledWith(location.coordinates, any(Function))
             expect(component.address).toEqual('address')
         })
 
         it('builds a map by address', () => {
             geocoderSpy.geocode.and.callFake(
-                (request, callback: any) => callback(location)
+                (request, callback: any) => callback(location.coordinates)
             )
             component.ngOnInit()
 
@@ -132,17 +148,20 @@ describe('AngularGoogleMapsComponent', () => {
             expect(googleMapsBuilderSpy.createMap).toHaveBeenCalledWith(
                 jasmine.objectContaining({
                     center: {
-                        lat: location.latitude,
-                        lng: location.longitude
+                        lat: location.coordinates.latitude,
+                        lng: location.coordinates.longitude
                     },
                     mapTypeControlOptions: {
                         mapTypeIds: ['roadmap', 'satellite'],
                         position: 'position'
                     }
                 }))
-            expect(googleMapsBuilderSpy.addMarkerWithCircle).toHaveBeenCalled()
-            expect(googleMapsBuilderSpy.hideMarkerWithCircle)
-            expect(googleMapsBuilderSpy.addSearchBox)
+            expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalled()
+            expect(googleMapsBuilderSpy.addCircle).toHaveBeenCalled()
+            expect(googleMapsBuilderSpy.bindCircleToMarker).toHaveBeenCalled()
+            expect(googleMapsBuilderSpy.hideMarker).toHaveBeenCalled()
+            expect(googleMapsBuilderSpy.hideCircle).toHaveBeenCalled()
+            expect(googleMapsBuilderSpy.addSearchBox).toHaveBeenCalled()
         })
 
     })

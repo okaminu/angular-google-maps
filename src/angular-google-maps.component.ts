@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, Output } from '@angular/core'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { mapsText } from './angular-google-maps.constant'
+import { Coordinates } from './coordinates'
 import { Location } from './location'
 import { AngularGoogleMapsBuilder } from './service/angular-google-maps-builder.service'
 import { AngularGoogleMapsGeocoder } from './service/angular-google-maps-geocoder.service'
@@ -42,6 +43,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         controlSize: 22,
         fullscreenControl: false
     }
+
     @Output() markerOptions: MarkerOptions = {
         position: {
             lat: 0,
@@ -51,13 +53,14 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         animation: this.googleMapsFactory.getGoogleMaps().Animation.DROP
     }
 
-    @Output() markerCircleOptions: CircleOptions = {
+    @Output() circleOptions: CircleOptions = {
         strokeColor: '#FF0000',
         strokeOpacity: 0.8,
         strokeWeight: 2,
         fillColor: '#FF0000',
         fillOpacity: 0.35,
-        radius: 50
+        editable: true,
+        radius: 70
     }
 
     constructor(private googleMapsFactory: GoogleMapsFactory,
@@ -71,7 +74,6 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         this.eventPublisher.subscribe('addressReverseGeocoded', (address: string) => this.address = address)
         this.iconRegistry.register('expand', './assets/expand.svg')
         this.iconRegistry.register('collapse', './assets/collapse.svg')
-
     }
 
     ngOnDestroy() {
@@ -79,22 +81,28 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
     }
 
     createMapByLocation(focusLocation: Location) {
-        this.googleMapsGeocoder.reverseGeocode(focusLocation, (address: string) => this.address = address)
+        this.googleMapsGeocoder.reverseGeocode(focusLocation.coordinates, (address: string) => this.address = address)
 
-        this.changeMapCenter(focusLocation)
+        this.circleOptions.radius = focusLocation.radiusInMeters
+        this.changeMapCenter(focusLocation.coordinates)
         this.googleMapsBuilder
             .createMap(this.mapOptions)
-            .addMarkerWithCircle(this.markerOptions, this.markerCircleOptions)
+            .addMarker(this.markerOptions)
+            .addCircle(this.circleOptions)
+            .bindCircleToMarker()
             .addSearchBox()
     }
 
     createMapByAddress(address: string) {
-        this.googleMapsGeocoder.geocode(address, (location: Location) => {
-                this.changeMapCenter(location)
+        this.googleMapsGeocoder.geocode(address, (coordinates: Coordinates) => {
+                this.changeMapCenter(coordinates)
                 this.googleMapsBuilder
                     .createMap(this.mapOptions)
-                    .addMarkerWithCircle(this.markerOptions, this.markerCircleOptions)
-                    .hideMarkerWithCircle()
+                    .addMarker(this.markerOptions)
+                    .addCircle(this.circleOptions)
+                    .bindCircleToMarker()
+                    .hideMarker()
+                    .hideCircle()
                     .addSearchBox()
             }
         )
@@ -108,10 +116,10 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
             this.eventPublisher.notify('googleMapsCollapsed')
     }
 
-    private changeMapCenter(location: Location) {
+    private changeMapCenter(coordinates: Coordinates) {
         this.mapOptions.center = {
-            lat: location.latitude,
-            lng: location.longitude
+            lat: coordinates.latitude,
+            lng: coordinates.longitude
         }
     }
 }

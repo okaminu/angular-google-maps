@@ -1,6 +1,8 @@
+import { Coordinates } from './coordinates'
+
 export class Location {
     constructor(
-        public latitude: number,
-        public longitude: number) {
+        public coordinates: Coordinates,
+        public radiusInMeters: number) {
     }
 }
