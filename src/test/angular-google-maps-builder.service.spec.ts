@@ -126,7 +126,7 @@ describe('AngularGoogleMapsBuilder', () => {
             })
 
 
-            it('creates circle', () => {
+            it('creates a circle', () => {
                 builder
                     .createMap(mapOptionsSpy)
                     .addCircle(circleOptionsSpy)
@@ -186,7 +186,7 @@ describe('AngularGoogleMapsBuilder', () => {
                         .toEqual(new Location(new Coordinates(location.lat(), location.lng()), radius))
                 })
 
-                it('notifies radius change when marker does not exist', () => {
+                it('notifies radius change with default location coordinates when marker does not exist', () => {
                     builder
                         .createMap(mapOptionsSpy)
                         .addCircle(circleOptionsSpy)
@@ -229,8 +229,7 @@ describe('AngularGoogleMapsBuilder', () => {
                     getCallsByInvokedParameter(markerSpy.addListener.calls.all(), 'dragend')[1].args[1](mouseEvent)
 
                     const coordinates = new Coordinates(location.lat(), location.lng())
-                    expect(geocoderSpy.reverseGeocode)
-                        .toHaveBeenCalledWith(coordinates, any(Function))
+                    expect(geocoderSpy.reverseGeocode).toHaveBeenCalledWith(coordinates, any(Function))
                     expect(eventPublisherSpy.notify).toHaveBeenCalledWith(any(String), 'address')
                 })
 
@@ -294,9 +293,8 @@ describe('AngularGoogleMapsBuilder', () => {
                     )
                     getCallsByInvokedParameter(mapSpy.addListener.calls.all(), 'click')[2].args[1](mouseEvent)
 
-                    const coordinates = new Coordinates(location.lat(), location.lng())
                     expect(geocoderSpy.reverseGeocode)
-                        .toHaveBeenCalledWith(coordinates, any(Function))
+                        .toHaveBeenCalledWith(new Coordinates(location.lat(), location.lng()), any(Function))
                     expect(eventPublisherSpy.notify).toHaveBeenCalledWith(any(String), 'address')
                 })
 
