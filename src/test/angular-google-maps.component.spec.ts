@@ -34,16 +34,8 @@ describe('AngularGoogleMapsComponent', () => {
                 {
                     provide: AngularGoogleMapsBuilder,
                     useValue: createSpyObj('AngularGoogleMapsBuilder',
-                        [
-                            'createMap',
-                            'addMarker',
-                            'addCircle',
-                            'hideMarker',
-                            'hideCircle',
-                            'bindCircleToMarker',
-                            'addSearchBox',
-                            'build'
-                        ]
+                        ['createMap', 'addMarker', 'addCircle', 'hideMarker', 'hideCircle', 'bindCircleToMarker',
+                            'addSearchBox', 'build']
                     )
                 },
                 {
@@ -58,7 +50,7 @@ describe('AngularGoogleMapsComponent', () => {
                     provide: EventPublisher,
                     useValue: createSpyObj('EvenPublisher', ['subscribe', 'notify', 'unsubscribeAll'])
                 },
-                {provide: IconRegistry, useValue: createSpyObj('IconRegistry', ['register'])},
+                {provide: IconRegistry, useValue: createSpyObj('IconRegistry', ['register'])}
             ]
         })
         eventPublisherSpy = TestBed.get(EventPublisher)

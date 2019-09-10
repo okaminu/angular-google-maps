@@ -1,6 +1,6 @@
 {
   "name": "@boldadmin/angular-google-maps",
-  "version": "2.3.1-dev",
+  "version": "2.4.0-dev",
   "description": "Google Maps adapter for Angular Framework",
   "keywords": [
     "google",
@@ -29,7 +29,7 @@
     "@angular/core": "^8.2.0",
     "@angular/platform-browser": "^8.2.0",
     "@angular/platform-browser-dynamic": "^8.2.0",
-    "@boldadmin/event-publisher": "^2.3.1-dev",
+    "@boldadmin/event-publisher": "^2.4.0-dev",
     "@types/googlemaps": "^3.37.3",
     "@types/jasmine": "^3.4.0",
     "ng-packagr": "^5.4.3",
@@ -50,7 +50,7 @@
   },
   "peerDependencies": {
     "load-google-maps-api": "^2.0.1",
-    "@boldadmin/event-publisher": "^2.3.1-dev"
+    "@boldadmin/event-publisher": "^2.4.0-dev"
   },
   "scripts": {
     "build": "ng build",
