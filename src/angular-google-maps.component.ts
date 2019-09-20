@@ -39,7 +39,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
             mapTypeIds: ['roadmap', 'satellite'],
             position: this.googleMapsFactory.getGoogleMaps().ControlPosition.LEFT_BOTTOM
         },
-        zoom: 10,
+        zoom: 16,
         controlSize: 22,
         fullscreenControl: false
     }

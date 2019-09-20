@@ -109,7 +109,7 @@ export class AngularGoogleMapsBuilder {
 
     private changeMapLocationAndZoom(location: LatLng) {
         this.map.panTo(location)
-        this.map.setZoom(15)
+        this.map.setZoom(16)
     }
 
     private changeMarkerLocation(location: LatLng) {
