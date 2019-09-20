@@ -21,7 +21,8 @@ describe('AngularGoogleMapsComponent', () => {
     let geocoderSpy: SpyObj<AngularGoogleMapsGeocoder>
     let googleMapsFactory: SpyObj<GoogleMapsFactory>
 
-    const subscribers = new Map<string, Function>()
+    let subscribers: Map<string, Function>
+
     const location = new Location(new Coordinates(10, 20), 70)
     const googleMapsStub = {
         Animation: {DROP: ''},
@@ -29,6 +30,8 @@ describe('AngularGoogleMapsComponent', () => {
     }
 
     beforeEach(() => {
+        subscribers = new Map<string, Function>()
+
         TestBed.configureTestingModule({
             providers: [AngularGoogleMapsComponent,
                 {
@@ -48,7 +51,7 @@ describe('AngularGoogleMapsComponent', () => {
                 },
                 {
                     provide: EventPublisher,
-                    useValue: createSpyObj('EvenPublisher', ['subscribe', 'notify', 'unsubscribeAll'])
+                    useValue: createSpyObj('EvenPublisher', ['subscribe', 'notify', 'unsubscribe', 'unsubscribeAll'])
                 },
                 {provide: IconRegistry, useValue: createSpyObj('IconRegistry', ['register'])}
             ]
@@ -71,16 +74,23 @@ describe('AngularGoogleMapsComponent', () => {
         expect(iconRegistrySpy.register).toHaveBeenCalledTimes(2)
     })
 
-    it('subscribes setup functions', () => {
+    it('notifies component loaded state', () => {
         component.ngOnInit()
 
-        expect(eventPublisherSpy.subscribe).toHaveBeenCalledWith('addressReverseGeocoded', any(Function))
+        expect(eventPublisherSpy.notify).toHaveBeenCalledWith('googleMapsComponentLoaded')
     })
 
     it('unsubscribes on destroy', () => {
+        jasmine.addCustomEqualityTester(((first: Function, second: Function) => first.toString() === second.toString()))
+        component.ngOnInit()
+
         component.ngOnDestroy()
 
         expect(eventPublisherSpy.unsubscribeAll).toHaveBeenCalledWith('addressReverseGeocoded')
+        expect(eventPublisherSpy.unsubscribe)
+            .toHaveBeenCalledWith('googleMapsExpanded', subscribers.get('googleMapsExpanded'))
+        expect(eventPublisherSpy.unsubscribe)
+            .toHaveBeenCalledWith('googleMapsCollapsed', subscribers.get('googleMapsCollapsed'))
     })
 
     describe('Loading Google Maps', () => {
@@ -167,7 +177,12 @@ describe('AngularGoogleMapsComponent', () => {
         expect(component.address).toEqual(address)
     })
 
-    describe('Resizes Google Maps', () => {
+    describe('Resizing Google Maps', () => {
+
+        beforeEach(() => eventPublisherSpy.notify.and.callFake((e: string) => {
+            const fun = subscribers.get(e)
+            if (fun) fun()
+        }))
 
         it('expands map', () => {
             component.ngOnInit()
@@ -178,6 +193,14 @@ describe('AngularGoogleMapsComponent', () => {
             expect(eventPublisherSpy.notify).toHaveBeenCalledWith('googleMapsExpanded')
         })
 
+        it('expands map on event', () => {
+            component.ngOnInit()
+
+            subscribers.get('googleMapsExpanded')()
+
+            expect(component.isMapExpanded).toBeTruthy()
+        })
+
         it('collapses map', () => {
             component.ngOnInit()
 
@@ -186,6 +209,15 @@ describe('AngularGoogleMapsComponent', () => {
 
             expect(component.isMapExpanded).toBeFalsy()
             expect(eventPublisherSpy.notify).toHaveBeenCalledWith('googleMapsCollapsed')
+        })
+
+        it('collapses map on event', () => {
+            component.ngOnInit()
+            subscribers.get('googleMapsExpanded')()
+
+            subscribers.get('googleMapsCollapsed')()
+
+            expect(component.isMapExpanded).toBeFalsy()
         })
     })
 

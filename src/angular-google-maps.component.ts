@@ -63,6 +63,9 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         radius: 70
     }
 
+    private expandMap = () => this.isMapExpanded = true
+    private collapseMap = () => this.isMapExpanded = false
+
     constructor(private googleMapsFactory: GoogleMapsFactory,
                 private googleMapsBuilder: AngularGoogleMapsBuilder,
                 private googleMapsGeocoder: AngularGoogleMapsGeocoder,
@@ -72,12 +75,17 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.eventPublisher.subscribe('addressReverseGeocoded', (address: string) => this.address = address)
+        this.eventPublisher.subscribe('googleMapsExpanded', this.expandMap)
+        this.eventPublisher.subscribe('googleMapsCollapsed', this.collapseMap)
+        this.eventPublisher.notify('googleMapsComponentLoaded')
         this.iconRegistry.register('expand', './assets/expand.svg')
         this.iconRegistry.register('collapse', './assets/collapse.svg')
     }
 
     ngOnDestroy() {
         this.eventPublisher.unsubscribeAll('addressReverseGeocoded')
+        this.eventPublisher.unsubscribe('googleMapsExpanded', this.expandMap)
+        this.eventPublisher.unsubscribe('googleMapsCollapsed', this.collapseMap)
     }
 
     createMapByLocation(focusLocation: Location) {
@@ -109,8 +117,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
     }
 
     resizeMap() {
-        this.isMapExpanded = !this.isMapExpanded
-        if (this.isMapExpanded)
+        if (!this.isMapExpanded)
             this.eventPublisher.notify('googleMapsExpanded')
         else
             this.eventPublisher.notify('googleMapsCollapsed')
