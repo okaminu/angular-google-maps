@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core'
+import { MatIconRegistry } from '@angular/material'
+import { DomSanitizer } from '@angular/platform-browser'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { Coordinates } from '../coordinates'
 import { Location } from '../location'
@@ -22,11 +24,71 @@ export class AngularGoogleMapsBuilder {
 
     constructor(private googleMaps: GoogleMapsFactory,
                 private geocoder: AngularGoogleMapsGeocoder,
-                private eventPublisher: EventPublisher) {
+                private eventPublisher: EventPublisher,
+                private iconRegistry: MatIconRegistry,
+                private sanitizer: DomSanitizer) {
     }
 
     createMap(mapOptions: MapOptions) {
         this.map = this.googleMaps.createMap(mapOptions)
+        const person = {
+            url: 'http://cdn.boldadmin.com.s3-website-eu-west-1.amazonaws.com/person.png',
+            // This marker is 20 pixels wide by 32 pixels high.
+            size: new google.maps.Size(20, 33),
+            // The origin for this image is (0, 0).
+            origin: new google.maps.Point(0, 0),
+            // The anchor for this image is the base of the flagpole at (0, 32).
+            anchor: new google.maps.Point(10, 23)
+        }
+
+        const flag = {
+            url: 'http://cdn.boldadmin.com.s3-website-eu-west-1.amazonaws.com/flag.png',
+            // This marker is 20 pixels wide by 32 pixels high.
+            size: new google.maps.Size(20, 20),
+            // The origin for this image is (0, 0).
+            origin: new google.maps.Point(0, 0),
+            // The anchor for this image is the base of the flagpole at (0, 32).
+            anchor: new google.maps.Point(0, 20)
+        }
+
+        const flightPlanCoordinates = [
+            {lat: 54.7032843540163, lng: 25.2913247925164},
+            {lat: 54.7011951570853, lng: 25.3239404541375},
+            {lat: 54.7162923278114, lng: 25.3202006080902}
+        ]
+
+        flightPlanCoordinates.forEach((value, index) => {
+            let icon = flag
+
+            if (index === 2) {
+                icon = person
+            }
+            const marker = new google.maps.Marker({
+                position: value,
+                map: this.map,
+                icon: icon,
+                shape: {
+                    coords: [1, 1, 1, 20, 18, 20, 18, 1],
+                    type: 'poly'
+                },
+                title: 'Cia buvo Aurimas'
+            })
+        })
+
+        const flightPath = new google.maps.Polyline({
+            path: flightPlanCoordinates,
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.3,
+            strokeWeight: 2,
+            icons: [{
+                icon: {
+                    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW
+                },
+                offset: '100%'
+            }]
+        })
+        flightPath.setMap(this.map)
         return this
     }
 

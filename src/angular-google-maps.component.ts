@@ -54,10 +54,10 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
     }
 
     @Output() circleOptions: CircleOptions = {
-        strokeColor: '#FF0000',
+        strokeColor: '#448aff',
         strokeOpacity: 0.8,
         strokeWeight: 2,
-        fillColor: '#FF0000',
+        fillColor: '#448aff',
         fillOpacity: 0.35,
         editable: true,
         radius: 70
