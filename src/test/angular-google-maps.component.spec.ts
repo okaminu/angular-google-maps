@@ -51,7 +51,7 @@ describe('AngularGoogleMapsComponent', () => {
                 },
                 {
                     provide: EventPublisher,
-                    useValue: createSpyObj('EvenPublisher', ['subscribe', 'notify', 'unsubscribe', 'unsubscribeAll'])
+                    useValue: createSpyObj('EvenPublisher', ['subscribe', 'notify', 'unsubscribeAll'])
                 },
                 {provide: IconRegistry, useValue: createSpyObj('IconRegistry', ['register'])}
             ]
@@ -71,26 +71,15 @@ describe('AngularGoogleMapsComponent', () => {
 
         component.ngOnInit()
 
-        expect(iconRegistrySpy.register).toHaveBeenCalledTimes(2)
-    })
-
-    it('notifies component loaded state', () => {
-        component.ngOnInit()
-
-        expect(eventPublisherSpy.notify).toHaveBeenCalledWith('googleMapsComponentLoaded')
+        expect(iconRegistrySpy.register).toHaveBeenCalledTimes(1)
     })
 
     it('unsubscribes on destroy', () => {
-        jasmine.addCustomEqualityTester(((first: Function, second: Function) => first.toString() === second.toString()))
         component.ngOnInit()
 
         component.ngOnDestroy()
 
         expect(eventPublisherSpy.unsubscribeAll).toHaveBeenCalledWith('addressReverseGeocoded')
-        expect(eventPublisherSpy.unsubscribe)
-            .toHaveBeenCalledWith('googleMapsExpanded', subscribers.get('googleMapsExpanded'))
-        expect(eventPublisherSpy.unsubscribe)
-            .toHaveBeenCalledWith('googleMapsCollapsed', subscribers.get('googleMapsCollapsed'))
     })
 
     describe('Loading Google Maps', () => {
@@ -177,48 +166,10 @@ describe('AngularGoogleMapsComponent', () => {
         expect(component.address).toEqual(address)
     })
 
-    describe('Resizing Google Maps', () => {
+    it('notifies map resize', () => {
+        component.notifyMapResize()
 
-        beforeEach(() => eventPublisherSpy.notify.and.callFake((e: string) => {
-            const fun = subscribers.get(e)
-            if (fun) fun()
-        }))
-
-        it('expands map', () => {
-            component.ngOnInit()
-
-            component.resizeMap()
-
-            expect(component.isMapExpanded).toBeTruthy()
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith('googleMapsExpanded')
-        })
-
-        it('expands map on event', () => {
-            component.ngOnInit()
-
-            subscribers.get('googleMapsExpanded')()
-
-            expect(component.isMapExpanded).toBeTruthy()
-        })
-
-        it('collapses map', () => {
-            component.ngOnInit()
-
-            component.resizeMap()
-            component.resizeMap()
-
-            expect(component.isMapExpanded).toBeFalsy()
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith('googleMapsCollapsed')
-        })
-
-        it('collapses map on event', () => {
-            component.ngOnInit()
-            subscribers.get('googleMapsExpanded')()
-
-            subscribers.get('googleMapsCollapsed')()
-
-            expect(component.isMapExpanded).toBeFalsy()
-        })
+        expect(eventPublisherSpy.notify).toHaveBeenCalledWith('mapResized')
     })
 
 })

@@ -18,8 +18,7 @@ import MarkerOptions = google.maps.MarkerOptions
                placeholder="{{mapsText.searchBox}}"
                [ngModelOptions]="{standalone: true}"
                [(ngModel)]="address"/>
-        <mat-icon id="resize-control" svgIcon="{{!isMapExpanded ? 'expand' : 'collapse'}}"
-                  (click)="resizeMap()"></mat-icon>
+        <mat-icon id="resize-control" svgIcon="resize" (click)="notifyMapResize()"></mat-icon>
 
         <div id="map"></div>`,
     providers: [AngularGoogleMapsBuilder]
@@ -28,7 +27,6 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
 
     mapsText = mapsText
     address = ''
-    isMapExpanded = false
 
     @Output() mapOptions: MapOptions = {
         center: {
@@ -63,9 +61,6 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         radius: 70
     }
 
-    private expandMap = () => this.isMapExpanded = true
-    private collapseMap = () => this.isMapExpanded = false
-
     constructor(private googleMapsFactory: GoogleMapsFactory,
                 private googleMapsBuilder: AngularGoogleMapsBuilder,
                 private googleMapsGeocoder: AngularGoogleMapsGeocoder,
@@ -75,17 +70,11 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.eventPublisher.subscribe('addressReverseGeocoded', (address: string) => this.address = address)
-        this.eventPublisher.subscribe('googleMapsExpanded', this.expandMap)
-        this.eventPublisher.subscribe('googleMapsCollapsed', this.collapseMap)
-        this.eventPublisher.notify('googleMapsComponentLoaded')
-        this.iconRegistry.register('expand', './assets/expand.svg')
-        this.iconRegistry.register('collapse', './assets/collapse.svg')
+        this.iconRegistry.register('resize', './assets/expand.svg')
     }
 
     ngOnDestroy() {
         this.eventPublisher.unsubscribeAll('addressReverseGeocoded')
-        this.eventPublisher.unsubscribe('googleMapsExpanded', this.expandMap)
-        this.eventPublisher.unsubscribe('googleMapsCollapsed', this.collapseMap)
     }
 
     createMapByLocation(focusLocation: Location) {
@@ -116,11 +105,8 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         )
     }
 
-    resizeMap() {
-        if (!this.isMapExpanded)
-            this.eventPublisher.notify('googleMapsExpanded')
-        else
-            this.eventPublisher.notify('googleMapsCollapsed')
+    notifyMapResize() {
+        this.eventPublisher.notify('mapResized')
     }
 
     private changeMapCenter(coordinates: Coordinates) {
