@@ -71,7 +71,7 @@ describe('AngularGoogleMapsComponent', () => {
 
         component.ngOnInit()
 
-        expect(iconRegistrySpy.register).toHaveBeenCalledTimes(1)
+        expect(iconRegistrySpy.register).toHaveBeenCalledTimes(2)
     })
 
     it('unsubscribes on destroy', () => {
