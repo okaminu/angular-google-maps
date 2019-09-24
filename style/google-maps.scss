@@ -9,7 +9,7 @@ google-maps {
     height: 100%
   }
 
-  #resize-control {
+  mat-icon.resize-control {
     position: absolute;
 
     top: 0;
@@ -20,6 +20,15 @@ google-maps {
     margin: 0.3em;
     padding: 0;
     background-color: white;
+
+    &.expand {
+      display: block;
+    }
+
+    &.collapse {
+      display: none;
+    }
+
   }
 
   #search-input {

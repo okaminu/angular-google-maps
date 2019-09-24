@@ -18,7 +18,8 @@ import MarkerOptions = google.maps.MarkerOptions
                placeholder="{{mapsText.searchBox}}"
                [ngModelOptions]="{standalone: true}"
                [(ngModel)]="address"/>
-        <mat-icon id="resize-control" svgIcon="resize" (click)="notifyMapResize()"></mat-icon>
+        <mat-icon class="resize-control expand" svgIcon="expand" (click)="notifyMapResize()"></mat-icon>
+        <mat-icon class="resize-control collapse" svgIcon="collapse" (click)="notifyMapResize()"></mat-icon>
 
         <div id="map"></div>`,
     providers: [AngularGoogleMapsBuilder]
@@ -70,7 +71,8 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.eventPublisher.subscribe('addressReverseGeocoded', (address: string) => this.address = address)
-        this.iconRegistry.register('resize', './assets/expand.svg')
+        this.iconRegistry.register('expand', './assets/expand.svg')
+        this.iconRegistry.register('collapse', './assets/collapse.svg')
     }
 
     ngOnDestroy() {
