@@ -6,7 +6,6 @@ import { Location } from './location'
 import { AngularGoogleMapsBuilder } from './service/angular-google-maps-builder.service'
 import { AngularGoogleMapsGeocoder } from './service/angular-google-maps-geocoder.service'
 import { GoogleMapsFactory } from './service/google-maps-factory.service'
-import { IconRegistry } from './service/icon-registry/icon-registry'
 import CircleOptions = google.maps.CircleOptions
 import MapOptions = google.maps.MapOptions
 import MarkerOptions = google.maps.MarkerOptions
@@ -18,9 +17,6 @@ import MarkerOptions = google.maps.MarkerOptions
                placeholder="{{mapsText.searchBox}}"
                [ngModelOptions]="{standalone: true}"
                [(ngModel)]="address"/>
-        <mat-icon class="resize-control expand" svgIcon="expand" (click)="notifyMapResize()"></mat-icon>
-        <mat-icon class="resize-control collapse" svgIcon="collapse" (click)="notifyMapResize()"></mat-icon>
-
         <div id="map"></div>`,
     providers: [AngularGoogleMapsBuilder]
 })
@@ -65,14 +61,11 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
     constructor(private googleMapsFactory: GoogleMapsFactory,
                 private googleMapsBuilder: AngularGoogleMapsBuilder,
                 private googleMapsGeocoder: AngularGoogleMapsGeocoder,
-                private eventPublisher: EventPublisher,
-                private iconRegistry: IconRegistry) {
+                private eventPublisher: EventPublisher) {
     }
 
     ngOnInit() {
         this.eventPublisher.subscribe('addressReverseGeocoded', (address: string) => this.address = address)
-        this.iconRegistry.register('expand', './assets/expand.svg')
-        this.iconRegistry.register('collapse', './assets/collapse.svg')
     }
 
     ngOnDestroy() {
@@ -105,10 +98,6 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
                     .addSearchBox()
             }
         )
-    }
-
-    notifyMapResize() {
-        this.eventPublisher.notify('mapResized')
     }
 
     private changeMapCenter(coordinates: Coordinates) {
