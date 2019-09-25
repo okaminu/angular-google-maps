@@ -18,8 +18,8 @@ import MarkerOptions = google.maps.MarkerOptions
                placeholder="{{mapsText.searchBox}}"
                [ngModelOptions]="{standalone: true}"
                [(ngModel)]="address"/>
-        <mat-icon class="resize-control expand" svgIcon="expand" (click)="notifyMapResize()"></mat-icon>
-        <mat-icon class="resize-control collapse" svgIcon="collapse" (click)="notifyMapResize()"></mat-icon>
+        <mat-icon id="expand-icon" class="resize-control" svgIcon="expand" (click)="notifyMapResize()"></mat-icon>
+        <mat-icon id="collapse-icon" class="resize-control" svgIcon="collapse" (click)="notifyMapResize()"></mat-icon>
 
         <div id="map"></div>`,
     providers: [AngularGoogleMapsBuilder]

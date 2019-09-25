@@ -21,11 +21,11 @@ google-maps {
     padding: 0;
     background-color: white;
 
-    &.expand {
+    &#expand-icon {
       display: block;
     }
 
-    &.collapse {
+    &#collapse-icon {
       display: none;
     }
 
