@@ -9,6 +9,28 @@ google-maps {
     height: 100%
   }
 
+  mat-icon.resize-control {
+    position: absolute;
+
+    top: 0;
+    right: 0;
+
+    z-index: 1;
+
+    margin: 0.3em;
+    padding: 0;
+    background-color: white;
+
+    &.expand {
+      display: block;
+    }
+
+    &.collapse {
+      display: none;
+    }
+
+  }
+
   #search-input {
     position: absolute;
     width: 80%;

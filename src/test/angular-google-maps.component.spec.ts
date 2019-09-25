@@ -6,6 +6,7 @@ import { Location } from '../location'
 import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder.service'
 import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocoder.service'
 import { GoogleMapsFactory } from '../service/google-maps-factory.service'
+import { IconRegistry } from '../service/icon-registry/icon-registry'
 import any = jasmine.any
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
@@ -15,6 +16,7 @@ describe('AngularGoogleMapsComponent', () => {
     let component: AngularGoogleMapsComponent
 
     let eventPublisherSpy: SpyObj<EventPublisher>
+    let iconRegistrySpy: SpyObj<IconRegistry>
     let googleMapsBuilderSpy: SpyObj<AngularGoogleMapsBuilder>
     let geocoderSpy: SpyObj<AngularGoogleMapsGeocoder>
     let googleMapsFactory: SpyObj<GoogleMapsFactory>
@@ -43,18 +45,33 @@ describe('AngularGoogleMapsComponent', () => {
                     provide: AngularGoogleMapsGeocoder,
                     useValue: createSpyObj('AngularGoogleMapsGeocoder', ['reverseGeocode', 'geocode'])
                 },
-                {provide: GoogleMapsFactory, useValue: createSpyObj('GoogleMapsFactory', ['getGoogleMaps'])},
-                {provide: EventPublisher, useValue: createSpyObj('EvenPublisher', ['subscribe', 'unsubscribeAll'])}
+                {
+                    provide: GoogleMapsFactory,
+                    useValue: createSpyObj('GoogleMapsFactory', ['getGoogleMaps'])
+                },
+                {
+                    provide: EventPublisher,
+                    useValue: createSpyObj('EvenPublisher', ['subscribe', 'notify', 'unsubscribeAll'])
+                },
+                {provide: IconRegistry, useValue: createSpyObj('IconRegistry', ['register'])}
             ]
         })
         eventPublisherSpy = TestBed.get(EventPublisher)
-        eventPublisherSpy.subscribe.and.callFake((id, cb) => subscribers.set(id, cb))
+        eventPublisherSpy.subscribe.and.callFake((e, fun) => subscribers.set(e, fun))
         googleMapsBuilderSpy = TestBed.get(AngularGoogleMapsBuilder)
         geocoderSpy = TestBed.get(AngularGoogleMapsGeocoder)
         googleMapsFactory = TestBed.get(GoogleMapsFactory)
         googleMapsFactory.getGoogleMaps.and.returnValue(googleMapsStub)
 
         component = TestBed.get(AngularGoogleMapsComponent)
+    })
+
+    it('registers an icon', () => {
+        iconRegistrySpy = TestBed.get(IconRegistry)
+
+        component.ngOnInit()
+
+        expect(iconRegistrySpy.register).toHaveBeenCalledTimes(2)
     })
 
     it('unsubscribes on destroy', () => {
@@ -147,6 +164,12 @@ describe('AngularGoogleMapsComponent', () => {
         subscribers.get('addressReverseGeocoded')(address)
 
         expect(component.address).toEqual(address)
+    })
+
+    it('notifies map resize', () => {
+        component.notifyMapResize()
+
+        expect(eventPublisherSpy.notify).toHaveBeenCalledWith('mapResized')
     })
 
 })
