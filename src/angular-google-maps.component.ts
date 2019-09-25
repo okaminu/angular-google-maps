@@ -108,7 +108,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
     }
 
     notifyMapResize() {
-        this.eventPublisher.notify('mapResized')
+        this.eventPublisher.notify('resizeMap')
     }
 
     private changeMapCenter(coordinates: Coordinates) {

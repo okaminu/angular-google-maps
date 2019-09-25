@@ -166,10 +166,10 @@ describe('AngularGoogleMapsComponent', () => {
         expect(component.address).toEqual(address)
     })
 
-    it('notifies map resize', () => {
+    it('fires map resize event', () => {
         component.notifyMapResize()
 
-        expect(eventPublisherSpy.notify).toHaveBeenCalledWith('mapResized')
+        expect(eventPublisherSpy.notify).toHaveBeenCalledWith('resizeMap')
     })
 
 })
