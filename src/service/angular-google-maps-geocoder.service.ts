@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { Coordinates } from '../coordinates'
+import { Coordinates } from '../value-object/coordinates'
 import { GoogleMapsFactory } from './google-maps-factory.service'
 
 @Injectable()

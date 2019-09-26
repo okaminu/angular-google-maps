@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing'
-import { Coordinates } from '../coordinates'
 import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocoder.service'
 import { GoogleMapsFactory } from '../service/google-maps-factory.service'
+import { Coordinates } from '../value-object/coordinates'
 import createSpy = jasmine.createSpy
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
