@@ -21,8 +21,6 @@ describe('AngularGoogleMapsComponent', () => {
     let geocoderSpy: SpyObj<AngularGoogleMapsGeocoder>
     let googleMapsFactory: SpyObj<GoogleMapsFactory>
 
-    let subscribers: Map<string, Function>
-
     const location = new Location(new Coordinates(10, 20), 70)
     const googleMapsStub = {
         Animation: {DROP: ''},
@@ -30,8 +28,6 @@ describe('AngularGoogleMapsComponent', () => {
     }
 
     beforeEach(() => {
-        subscribers = new Map<string, Function>()
-
         TestBed.configureTestingModule({
             providers: [AngularGoogleMapsComponent,
                 {
@@ -57,7 +53,6 @@ describe('AngularGoogleMapsComponent', () => {
             ]
         })
         eventPublisherSpy = TestBed.get(EventPublisher)
-        eventPublisherSpy.subscribe.and.callFake((e, fun) => subscribers.set(e, fun))
         googleMapsBuilderSpy = TestBed.get(AngularGoogleMapsBuilder)
         geocoderSpy = TestBed.get(AngularGoogleMapsGeocoder)
         googleMapsFactory = TestBed.get(GoogleMapsFactory)
@@ -159,6 +154,8 @@ describe('AngularGoogleMapsComponent', () => {
 
     it('sets address from broadcast event', () => {
         const address = 'Some address'
+        const subscribers = new Map<string, Function>()
+        eventPublisherSpy.subscribe.and.callFake((e, fun) => subscribers.set(e, fun))
         component.ngOnInit()
 
         subscribers.get('addressReverseGeocoded')(address)
