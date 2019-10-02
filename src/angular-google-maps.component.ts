@@ -70,15 +70,15 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
 
     @Output() polylineOptions: PolylineOptions = {
         geodesic: true,
-        strokeOpacity: 0.4,
-        strokeWeight: 2
+        strokeOpacity: 0.8,
+        strokeWeight: 1
     }
 
     @Output() previousMarkerIcon: Icon = {
         url: 'http://cdn.boldadmin.com.s3-website-eu-west-1.amazonaws.com/previous-marker.png',
-        size: this.googleMapsFactory.createSize(10, 10),
+        size: this.googleMapsFactory.createSize(5, 5),
         origin: this.googleMapsFactory.createPoint(0, 0),
-        anchor: this.googleMapsFactory.createPoint(5, 5)
+        anchor: this.googleMapsFactory.createPoint(2, 3)
     }
 
     @Output() currentMarkerIcon: Icon = {
