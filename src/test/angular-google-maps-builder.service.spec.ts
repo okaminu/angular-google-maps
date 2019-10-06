@@ -234,27 +234,6 @@ describe('AngularGoogleMapsBuilder', () => {
                     expect(eventPublisherSpy.notify).toHaveBeenCalledWith(any(String), 'address')
                 })
 
-                it('deletes marker with it`s circle', () => {
-                    getCallsByInvokedParameter(markerSpy.addListener.calls.all(), 'dblclick')[0].args[1]()
-
-                    expect(markerSpy.setMap).toHaveBeenCalledWith(null)
-                    expect(circleSpy.setMap).toHaveBeenCalledWith(null)
-                })
-
-                it('deleted marker fires location deleted event', () => {
-                    getCallsByInvokedParameter(markerSpy.addListener.calls.all(), 'dblclick')[1].args[1]()
-
-                    expect(eventPublisherSpy.notify).toHaveBeenCalledWith('locationDeleted')
-                })
-
-                it('deleted marker clears search box input', () => {
-                    const elementSpy: SpyObj<HTMLInputElement> = createSpyObj('HTMLInputElement', [''])
-                    mapsFactorySpy.getSearchBoxInput.and.returnValue(elementSpy)
-
-                    getCallsByInvokedParameter(markerSpy.addListener.calls.all(), 'dblclick')[2].args[1]()
-
-                    expect(elementSpy.value).toEqual('')
-                })
             })
 
             describe('Invoked marker dragend listener handler without circle', () => {
