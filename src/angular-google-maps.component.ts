@@ -13,15 +13,7 @@ import MarkerOptions = google.maps.MarkerOptions
 
 @Component({
     selector: 'google-maps',
-    template: `
-        <input id="search-input" name="searchBox" class="controls" type="text"
-               placeholder="{{mapsText.searchBox}}"
-               [ngModelOptions]="{standalone: true}"
-               [(ngModel)]="address"/>
-        <mat-icon id="expand-icon" class="resize-control" svgIcon="expand" (click)="notifyMapResize()"></mat-icon>
-        <mat-icon id="collapse-icon" class="resize-control" svgIcon="collapse" (click)="notifyMapResize()"></mat-icon>
-
-        <div id="map"></div>`,
+    templateUrl: 'angular-google-maps.html',
     providers: [AngularGoogleMapsBuilder]
 })
 export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
