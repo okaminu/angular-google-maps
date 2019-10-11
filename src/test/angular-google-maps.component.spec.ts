@@ -69,6 +69,12 @@ describe('AngularGoogleMapsComponent', () => {
         expect(iconRegistrySpy.register).toHaveBeenCalledTimes(2)
     })
 
+    it('subscribes on init', () => {
+        component.ngOnInit()
+
+        expect(eventPublisherSpy.subscribe).toHaveBeenCalledWith('addressReverseGeocoded', jasmine.any(Function))
+    })
+
     it('unsubscribes on destroy', () => {
         component.ngOnInit()
 
