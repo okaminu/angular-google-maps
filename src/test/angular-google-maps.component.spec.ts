@@ -8,6 +8,7 @@ import { IconRegistry } from '../service/icon-registry/icon-registry'
 import { Coordinates } from '../value-object/coordinates'
 import { Location } from '../value-object/location'
 import { TimestampCoordinates } from '../value-object/timestamp-coordinates'
+import LatLng = google.maps.LatLng
 import any = jasmine.any
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
@@ -27,13 +28,6 @@ describe('AngularGoogleMapsComponent', () => {
     const googleMapsStub = {
         Animation: {DROP: ''},
         ControlPosition: {LEFT_BOTTOM: 'position'}
-    }
-    const latLng = {
-        lat: (): number => 1,
-        lng: (): number => 2,
-        equals : (): boolean => true,
-        toUrlValue : (): string => '',
-        toJSON : () => ({ lat: 1, lng: 2 }),
     }
 
     beforeEach(() => {
@@ -202,9 +196,19 @@ describe('AngularGoogleMapsComponent', () => {
 
     describe('Travel path', () => {
 
-        it('does not add marker when no coordinates are given', () => {
-            component.ngOnInit()
+        const latLng: LatLng = {
+            lat: (): number => 1,
+            lng: (): number => 2,
+            equals : (): boolean => true,
+            toUrlValue : (): string => '',
+            toJSON : () => ({ lat: 1, lng: 2 }),
+        }
 
+        beforeEach(() => {
+            component.ngOnInit()
+        })
+
+        it('does not add marker when no coordinates are given', () => {
             component.addTravelPath([], '')
 
             expect(googleMapsBuilderSpy.addMarker).not.toHaveBeenCalled()
@@ -212,10 +216,7 @@ describe('AngularGoogleMapsComponent', () => {
 
 
         it('adds current icon for last coordinates', () => {
-            component.ngOnInit()
-
-            const coordinates = new TimestampCoordinates(new Coordinates(1, 2), 0)
-            component.addTravelPath([coordinates], '')
+            component.addTravelPath([(new TimestampCoordinates(new Coordinates(1, 2), 0))], '')
 
             expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalledWith(
                 jasmine.objectContaining({
@@ -225,9 +226,8 @@ describe('AngularGoogleMapsComponent', () => {
         })
 
         it('adds previous icon for past coordinates', () => {
-            component.ngOnInit()
-
             const coordinates = new TimestampCoordinates(new Coordinates(1, 2), 0)
+
             component.addTravelPath([coordinates, coordinates], '')
 
             expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalledTimes(2)
@@ -238,11 +238,8 @@ describe('AngularGoogleMapsComponent', () => {
             )
         })
 
-        it('marker title consists of name and formatted timestamp', () => {
-            component.ngOnInit()
-
-            const coordinates = new TimestampCoordinates(new Coordinates(1, 2), 1234567)
-            component.addTravelPath([coordinates], 'john')
+        it('adds name and formatted timestamp to title', () => {
+            component.addTravelPath([(new TimestampCoordinates(new Coordinates(1, 2), 1234567))], 'john')
 
             expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalledWith(
                 jasmine.objectContaining({
@@ -251,20 +248,17 @@ describe('AngularGoogleMapsComponent', () => {
             )
         })
 
-        it('marker position matches given coordinates', () => {
-            component.ngOnInit()
+        it('matches given coordinates for marker position', () => {
             googleMapsFactory.createLatLng.withArgs(new Coordinates(1, 2)).and.returnValue(latLng)
 
-            const coordinates = new TimestampCoordinates(new Coordinates(1, 2), 0)
-            component.addTravelPath([coordinates], '')
+            component.addTravelPath([(new TimestampCoordinates(new Coordinates(1, 2), 0))], '')
 
             expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalledWith(
                 jasmine.objectContaining({ position: latLng })
             )
         })
 
-        it('polyline for given coordinates', () => {
-            component.ngOnInit()
+        it('sets polyline for given coordinates', () => {
             googleMapsFactory.createLatLng.withArgs(new Coordinates(1, 1)).and.returnValue(latLng)
 
             const coordinates = new TimestampCoordinates(new Coordinates(1, 1), 0)
@@ -273,6 +267,15 @@ describe('AngularGoogleMapsComponent', () => {
             expect(googleMapsBuilderSpy.addPolyline).toHaveBeenCalledWith(
                 jasmine.objectContaining({ path: [latLng, latLng] })
             )
+        })
+
+        it('sets polyline color from color code', () => {
+            googleMapsFactory.createLatLng.withArgs(new Coordinates(1, 1)).and.returnValue(latLng)
+
+            component.addTravelPath([(new TimestampCoordinates(new Coordinates(1, 1), 0))], '')
+
+            const colorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
+            expect(googleMapsBuilderSpy.addPolyline.calls.mostRecent().args[0].strokeColor).toMatch(colorRegex)
         })
     })
 })
