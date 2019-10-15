@@ -14,19 +14,10 @@ import Icon = google.maps.Icon
 import LatLng = google.maps.LatLng
 import MapOptions = google.maps.MapOptions
 import MarkerOptions = google.maps.MarkerOptions
-import PolylineOptions = google.maps.PolylineOptions
 
 @Component({
     selector: 'google-maps',
-    template: `
-        <input id="search-input" name="searchBox" class="controls" type="text"
-               placeholder="{{mapsText.searchBox}}"
-               [ngModelOptions]="{standalone: true}"
-               [(ngModel)]="address"/>
-        <mat-icon id="resize-control" svgIcon="{{!isMapExpanded ? 'expand' : 'collapse'}}"
-                  (click)="resizeMap()"></mat-icon>
-
-        <div id="map"></div>`,
+    templateUrl: './angular-google-maps.component.html',
     providers: [AngularGoogleMapsBuilder]
 })
 export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
@@ -68,31 +59,12 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         radius: 70
     }
 
-    @Output() polylineOptions: PolylineOptions = {
-        geodesic: true,
-        strokeOpacity: 0.8,
-        strokeWeight: 1
-    }
-
     @Output() previousMarkerIcon: Icon = {
-        url: 'http://cdn.boldadmin.com.s3-website-eu-west-1.amazonaws.com/previous-marker.png',
-        size: this.googleMapsFactory.createSize(5, 5),
-        origin: this.googleMapsFactory.createPoint(0, 0),
-        anchor: this.googleMapsFactory.createPoint(2, 3)
+        url: 'http://cdn.boldadmin.com.s3-website-eu-west-1.amazonaws.com/previous-marker.png'
     }
 
     @Output() currentMarkerIcon: Icon = {
-        url: 'http://cdn.boldadmin.com.s3-website-eu-west-1.amazonaws.com/current-marker.png',
-        size: this.googleMapsFactory.createSize(20, 33),
-        origin: this.googleMapsFactory.createPoint(0, 0),
-        anchor: this.googleMapsFactory.createPoint(10, 23)
-    }
-
-    @Output() pathMarkerOptions: MarkerOptions = {
-        shape: {
-            coords: [1, 1, 1, 20, 18, 20, 18, 1],
-            type: 'poly'
-        }
+        url: 'http://cdn.boldadmin.com.s3-website-eu-west-1.amazonaws.com/current-marker.png'
     }
 
     constructor(private googleMapsFactory: GoogleMapsFactory,
@@ -114,7 +86,6 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
 
     createMapByLocation(focusLocation: Location) {
         this.googleMapsGeocoder.reverseGeocode(focusLocation.coordinates, (address: string) => this.address = address)
-
         this.circleOptions.radius = focusLocation.radiusInMeters
         this.changeMapCenter(focusLocation.coordinates)
         this.googleMapsBuilder
@@ -149,40 +120,31 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
     }
 
     addTravelPath(timestampCoordinatesList: Array<TimestampCoordinates>, name: string) {
-        timestampCoordinatesList.forEach((timestampCoordinates, index) => {
+        timestampCoordinatesList.forEach((timestampCoordinates: TimestampCoordinates, index: number) => {
             const icon = index === 0 ? this.currentMarkerIcon : this.previousMarkerIcon
-            const time = moment.utc(timestampCoordinates.timestamp).format('YYYY.MM.DD' + ' HH:mm')
-            this.addMarker(this.toLatLng(timestampCoordinates.coordinates), `Name: ${name}, Time: ${time}`, icon)
+            const dateTime = moment.utc(timestampCoordinates.timestamp).format('YYYY.MM.DD HH:mm')
+            this.googleMapsBuilder.addMarker({
+                position: this.googleMapsFactory.createLatLng(timestampCoordinates.coordinates),
+                title: `Name: ${name}, Time: ${dateTime}`,
+                icon: icon
+            })
         })
 
-        this.addPolyline(this.toLatLngs(timestampCoordinatesList), '#' + Math.random().toString(16).substr(2, 6))
-    }
-
-    private toLatLngs(coordinates: Array<TimestampCoordinates>) {
-        return coordinates.map((value) => this.googleMapsFactory.createLatLng(value.coordinates))
-    }
-
-    private toLatLng(coordinates: Coordinates) {
-        return this.googleMapsFactory.createLatLng(coordinates)
-    }
-
-    private addMarker(coordinates: LatLng, title: string, icon: Icon) {
-        this.pathMarkerOptions.position = coordinates
-        this.pathMarkerOptions.title = title
-        this.pathMarkerOptions.icon = icon
-        this.googleMapsBuilder.addMarker(this.pathMarkerOptions)
+        const latLngs = timestampCoordinatesList.map((value) => this.googleMapsFactory.createLatLng(value.coordinates))
+        this.addPolyline(latLngs, '#' + Math.random().toString(16).substr(2, 6))
     }
 
     private addPolyline(path: Array<LatLng>, colorCode: string) {
-        this.polylineOptions.path = path
-        this.polylineOptions.strokeColor = colorCode
-        this.googleMapsBuilder.addPolyline(this.polylineOptions)
+        this.googleMapsBuilder.addPolyline({
+            geodesic: true,
+            strokeOpacity: 0.8,
+            strokeWeight: 1,
+            path: path,
+            strokeColor: colorCode
+        })
     }
 
     private changeMapCenter(coordinates: Coordinates) {
-        this.mapOptions.center = {
-            lat: coordinates.latitude,
-            lng: coordinates.longitude
-        }
+        this.mapOptions.center = {lat: coordinates.latitude, lng: coordinates.longitude}
     }
 }

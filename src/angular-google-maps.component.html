@@ -1,0 +1,8 @@
+<input id="search-input" name="searchBox" class="controls" type="text"
+       placeholder="{{mapsText.searchBox}}"
+       [ngModelOptions]="{standalone: true}"
+       [(ngModel)]="address"/>
+<mat-icon id="resize-control" svgIcon="{{!isMapExpanded ? 'expand' : 'collapse'}}"
+          (click)="resizeMap()"></mat-icon>
+
+<div id="map"></div>
