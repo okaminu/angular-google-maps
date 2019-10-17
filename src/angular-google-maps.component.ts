@@ -130,7 +130,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
             })
         })
 
-        const latLngs = timestampCoordinatesList.map((value) => this.googleMapsFactory.createLatLng(value.coordinates))
+        const latLngs = timestampCoordinatesList.map(value => this.googleMapsFactory.createLatLng(value.coordinates))
         this.addPolyline(latLngs, '#' + Math.random().toString(16).substr(2, 6))
     }
 
