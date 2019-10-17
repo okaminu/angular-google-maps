@@ -17,7 +17,7 @@ import MarkerOptions = google.maps.MarkerOptions
 
 @Component({
     selector: 'google-maps',
-    templateUrl: './angular-google-maps.component.html',
+    templateUrl: './angular-google-maps.html',
     providers: [AngularGoogleMapsBuilder]
 })
 export class AngularGoogleMapsComponent implements OnInit, OnDestroy {

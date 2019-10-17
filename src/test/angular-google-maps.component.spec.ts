@@ -274,7 +274,7 @@ describe('AngularGoogleMapsComponent', () => {
 
             component.addTravelPath([(new TimestampCoordinates(new Coordinates(1, 1), 0))], '')
 
-            const colorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
+            const colorRegex = /^#([A-Fa-f0-9]{3,6})$/
             expect(googleMapsBuilderSpy.addPolyline.calls.mostRecent().args[0].strokeColor).toMatch(colorRegex)
         })
     })
