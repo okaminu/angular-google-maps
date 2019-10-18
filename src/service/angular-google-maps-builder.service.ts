@@ -79,9 +79,6 @@ export class AngularGoogleMapsBuilder {
     private addMarkerListeners() {
         this.marker.addListener('dragend', () => this.notifyLocationChange())
         this.marker.addListener('dragend', mouseEvent => this.reverseGeocode(mouseEvent))
-        this.marker.addListener('dblclick', () => { this.hideMarker(); this.hideCircle() })
-        this.marker.addListener('dblclick', () => this.eventPublisher.notify('locationDeleted'))
-        this.marker.addListener('dblclick', () => this.googleMaps.getSearchBoxInput().value = '')
         this.map.addListener('click', mouseEvent => this.changeMarkerLocation(mouseEvent.latLng))
         this.map.addListener('click', () => this.notifyLocationChange())
         this.map.addListener('click', mouseEvent => this.reverseGeocode(mouseEvent))
