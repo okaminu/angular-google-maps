@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { Coordinates } from '../coordinates'
+import { Coordinates } from '../value-object/coordinates'
 import Circle = google.maps.Circle
 import CircleOptions = google.maps.CircleOptions
 import Geocoder = google.maps.Geocoder
@@ -9,6 +9,8 @@ import MapOptions = google.maps.MapOptions
 import Marker = google.maps.Marker
 import MarkerOptions = google.maps.MarkerOptions
 import SearchBox = google.maps.places.SearchBox
+import Polyline = google.maps.Polyline
+import PolylineOptions = google.maps.PolylineOptions
 
 @Injectable()
 export class GoogleMapsFactory {
@@ -29,6 +31,10 @@ export class GoogleMapsFactory {
         return new google.maps.Marker(options)
     }
 
+    createPolyline(options: PolylineOptions): Polyline {
+        return new google.maps.Polyline(options)
+    }
+
     createSearchBox(): SearchBox {
         return new google.maps.places.SearchBox(<HTMLInputElement>document.getElementById('search-input'))
     }
@@ -43,6 +49,14 @@ export class GoogleMapsFactory {
 
     getSearchBoxInput() {
         return <HTMLInputElement>document.getElementById('search-input')
+    }
+
+    createSize(width: number, height: number) {
+        return new google.maps.Size(width, height)
+    }
+
+    createPoint(x: number, y: number) {
+        return new google.maps.Point(x, y)
     }
 
 }

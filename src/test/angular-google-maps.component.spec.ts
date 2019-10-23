@@ -1,12 +1,14 @@
 import { TestBed } from '@angular/core/testing'
 import { EventPublisher } from '@boldadmin/event-publisher'
 import { AngularGoogleMapsComponent } from '../angular-google-maps.component'
-import { Coordinates } from '../coordinates'
-import { Location } from '../location'
 import { AngularGoogleMapsBuilder } from '../service/angular-google-maps-builder.service'
 import { AngularGoogleMapsGeocoder } from '../service/angular-google-maps-geocoder.service'
 import { GoogleMapsFactory } from '../service/google-maps-factory.service'
 import { IconRegistry } from '../service/icon-registry/icon-registry'
+import { Coordinates } from '../value-object/coordinates'
+import { Location } from '../value-object/location'
+import { TimestampCoordinates } from '../value-object/timestamp-coordinates'
+import LatLng = google.maps.LatLng
 import any = jasmine.any
 import createSpyObj = jasmine.createSpyObj
 import SpyObj = jasmine.SpyObj
@@ -21,7 +23,6 @@ describe('AngularGoogleMapsComponent', () => {
     let geocoderSpy: SpyObj<AngularGoogleMapsGeocoder>
     let googleMapsFactory: SpyObj<GoogleMapsFactory>
 
-    const subscribers = new Map<string, Function>()
     const location = new Location(new Coordinates(10, 20), 70)
     const googleMapsStub = {
         Animation: {DROP: ''},
@@ -34,8 +35,8 @@ describe('AngularGoogleMapsComponent', () => {
                 {
                     provide: AngularGoogleMapsBuilder,
                     useValue: createSpyObj('AngularGoogleMapsBuilder',
-                        ['createMap', 'addMarker', 'addCircle', 'hideMarker', 'hideCircle', 'bindCircleToMarker',
-                            'addSearchBox', 'build']
+                        ['createMap', 'addCenterMarker', 'addCircle', 'hideMarker', 'hideCircle', 'bindCircleToMarker',
+                            'addSearchBox', 'build', 'addMarker', 'addPolyline']
                     )
                 },
                 {
@@ -44,7 +45,10 @@ describe('AngularGoogleMapsComponent', () => {
                 },
                 {
                     provide: GoogleMapsFactory,
-                    useValue: createSpyObj('GoogleMapsFactory', ['getGoogleMaps'])
+                    useValue: createSpyObj(
+                        'GoogleMapsFactory',
+                        ['getGoogleMaps', 'createSize', 'createPoint', 'createLatLng']
+                    )
                 },
                 {
                     provide: EventPublisher,
@@ -54,7 +58,6 @@ describe('AngularGoogleMapsComponent', () => {
             ]
         })
         eventPublisherSpy = TestBed.get(EventPublisher)
-        eventPublisherSpy.subscribe.and.callFake((e, fun) => subscribers.set(e, fun))
         googleMapsBuilderSpy = TestBed.get(AngularGoogleMapsBuilder)
         geocoderSpy = TestBed.get(AngularGoogleMapsGeocoder)
         googleMapsFactory = TestBed.get(GoogleMapsFactory)
@@ -71,13 +74,15 @@ describe('AngularGoogleMapsComponent', () => {
         expect(iconRegistrySpy.register).toHaveBeenCalledTimes(2)
     })
 
-    it('subscribes setup functions', () => {
+    it('subscribes on init', () => {
         component.ngOnInit()
 
-        expect(eventPublisherSpy.subscribe).toHaveBeenCalledWith('addressReverseGeocoded', any(Function))
+        expect(eventPublisherSpy.subscribe).toHaveBeenCalledWith('addressReverseGeocoded', jasmine.any(Function))
     })
 
     it('unsubscribes on destroy', () => {
+        component.ngOnInit()
+
         component.ngOnDestroy()
 
         expect(eventPublisherSpy.unsubscribeAll).toHaveBeenCalledWith('addressReverseGeocoded')
@@ -87,7 +92,7 @@ describe('AngularGoogleMapsComponent', () => {
 
         beforeEach(() => {
             googleMapsBuilderSpy.createMap.and.returnValue(googleMapsBuilderSpy)
-            googleMapsBuilderSpy.addMarker.and.returnValue(googleMapsBuilderSpy)
+            googleMapsBuilderSpy.addCenterMarker.and.returnValue(googleMapsBuilderSpy)
             googleMapsBuilderSpy.addCircle.and.returnValue(googleMapsBuilderSpy)
             googleMapsBuilderSpy.bindCircleToMarker.and.returnValue(googleMapsBuilderSpy)
             googleMapsBuilderSpy.hideCircle.and.returnValue(googleMapsBuilderSpy)
@@ -111,7 +116,7 @@ describe('AngularGoogleMapsComponent', () => {
                         position: 'position'
                     }
                 }))
-            expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalled()
+            expect(googleMapsBuilderSpy.addCenterMarker).toHaveBeenCalled()
             expect(googleMapsBuilderSpy.addCircle).toHaveBeenCalled()
             expect(googleMapsBuilderSpy.bindCircleToMarker).toHaveBeenCalled()
             expect(googleMapsBuilderSpy.addSearchBox).toHaveBeenCalled()
@@ -148,7 +153,7 @@ describe('AngularGoogleMapsComponent', () => {
                         position: 'position'
                     }
                 }))
-            expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalled()
+            expect(googleMapsBuilderSpy.addCenterMarker).toHaveBeenCalled()
             expect(googleMapsBuilderSpy.addCircle).toHaveBeenCalled()
             expect(googleMapsBuilderSpy.bindCircleToMarker).toHaveBeenCalled()
             expect(googleMapsBuilderSpy.hideMarker).toHaveBeenCalled()
@@ -160,6 +165,8 @@ describe('AngularGoogleMapsComponent', () => {
 
     it('sets address from broadcast event', () => {
         const address = 'Some address'
+        const subscribers = new Map<string, Function>()
+        eventPublisherSpy.subscribe.and.callFake((e, fun) => subscribers.set(e, fun))
         component.ngOnInit()
 
         subscribers.get('addressReverseGeocoded')(address)
@@ -167,26 +174,94 @@ describe('AngularGoogleMapsComponent', () => {
         expect(component.address).toEqual(address)
     })
 
-    describe('Resizes Google Maps', () => {
+    it('fires map resize event', () => {
+        component.notifyMapResize()
 
-        it('expands map', () => {
-            component.ngOnInit()
-
-            component.resizeMap()
-
-            expect(component.isMapExpanded).toBeTruthy()
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith('googleMapsExpanded')
-        })
-
-        it('collapses map', () => {
-            component.ngOnInit()
-
-            component.resizeMap()
-            component.resizeMap()
-
-            expect(component.isMapExpanded).toBeFalsy()
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith('googleMapsCollapsed')
-        })
+        expect(eventPublisherSpy.notify).toHaveBeenCalledWith('resizeMap')
     })
 
+    describe('Travel path', () => {
+
+        const latLng: LatLng = {
+            lat: (): number => 1,
+            lng: (): number => 2,
+            equals : (): boolean => true,
+            toUrlValue : (): string => '',
+            toJSON : () => ({ lat: 1, lng: 2 }),
+        }
+
+        beforeEach(() => {
+            component.ngOnInit()
+        })
+
+        it('does not add marker when no coordinates are given', () => {
+            component.addTravelPath([], '')
+
+            expect(googleMapsBuilderSpy.addMarker).not.toHaveBeenCalled()
+        })
+
+
+        it('adds current icon for last coordinates', () => {
+            component.addTravelPath([(new TimestampCoordinates(new Coordinates(1, 2), 0))], '')
+
+            expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalledWith(
+                jasmine.objectContaining({
+                    icon: component.currentMarkerIcon
+                })
+            )
+        })
+
+        it('adds previous icon for past coordinates', () => {
+            const coordinates = new TimestampCoordinates(new Coordinates(1, 2), 0)
+
+            component.addTravelPath([coordinates, coordinates], '')
+
+            expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalledTimes(2)
+            expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalledWith(
+                jasmine.objectContaining({
+                    icon: component.previousMarkerIcon
+                })
+            )
+        })
+
+        it('adds name and formatted timestamp to title', () => {
+            component.addTravelPath([(new TimestampCoordinates(new Coordinates(1, 2), 1234567))], 'john')
+
+            expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalledWith(
+                jasmine.objectContaining({
+                    title: 'Name: john, Time: 1970.01.01 00:20'
+                })
+            )
+        })
+
+        it('matches given coordinates for marker position', () => {
+            googleMapsFactory.createLatLng.withArgs(new Coordinates(1, 2)).and.returnValue(latLng)
+
+            component.addTravelPath([(new TimestampCoordinates(new Coordinates(1, 2), 0))], '')
+
+            expect(googleMapsBuilderSpy.addMarker).toHaveBeenCalledWith(
+                jasmine.objectContaining({ position: latLng })
+            )
+        })
+
+        it('sets polyline for given coordinates', () => {
+            googleMapsFactory.createLatLng.withArgs(new Coordinates(1, 1)).and.returnValue(latLng)
+
+            const coordinates = new TimestampCoordinates(new Coordinates(1, 1), 0)
+            component.addTravelPath([coordinates, coordinates], '')
+
+            expect(googleMapsBuilderSpy.addPolyline).toHaveBeenCalledWith(
+                jasmine.objectContaining({ path: [latLng, latLng] })
+            )
+        })
+
+        it('sets polyline color from color code', () => {
+            googleMapsFactory.createLatLng.withArgs(new Coordinates(1, 1)).and.returnValue(latLng)
+
+            component.addTravelPath([(new TimestampCoordinates(new Coordinates(1, 1), 0))], '')
+
+            const colorRegex = /^#([A-Fa-f0-9]{3,6})$/
+            expect(googleMapsBuilderSpy.addPolyline.calls.mostRecent().args[0].strokeColor).toMatch(colorRegex)
+        })
+    })
 })
