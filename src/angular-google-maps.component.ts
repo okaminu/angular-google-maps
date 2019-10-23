@@ -17,14 +17,13 @@ import MarkerOptions = google.maps.MarkerOptions
 
 @Component({
     selector: 'google-maps',
-    templateUrl: './angular-google-maps.html',
+    templateUrl: 'angular-google-maps.html',
     providers: [AngularGoogleMapsBuilder]
 })
 export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
 
     mapsText = mapsText
     address = ''
-    isMapExpanded = false
 
     @Output() mapOptions: MapOptions = {
         center: {
@@ -35,7 +34,7 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
             mapTypeIds: ['roadmap', 'satellite'],
             position: this.googleMapsFactory.getGoogleMaps().ControlPosition.LEFT_BOTTOM
         },
-        zoom: 10,
+        zoom: 16,
         controlSize: 22,
         fullscreenControl: false
     }
@@ -111,12 +110,8 @@ export class AngularGoogleMapsComponent implements OnInit, OnDestroy {
         )
     }
 
-    resizeMap() {
-        this.isMapExpanded = !this.isMapExpanded
-        if (this.isMapExpanded)
-            this.eventPublisher.notify('googleMapsExpanded')
-        else
-            this.eventPublisher.notify('googleMapsCollapsed')
+    notifyMapResize() {
+        this.eventPublisher.notify('resizeMap')
     }
 
     addTravelPath(timestampCoordinatesList: Array<TimestampCoordinates>, name: string) {

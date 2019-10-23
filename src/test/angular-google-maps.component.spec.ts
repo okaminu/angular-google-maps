@@ -23,7 +23,6 @@ describe('AngularGoogleMapsComponent', () => {
     let geocoderSpy: SpyObj<AngularGoogleMapsGeocoder>
     let googleMapsFactory: SpyObj<GoogleMapsFactory>
 
-    const subscribers = new Map<string, Function>()
     const location = new Location(new Coordinates(10, 20), 70)
     const googleMapsStub = {
         Animation: {DROP: ''},
@@ -59,7 +58,6 @@ describe('AngularGoogleMapsComponent', () => {
             ]
         })
         eventPublisherSpy = TestBed.get(EventPublisher)
-        eventPublisherSpy.subscribe.and.callFake((e, fun) => subscribers.set(e, fun))
         googleMapsBuilderSpy = TestBed.get(AngularGoogleMapsBuilder)
         geocoderSpy = TestBed.get(AngularGoogleMapsGeocoder)
         googleMapsFactory = TestBed.get(GoogleMapsFactory)
@@ -76,13 +74,15 @@ describe('AngularGoogleMapsComponent', () => {
         expect(iconRegistrySpy.register).toHaveBeenCalledTimes(2)
     })
 
-    it('subscribes setup functions', () => {
+    it('subscribes on init', () => {
         component.ngOnInit()
 
-        expect(eventPublisherSpy.subscribe).toHaveBeenCalledWith('addressReverseGeocoded', any(Function))
+        expect(eventPublisherSpy.subscribe).toHaveBeenCalledWith('addressReverseGeocoded', jasmine.any(Function))
     })
 
     it('unsubscribes on destroy', () => {
+        component.ngOnInit()
+
         component.ngOnDestroy()
 
         expect(eventPublisherSpy.unsubscribeAll).toHaveBeenCalledWith('addressReverseGeocoded')
@@ -165,6 +165,8 @@ describe('AngularGoogleMapsComponent', () => {
 
     it('sets address from broadcast event', () => {
         const address = 'Some address'
+        const subscribers = new Map<string, Function>()
+        eventPublisherSpy.subscribe.and.callFake((e, fun) => subscribers.set(e, fun))
         component.ngOnInit()
 
         subscribers.get('addressReverseGeocoded')(address)
@@ -172,26 +174,10 @@ describe('AngularGoogleMapsComponent', () => {
         expect(component.address).toEqual(address)
     })
 
-    describe('Resizes Google Maps', () => {
+    it('fires map resize event', () => {
+        component.notifyMapResize()
 
-        it('expands map', () => {
-            component.ngOnInit()
-
-            component.resizeMap()
-
-            expect(component.isMapExpanded).toBeTruthy()
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith('googleMapsExpanded')
-        })
-
-        it('collapses map', () => {
-            component.ngOnInit()
-
-            component.resizeMap()
-            component.resizeMap()
-
-            expect(component.isMapExpanded).toBeFalsy()
-            expect(eventPublisherSpy.notify).toHaveBeenCalledWith('googleMapsCollapsed')
-        })
+        expect(eventPublisherSpy.notify).toHaveBeenCalledWith('resizeMap')
     })
 
     describe('Travel path', () => {
